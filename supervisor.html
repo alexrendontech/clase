@@ -3,377 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Supervisión App</title>
+    <title>Panel de Supervisión Profesional</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="email-service.js"></script>
     <style>
         :root {
-            --primary: #6366f1; /* Indigo moderno */
-            --primary-dark: #4f46e5;
-            --bg-app: #f3f4f6;
-            --card-bg: #ffffff;
-            --text-main: #1f2937;
-            --text-light: #6b7280;
+            --primary: #4f46e5;
+            --primary-light: #eef2ff;
             --success: #10b981;
             --warning: #f59e0b;
-            --border: #e5e7eb;
-            --safe-area-top: env(safe-area-inset-top);
-            --safe-area-bottom: env(safe-area-inset-bottom);
+            --danger: #ef4444;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --safe-top: env(safe-area-inset-top);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent; /* Quita el flash azul al tocar en Android */
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-app);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
             color: var(--text-main);
-            line-height: 1.5;
-            padding-bottom: calc(80px + var(--safe-area-bottom)); /* Espacio para scroll final */
+            padding-top: var(--safe-top);
+            user-select: none; /* Evita selección accidental al tocar */
         }
 
-        /* --- Header tipo App Bar --- */
-        .topbar {
+        /* Header estilo App Nativa */
+        .app-header {
             background: var(--card-bg);
-            padding: calc(15px + var(--safe-area-top)) 20px 15px 20px;
+            padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .brand h1 {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .logout-btn-mini {
-            background: #fee2e2;
-            color: #991b1b;
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        /* --- Tabs Navegación --- */
-        .tabs-container {
-            background: var(--card-bg);
-            padding: 0 15px;
-            position: sticky;
-            top: calc(60px + var(--safe-area-top)); /* Se pega debajo del header */
-            z-index: 999;
             border-bottom: 1px solid var(--border);
-            overflow-x: auto;
-            white-space: nowrap;
-            -webkit-overflow-scrolling: touch; /* Scroll suave en iOS/Android */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .brand-info h1 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .status-pill {
             display: flex;
-            gap: 20px;
-        }
-
-        /* Ocultar scrollbar de tabs */
-        .tabs-container::-webkit-scrollbar { display: none; }
-
-        .tab {
-            padding: 15px 5px;
-            background: none;
-            border: none;
-            color: var(--text-light);
-            font-size: 14px;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
             font-weight: 600;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .tab.active {
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: var(--primary-light);
             color: var(--primary);
         }
 
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: var(--primary);
-            border-radius: 3px 3px 0 0;
+        .status-online { color: var(--success); }
+        .status-offline { color: var(--warning); }
+
+        /* Tabs de navegación */
+        .nav-tabs {
+            display: flex;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .nav-tabs::-webkit-scrollbar { display: none; }
+
+        .tab-item {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 3px solid transparent;
+            transition: 0.2s;
         }
 
-        .tab-badge {
-            background: var(--warning);
-            color: white;
-            padding: 1px 6px;
-            border-radius: 10px;
-            font-size: 10px;
-            vertical-align: top;
-            margin-left: 2px;
+        .tab-item.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
         }
 
-        /* --- Contenedor Principal --- */
-        .container {
-            padding: 20px 15px;
-            max-width: 100%;
-        }
+        /* Contenedor de Cards */
+        .content-area { padding: 16px; }
 
         .reprog-card {
             background: var(--card-bg);
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 16px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 16px;
             border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--bg-app);
+            margin-bottom: 12px;
         }
 
-        .card-info h3 {
-            font-size: 16px;
+        .user-tag {
             font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .date-tag {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Formulario táctil */
+        .input-group {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--primary);
             margin-bottom: 4px;
         }
 
-        .card-meta {
-            font-size: 12px;
-            color: var(--text-light);
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .status-badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .badge-pending { background: #fef3c7; color: #92400e; }
-        .badge-answered { background: #d1fae5; color: #065f46; }
-
-        /* --- Transformación de Tabla a Cards para Móvil --- */
-        .mobile-table-wrapper {
-            margin-top: 10px;
-        }
-
-        /* En Desktop se ve tabla normal, en móvil cambiamos */
-        @media (max-width: 768px) {
-            .data-table, .data-table thead, .data-table tbody, .data-table th, .data-table td, .data-table tr {
-                display: block;
-            }
-
-            .data-table thead { display: none; } /* Ocultar encabezados de tabla */
-
-            .data-table tr {
-                background: #fff;
-                border: 1px solid var(--border);
-                border-radius: 8px;
-                margin-bottom: 15px;
-                padding: 15px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            }
-
-            .data-table td {
-                padding: 8px 0;
-                border: none;
-                border-bottom: 1px solid #f3f4f6;
-                position: relative;
-                padding-left: 0;
-                text-align: left;
-                display: flex;
-                flex-direction: column;
-            }
-
-            .data-table td:last-child { border-bottom: none; }
-
-            /* Estilo especial para los campos editables */
-            .td-editable-primary {
-                background: #fdfeff;
-                padding: 10px !important;
-                border: 1px solid #e0e7ff !important;
-                border-radius: 8px;
-                margin-bottom: 8px;
-            }
-
-            .label-mobile {
-                font-size: 11px;
-                text-transform: uppercase;
-                color: var(--text-light);
-                font-weight: 700;
-                margin-bottom: 4px;
-                display: block;
-            }
-
-            .value-mobile {
-                font-size: 14px;
-                color: var(--text-main);
-                font-weight: 500;
-            }
-
-            /* Inputs grandes para dedos */
-            .editable-cell input[type="date"], 
-            .editable-cell textarea {
-                width: 100%;
-                padding: 12px;
-                border: 1px solid #d1d5db;
-                border-radius: 8px;
-                font-size: 16px; /* Evita zoom automático en iOS */
-                background: white;
-                min-height: 44px; /* Altura mínima táctil */
-            }
-
-            .editable-cell textarea {
-                min-height: 80px;
-            }
-
-            .editable-cell input:focus,
-            .editable-cell textarea:focus {
-                border-color: var(--primary);
-                outline: none;
-                box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-            }
-        }
-
-        /* --- Botones --- */
-        .btn {
+        .input-group input, .input-group textarea {
             width: 100%;
-            padding: 14px;
             border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
+            background: transparent;
+            font-size: 1rem;
+            color: var(--text-main);
+            outline: none;
+            font-family: inherit;
+        }
+
+        .btn-send {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-top: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            transition: transform 0.1s;
+            gap: 10px;
         }
 
-        .btn:active { transform: scale(0.98); }
+        .btn-send:active { opacity: 0.8; transform: scale(0.98); }
 
-        .btn-success { background: var(--success); color: white; margin-top: 15px; }
-        .btn-primary { background: var(--primary); color: white; }
-
-        /* --- Alertas y Loaders --- */
-        .alert {
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            display: none;
+        /* Alertas flotantes nativas */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 20px;
+            right: 20px;
+            background: #334155;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            display: flex;
             align-items: center;
             gap: 10px;
-            animation: slideIn 0.3s ease;
+            transform: translateY(100px);
+            transition: 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            z-index: 2000;
+            font-size: 0.9rem;
         }
-        .alert.show { display: flex; }
-        .alert-success { background: #d1fae5; color: #065f46; }
-        .alert-error { background: #fee2e2; color: #991b1b; }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .loader { display: none; text-align: center; padding: 40px; }
-        .loader.active { display: block; }
-        .spinner {
-            border: 3px solid #f3f4f6;
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 15px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Estado vacío */
-        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-light); }
-        .empty-icon { font-size: 48px; margin-bottom: 15px; opacity: 0.3; }
-
+        .toast.show { transform: translateY(0); }
     </style>
 </head>
 <body>
 
-    <div class="topbar">
-        <div class="brand">
-            <i class="fas fa-tasks" style="color: var(--primary); font-size: 20px;"></i>
+    <div class="app-header">
+        <div class="brand-info">
             <h1>Supervisión</h1>
-        </div>
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <div style="text-align: right;">
-                <div style="font-size: 12px; font-weight: 600;" id="userName">...</div>
-                <div style="font-size: 10px; color: var(--text-light);">Supervisor</div>
+            <div id="connectionStatus" class="status-pill">
+                <i class="fas fa-circle status-online"></i>
+                <span id="statusText">Conectado</span>
             </div>
-            <button class="logout-btn-mini" onclick="cerrarSesion()">
-                <i class="fas fa-sign-out-alt"></i>
-            </button>
         </div>
-    </div>
-
-    <div class="tabs-container">
-        <button class="tab active" data-tab="pendientes">
-            Pendientes <span class="tab-badge" id="pendingBadge">0</span>
-        </button>
-        <button class="tab" data-tab="respondidas">
-            Respondidas
-        </button>
-        <button class="tab" data-tab="todas">
-            Todas
+        <button onclick="cerrarSesion()" style="border:none; background:none; font-size: 1.2rem; color: var(--danger);">
+            <i class="fas fa-sign-out-alt"></i>
         </button>
     </div>
 
-    <div class="container">
-        <div class="alert alert-success" id="successAlert">
-            <i class="fas fa-check-circle"></i>
-            <span id="successMsg"></span>
-        </div>
-        <div class="alert alert-error" id="errorAlert">
-            <i class="fas fa-exclamation-circle"></i>
-            <span id="errorMsg"></span>
-        </div>
-
-        <div class="loader active" id="loader">
-            <div class="spinner"></div>
-            <div style="color: var(--text-light); font-size: 13px;">Sincronizando...</div>
-        </div>
-
-        <div id="reprogContainer"></div>
+    <div class="nav-tabs">
+        <div class="tab-item active" onclick="cambiarTab(this, 'pendientes')">Pendientes</div>
+        <div class="tab-item" onclick="cambiarTab(this, 'respondidas')">Completas</div>
+        <div class="tab-item" onclick="cambiarTab(this, 'todas')">Historial</div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <div class="content-area" id="mainList">
+        <div style="text-align:center; padding: 40px;">
+            <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--primary);"></i>
+        </div>
+    </div>
+
+    <div id="customToast" class="toast">
+        <i class="fas fa-info-circle"></i>
+        <span id="toastMsg">Mensaje</span>
+    </div>
+
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getDatabase, ref, get, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getDatabase, ref, get, update, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyBDRqsZI8EQaGn1lCc4Y5rIcfmLE7969zY",
@@ -382,264 +235,173 @@
             projectId: "reprogramacionesme",
             storageBucket: "reprogramacionesme.firebasestorage.app",
             messagingSenderId: "674035461204",
-            appId: "1:674035461204:web:a70b7793f71ae1c5e311c1",
-            measurementId: "G-T4VJ4EQKNT"
+            appId: "1:674035461204:web:a70b7793f71ae1c5e311c1"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        let currentUser = null;
-        let todasReprogramaciones = [];
-        let tabActual = 'pendientes';
-        let datosEditados = {};
+        let userSession = null;
+        let activeTab = 'pendientes';
+        let allData = [];
+        let isOnline = true;
 
-        // Autenticación
-        onAuthStateChanged(auth, async (user) => {
+        // --- GESTIÓN DE ESTADO ONLINE/OFFLINE ---
+        const connectedRef = ref(db, '.info/connected');
+        onValue(connectedRef, (snap) => {
+            const statusIcon = document.querySelector('.status-pill i');
+            const statusText = document.getElementById('statusText');
+            if (snap.val() === true) {
+                isOnline = true;
+                statusIcon.className = "fas fa-circle status-online";
+                statusText.innerText = "Conectado";
+            } else {
+                isOnline = false;
+                statusIcon.className = "fas fa-circle status-offline";
+                statusText.innerText = "Modo Local";
+            }
+        });
+
+        onAuthStateChanged(auth, (user) => {
             if (user) {
-                currentUser = user;
-                await cargarDatosUsuario();
-                cargarReprogramaciones();
+                userSession = user;
+                loadData();
             } else {
                 window.location.href = 'login.html';
             }
         });
 
-        async function cargarDatosUsuario() {
+        async function loadData() {
             try {
-                const userRef = ref(db, `usuarios/${currentUser.uid}`);
-                const snapshot = await get(userRef);
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    document.getElementById('userName').textContent = data.nombre.split(' ')[0]; // Solo primer nombre para móvil
-                }
-            } catch (e) { console.error(e); }
-        }
-
-        async function cargarReprogramaciones() {
-            const loader = document.getElementById('loader');
-            try {
-                const meses = obtenerUltimosMeses(3);
-                const promesas = meses.map(async mes => {
-                    const snapshot = await get(ref(db, `reprogramaciones/${mes}`));
-                    if (snapshot.exists()) {
-                        const data = snapshot.val();
-                        return Object.entries(data)
-                            .filter(([_, r]) => r.supervisorId === currentUser.uid)
-                            .map(([id, r]) => ({ id, mes, ...r }));
-                    }
-                    return [];
-                });
-
-                const resultados = await Promise.all(promesas);
-                todasReprogramaciones = resultsFlat(resultados).sort((a, b) => new Date(b.fechaSubida) - new Date(a.fechaSubida));
+                const meses = obtenerMeses(3);
+                const results = await Promise.all(meses.map(async m => {
+                    const s = await get(ref(db, `reprogramaciones/${m}`));
+                    return s.exists() ? Object.entries(s.val()).map(([id, val]) => ({ id, mes: m, ...val })) : [];
+                }));
                 
-                loader.classList.remove('active');
-                actualizarBadge();
-                mostrarReprogramaciones();
-            } catch (error) {
-                console.error(error);
-                loader.classList.remove('active');
-                mostrarAlerta('error', 'Error de conexión');
+                allData = results.flat().filter(r => r.supervisorId === userSession.uid);
+                renderList();
+            } catch (e) {
+                showToast("Error al cargar datos");
             }
         }
 
-        function resultsFlat(arr) {
-            return arr.reduce((acc, val) => acc.concat(val), []);
-        }
+        function renderList() {
+            const container = document.getElementById('mainList');
+            let filtered = allData;
+            if (activeTab === 'pendientes') filtered = allData.filter(r => r.estado === 'pendiente');
+            if (activeTab === 'respondidas') filtered = allData.filter(r => r.estado === 'respondida');
 
-        function actualizarBadge() {
-            const pendientes = todasReprogramaciones.filter(r => r.estado === 'pendiente').length;
-            document.getElementById('pendingBadge').textContent = pendientes;
-            document.getElementById('pendingBadge').style.display = pendientes > 0 ? 'inline-block' : 'none';
-        }
-
-        function mostrarReprogramaciones() {
-            let filtradas = todasReprogramaciones;
-            if (tabActual === 'pendientes') filtradas = todasReprogramaciones.filter(r => r.estado === 'pendiente');
-            else if (tabActual === 'respondidas') filtradas = todasReprogramaciones.filter(r => r.estado === 'respondida');
-
-            const container = document.getElementById('reprogContainer');
-            
-            if (filtradas.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon"><i class="fas fa-box-open"></i></div>
-                        <div class="empty-text">No hay tareas en esta sección</div>
-                    </div>`;
+            if (filtered.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:50px; color:var(--text-muted);">
+                    <i class="fas fa-folder-open" style="font-size:3rem; opacity:0.2;"></i>
+                    <p style="margin-top:10px;">No hay registros</p>
+                </div>`;
                 return;
             }
 
-            // Mostrar max 10 por rendimiento en móviles
-            const maxItems = 10;
-            const mostrar = filtradas.slice(0, maxItems);
-            
-            let html = mostrar.map(reprog => crearCardReprog(reprog)).join('');
-            
-            if(filtradas.length > maxItems) {
-                html += `<div style="text-align:center; padding: 20px; color: #999; font-size: 12px;">Mostrando ${maxItems} de ${filtradas.length}</div>`;
-            }
-
-            container.innerHTML = html;
-        }
-
-        function crearCardReprog(reprog) {
-            const fecha = new Date(reprog.fechaSubida).toLocaleDateString('es-CO', {day:'2-digit', month:'short'});
-            const estadoClass = reprog.estado === 'respondida' ? 'badge-answered' : 'badge-pending';
-            const estadoTexto = reprog.estado === 'respondida' ? 'LISTO' : 'PENDIENTE';
-
-            // Inicializar datos editables
-            if (!datosEditados[reprog.id] && reprog.estado === 'pendiente') {
-                datosEditados[reprog.id] = (reprog.datosExcel || []).map(row => ({
-                    ...row,
-                    'FECHA REPROGRAMACION': row['FECHA REPROGRAMACION'] || '',
-                    'OBSERVACION': row['OBSERVACION'] || ''
-                }));
-            }
-
-            const datos = reprog.estado === 'pendiente' ? datosEditados[reprog.id] : reprog.datosExcel;
-            const datosMuestra = datos.slice(0, 50); // Límite de renderizado móvil
-
-            let contentHTML = '';
-
-            if (reprog.estado === 'pendiente') {
-                contentHTML = `
-                    <div class="mobile-table-wrapper">
-                        <div class="data-table">
-                            ${datosMuestra.map((row, idx) => `
-                                <div>
-                                    <div class="td-editable-primary">
-                                        <span class="label-mobile" style="color:var(--primary);">📅 Nueva Fecha</span>
-                                        <div class="editable-cell">
-                                            <input type="date" 
-                                                value="${row['FECHA REPROGRAMACION'] || ''}"
-                                                onchange="window.actualizarDato('${reprog.id}', ${idx}, 'FECHA REPROGRAMACION', this.value)">
-                                        </div>
-                                    </div>
-                                    <div class="td-editable-primary">
-                                        <span class="label-mobile" style="color:var(--primary);">📝 Observación</span>
-                                        <div class="editable-cell">
-                                            <textarea placeholder="Escribe aquí..."
-                                                onchange="window.actualizarDato('${reprog.id}', ${idx}, 'OBSERVACION', this.value)">${row['OBSERVACION'] || ''}</textarea>
-                                        </div>
-                                    </div>
-                                    
-                                    <div style="padding: 0 5px;">
-                                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                                            <div><span class="label-mobile">Promotor</span><span class="value-mobile">${row['NOMBRE PROMOTOR'] || '-'}</span></div>
-                                            <div style="text-align:right;"><span class="label-mobile">AID</span><span class="value-mobile">${row['AID PROMOTOR'] || '-'}</span></div>
-                                        </div>
-                                        <div style="margin-bottom:5px;"><span class="label-mobile">Punto de Venta</span><span class="value-mobile">${row['NOMBRE PUNTO DE VENTA'] || '-'}</span></div>
-                                        <div style="display:flex; justify-content:space-between;">
-                                            <div><span class="label-mobile">Ciudad</span><span class="value-mobile">${row['CIUDAD PV'] || '-'}</span></div>
-                                            <div style="text-align:right;"><span class="label-mobile">Fecha Original</span><span class="value-mobile">${row['FECHA'] || '-'}</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <hr style="border:0; border-top:1px dashed #e5e7eb; margin:15px 0;">
-                            `).join('')}
-                        </div>
-                        <button class="btn btn-success" onclick="window.guardar('${reprog.mes}', '${reprog.id}')">
-                            <i class="fas fa-paper-plane"></i> ENVIAR RESPUESTA
-                        </button>
-                    </div>
-                `;
-            } else {
-                contentHTML = `<div style="padding:15px; text-align:center; color:var(--success); background:#f0fdf4; border-radius:8px; margin-top:10px;">
-                    <i class="fas fa-check-circle"></i> Reprogramación completada
-                </div>`;
-            }
-
-            return `
+            container.innerHTML = filtered.map(item => `
                 <div class="reprog-card">
                     <div class="card-header">
-                        <div class="card-info">
-                            <h3>${reprog.auxiliarNombre}</h3>
-                            <div class="card-meta">
-                                <span><i class="far fa-calendar"></i> ${fecha}</span>
-                                <span><i class="fas fa-file-alt"></i> ${reprog.datosExcel?.length || 0} registros</span>
-                            </div>
-                        </div>
-                        <span class="status-badge ${estadoClass}">${estadoTexto}</span>
+                        <span class="user-tag">${item.auxiliarNombre}</span>
+                        <span class="date-tag">${new Date(item.fechaSubida).toLocaleDateString()}</span>
                     </div>
-                    ${contentHTML}
+                    
+                    ${item.estado === 'pendiente' ? `
+                        <div class="input-group">
+                            <label>Nueva Fecha de Reprogramación</label>
+                            <input type="date" id="date-${item.id}" value="${item.datosExcel[0]['FECHA REPROGRAMACION'] || ''}">
+                        </div>
+                        <div class="input-group">
+                            <label>Observación del Supervisor</label>
+                            <textarea id="obs-${item.id}" rows="2" placeholder="Escribe aquí...">${item.datosExcel[0]['OBSERVACION'] || ''}</textarea>
+                        </div>
+                        <button class="btn-send" onclick="guardarGestion('${item.mes}', '${item.id}')">
+                            <i class="fas fa-cloud-upload-alt"></i> GUARDAR GESTIÓN
+                        </button>
+                    ` : `
+                        <div style="background:#f0fdf4; padding:10px; border-radius:10px; color:#166534; font-size:0.85rem;">
+                            <i class="fas fa-check-circle"></i> Gestionado el ${new Date(item.fechaRespuesta).toLocaleDateString()}
+                        </div>
+                    `}
                 </div>
-            `;
+            `).join('');
         }
 
-        // Funciones globales para el HTML
-        window.actualizarDato = (id, idx, campo, valor) => {
-            if(datosEditados[id]) datosEditados[id][idx][campo] = valor;
-        };
+        // --- LÓGICA DE GUARDADO ROBUSTA ---
+        window.guardarGestion = async (mes, id) => {
+            const dateVal = document.getElementById(`date-${id}`).value;
+            const obsVal = document.getElementById(`obs-${id}`).value;
 
-        window.guardar = async (mes, id) => {
-            if(!confirm('¿Estás seguro de enviar esta respuesta? No podrás editarla después.')) return;
-            
-            const btn = document.querySelector(`button[onclick*="${id}"]`);
-            if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...'; }
+            if (!dateVal) return showToast("La fecha es obligatoria");
+
+            const btn = event.currentTarget;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Sincronizando...`;
 
             try {
-                const datos = datosEditados[id];
-                const fechaRespuesta = new Date().toISOString();
-                
-                await update(ref(db, `reprogramaciones/${mes}/${id}`), {
+                const item = allData.find(r => r.id === id);
+                const nuevosDatos = [...item.datosExcel];
+                nuevosDatos[0]['FECHA REPROGRAMACION'] = dateVal;
+                nuevosDatos[0]['OBSERVACION'] = obsVal;
+
+                const updates = {
                     estado: 'respondida',
-                    datosExcel: datos,
-                    fechaRespuesta: fechaRespuesta
-                });
+                    datosExcel: nuevosDatos,
+                    fechaRespuesta: new Date().toISOString()
+                };
 
-                // Notificar correo (Opcional: usar la misma lógica de email-service.js si está disponible)
-                try {
-                     const reprog = todasReprogramaciones.find(r => r.id === id);
-                     if(reprog && window.notificarAuxiliarReprogramacionCompletada) {
-                         // Buscar email auxiliar (simplificado)
-                         const auxSnap = await get(ref(db, `usuarios/${reprog.auxiliarId}`));
-                         if(auxSnap.exists()) {
-                             await notificarAuxiliarReprogramacionCompletada({
-                                 auxiliarEmail: auxSnap.val().email,
-                                 auxiliarNombre: auxSnap.val().nombre,
-                                 supervisorNombre: document.getElementById('userName').textContent,
-                                 archivoNombre: reprog.archivoNombre,
-                                 totalRegistros: reprog.totalRegistros,
-                                 fechaRespuesta: fechaRespuesta
-                             });
-                         }
-                     }
-                } catch(e) { console.log('Email error', e); }
+                // Firebase gestionará esto offline si no hay red
+                await update(ref(db, `reprogramaciones/${mes}/${id}`), updates);
 
-                delete datosEditados[id];
-                mostrarAlerta('success', '¡Enviado correctamente!');
-                setTimeout(() => cargarReprogramaciones(), 1500);
+                // Intento de envío de correo (Solo si hay internet)
+                if (isOnline) {
+                    try {
+                        // Aquí llamamos a tu servicio de Brevo
+                        if (window.notificarAuxiliarReprogramacionCompletada) {
+                            // Buscamos el email del auxiliar (asumiendo que está en el registro)
+                            const auxSnap = await get(ref(db, `usuarios/${item.auxiliarId}`));
+                            if (auxSnap.exists()) {
+                                await notificarAuxiliarReprogramacionCompletada({
+                                    auxiliarEmail: auxSnap.val().email,
+                                    auxiliarNombre: item.auxiliarNombre,
+                                    supervisorNombre: userSession.displayName || "Supervisor",
+                                    archivoNombre: item.archivoNombre,
+                                    fechaRespuesta: updates.fechaRespuesta
+                                });
+                            }
+                        }
+                    } catch (mailErr) {
+                        console.log("Error de correo (pero datos guardados):", mailErr);
+                    }
+                }
+
+                showToast(isOnline ? "¡Guardado y Sincronizado!" : "Guardado localmente. Se subirá al tener red.");
+                setTimeout(() => loadData(), 1500);
 
             } catch (error) {
-                console.error(error);
-                mostrarAlerta('error', 'Error al guardar');
-                if(btn) btn.disabled = false;
+                showToast("Error al guardar gestión");
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fas fa-cloud-upload-alt"></i> REINTENTAR`;
             }
         };
 
-        window.mostrarAlerta = (tipo, msg) => {
-            const el = document.getElementById(tipo === 'success' ? 'successAlert' : 'errorAlert');
-            const msgEl = document.getElementById(tipo === 'success' ? 'successMsg' : 'errorMsg');
-            msgEl.textContent = msg;
-            el.classList.add('show');
-            setTimeout(() => el.classList.remove('show'), 3000);
+        window.cambiarTab = (el, tab) => {
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            activeTab = tab;
+            renderList();
         };
 
-        // Tabs Logic
-        document.querySelectorAll('.tab').forEach(t => {
-            t.addEventListener('click', function() {
-                document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-                this.classList.add('active');
-                tabActual = this.dataset.tab;
-                mostrarReprogramaciones();
-            });
-        });
+        function showToast(msg) {
+            const t = document.getElementById('customToast');
+            document.getElementById('toastMsg').innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
 
-        window.cerrarSesion = () => signOut(auth);
-
-        function obtenerUltimosMeses(n) {
+        function obtenerMeses(n) {
             const m = [];
             const d = new Date();
             for(let i=0; i<n; i++) {
@@ -648,6 +410,9 @@
             }
             return m;
         }
+
+        window.cerrarSesion = () => signOut(auth);
+
     </script>
 </body>
 </html>
