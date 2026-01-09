@@ -1,21 +1,19 @@
 /**
- * Servicio de notificaciones por correo - Brevo API
+ * Servicio de notificaciones por correo - Cloudflare Worker Proxy
+ * Usa Cloudflare Workers para proteger la API key de Brevo
  * Plan gratuito: 300 correos/día
  */
 
-const BREVO_API_KEY = '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';
-const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
+const CLOUDFLARE_WORKER_URL = 'https://spring-field-4fe9.mifestereo.workers.dev';
 
 async function enviarCorreo({ to, toName, subject, htmlContent }) {
     try {
         console.log('📧 Intentando enviar correo a:', to);
         
-        const response = await fetch(BREVO_API_URL, {
+        const response = await fetch(CLOUDFLARE_WORKER_URL, {
             method: 'POST',
             headers: {
-                'accept': 'application/json',
-                'api-key': BREVO_API_KEY,
-                'content-type': 'application/json'
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 sender: {
@@ -30,11 +28,11 @@ async function enviarCorreo({ to, toName, subject, htmlContent }) {
 
         const data = await response.json();
         
-        console.log('📨 Respuesta Brevo:', { status: response.status, data });
+        console.log('📨 Respuesta Worker:', { status: response.status, data });
         
         if (!response.ok) {
-            console.error('❌ Error Brevo completo:', JSON.stringify(data, null, 2));
-            throw new Error(data.message || `Error ${response.status}: ${JSON.stringify(data)}`);
+            console.error('❌ Error Worker completo:', JSON.stringify(data, null, 2));
+            throw new Error(data.message || data.error || `Error ${response.status}: ${JSON.stringify(data)}`);
         }
 
         console.log('✅ Correo enviado exitosamente a:', to);
