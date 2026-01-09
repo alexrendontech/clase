@@ -3,230 +3,789 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Panel de Supervisión Profesional</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#8b5cf6">
+    <title>Supervisión</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="email-service.js"></script>
     <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-light: #eef2ff;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --bg-body: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --safe-top: env(safe-area-inset-top);
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+
+        html {
+            /* Prevenir zoom en inputs en iOS */
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+            /* Scroll suave */
+            scroll-behavior: smooth;
+            /* Optimizaciones de rendimiento */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            padding-top: var(--safe-top);
-            user-select: none; /* Evita selección accidental al tocar */
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #f5f5f5;
+            color: #2d3748;
+            line-height: 1.5;
+            overflow-x: hidden;
+            /* Prevenir sobre-scroll */
+            overscroll-behavior: none;
+            /* Safe areas para notch/botones Android */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
         }
 
-        /* Header estilo App Nativa */
-        .app-header {
-            background: var(--card-bg);
-            padding: 16px 20px;
+        /* Optimización de imágenes y contenido */
+        img, video {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Mejorar rendimiento de animaciones */
+        * {
+            will-change: auto;
+        }
+
+        .topbar {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            padding: max(env(safe-area-inset-top), 12px) 16px 12px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 12px;
             position: sticky;
             top: 0;
             z-index: 1000;
-            border-bottom: 1px solid var(--border);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px);
         }
 
-        .brand-info h1 {
-            font-size: 1.1rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
         }
 
-        .status-pill {
+        .brand-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand i {
+            color: white;
+            font-size: 24px;
+        }
+
+        .brand h1 {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .stats-mini {
+            display: flex;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .stat-item {
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 20px;
-            background: var(--primary-light);
-            color: var(--primary);
-        }
-
-        .status-online { color: var(--success); }
-        .status-offline { color: var(--warning); }
-
-        /* Tabs de navegación */
-        .nav-tabs {
-            display: flex;
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border);
-            overflow-x: auto;
-            scrollbar-width: none;
-        }
-        .nav-tabs::-webkit-scrollbar { display: none; }
-
-        .tab-item {
+            font-size: 13px;
+            color: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.1);
+            padding: 6px 10px;
+            border-radius: 8px;
             flex: 1;
-            padding: 14px 10px;
-            text-align: center;
-            font-size: 0.85rem;
+            min-width: 0;
+        }
+
+        .stat-item i {
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .stat-number {
+            font-weight: 700;
+            color: white;
+            background: rgba(255,255,255,0.2);
+            padding: 3px 8px;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .stat-number.pending {
+            background: #fbbf24;
+            color: #78350f;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            background: rgba(255,255,255,0.1);
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+
+        .user-name {
+            font-size: 13px;
             font-weight: 600;
-            color: var(--text-muted);
-            border-bottom: 3px solid transparent;
-            transition: 0.2s;
+            color: white;
         }
 
-        .tab-item.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
+        .user-role {
+            font-size: 11px;
+            color: rgba(255,255,255,0.8);
         }
 
-        /* Contenedor de Cards */
-        .content-area { padding: 16px; }
+        .logout-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            font-size: 13px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            /* Mejor área táctil */
+            min-height: 44px;
+            min-width: 44px;
+        }
+
+        .logout-btn:active {
+            background: rgba(255,255,255,0.25);
+            transform: scale(0.95);
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 16px;
+            padding-bottom: max(env(safe-area-inset-bottom), 16px);
+        }
+
+        .page-header {
+            margin-bottom: 20px;
+        }
+
+        .page-header h2 {
+            font-size: 22px;
+            color: #111827;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding-bottom: 2px;
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            padding: 10px 16px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+            border-radius: 12px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            /* Mejor área táctil */
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab:active {
+            transform: scale(0.95);
+        }
+
+        .tab.active {
+            color: white;
+            background: #8b5cf6;
+            border-color: #8b5cf6;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .tab-badge {
+            background: rgba(251, 191, 36, 0.2);
+            color: #78350f;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .tab.active .tab-badge {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .alert.show {
+            display: flex;
+            animation: slideInDown 0.3s ease;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            border: none;
+            color: #065f46;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            border: none;
+            color: #991b1b;
+        }
 
         .reprog-card {
-            background: var(--card-bg);
+            background: white;
+            border: none;
             border-radius: 16px;
             padding: 16px;
             margin-bottom: 16px;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .reprog-card:active {
+            transform: scale(0.98);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 12px;
+            align-items: flex-start;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f3f4f6;
+            gap: 12px;
         }
 
-        .user-tag {
+        .card-info h3 {
+            font-size: 15px;
+            color: #1f2937;
             font-weight: 700;
-            font-size: 0.95rem;
+            margin-bottom: 6px;
         }
 
-        .date-tag {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        /* Formulario táctil */
-        .input-group {
-            background: #f1f5f9;
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 10px;
-        }
-
-        .input-group label {
-            display: block;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 4px;
-        }
-
-        .input-group input, .input-group textarea {
-            width: 100%;
-            border: none;
-            background: transparent;
-            font-size: 1rem;
-            color: var(--text-main);
-            outline: none;
-            font-family: inherit;
-        }
-
-        .btn-send {
-            width: 100%;
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 1rem;
-            margin-top: 10px;
+        .card-meta {
             display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-answered {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 12px 0;
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .data-table thead {
+            background: #f9fafb;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table th {
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 700;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+            white-space: nowrap;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #1f2937;
+        }
+
+        .data-table tbody tr:active {
+            background: #f9fafb;
+        }
+
+        .editable-cell input,
+        .editable-cell textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s;
+            /* Tamaño mínimo 16px para prevenir zoom en iOS */
+            min-height: 44px;
+        }
+
+        .editable-cell input:focus,
+        .editable-cell textarea:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .editable-cell textarea {
+            min-width: 180px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
+            /* Mejor área táctil */
+            min-height: 48px;
+            width: 100%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .btn-send:active { opacity: 0.8; transform: scale(0.98); }
+        .btn:active {
+            transform: scale(0.95);
+        }
 
-        /* Alertas flotantes nativas */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 20px;
-            right: 20px;
-            background: #334155;
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
             color: white;
-            padding: 12px 20px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transform: translateY(100px);
-            transition: 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            z-index: 2000;
-            font-size: 0.9rem;
         }
-        .toast.show { transform: translateY(0); }
+
+        .btn-primary:disabled {
+            background: #c4b5fd;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .actions-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.4;
+        }
+
+        .empty-text {
+            font-size: 15px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loader.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #8b5cf6;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+            font-size: 13px;
+            color: #1e40af;
+            line-height: 1.6;
+        }
+
+        /* Pull to refresh indicator (opcional) */
+        .pull-to-refresh {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100%);
+            padding: 10px 20px;
+            background: white;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            z-index: 999;
+        }
+
+        .pull-to-refresh.active {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Optimización de rendimiento */
+        .reprog-card,
+        .btn,
+        .tab {
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+
+        /* Scroll suave en contenedores */
+        .table-container,
+        .tabs {
+            scroll-padding: 16px;
+        }
+
+        /* Mejorar legibilidad en móvil */
+        @media (max-width: 768px) {
+            .data-table {
+                font-size: 12px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 10px 8px;
+            }
+
+            .card-meta {
+                flex-direction: column;
+                gap: 6px;
+            }
+        }
+
+        /* Landscape mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .topbar {
+                padding: 8px 16px;
+            }
+
+            .page-header {
+                margin-bottom: 12px;
+            }
+
+            .page-header h2 {
+                font-size: 18px;
+            }
+        }
+
+        /* Prevenir selección de texto en elementos interactivos */
+        .btn,
+        .tab,
+        .logout-btn {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Animación de carga de contenido */
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Skeleton loading (opcional para mejora futura) */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s ease-in-out infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        /* Indicador de conexión offline */
+        .offline-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #dc2626;
+            color: white;
+            padding: 8px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 10000;
+            display: none;
+        }
+
+        .offline-banner.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
+    <!-- Indicador offline -->
+    <div class="offline-banner" id="offlineBanner">
+        <i class="fas fa-wifi-slash"></i> Sin conexión a internet
+    </div>
 
-    <div class="app-header">
-        <div class="brand-info">
-            <h1>Supervisión</h1>
-            <div id="connectionStatus" class="status-pill">
-                <i class="fas fa-circle status-online"></i>
-                <span id="statusText">Conectado</span>
+    <div class="topbar">
+        <div class="brand">
+            <div class="brand-left">
+                <i class="fas fa-tasks"></i>
+                <h1>Supervisión</h1>
+            </div>
+            <div class="brand-left">
+                <i class="fas fa-tasks"></i>
+                <h1>Supervisión</h1>
+            </div>
+            <button class="logout-btn" onclick="cerrarSesion()">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+        <div class="user-section">
+            <div class="stats-mini">
+                <div class="stat-item">
+                    <i class="fas fa-clock"></i>
+                    <span class="stat-number pending" id="pendingCount">0</span>
+                    <span style="font-size: 12px;">Pendientes</span>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span class="stat-number" id="answeredCount">0</span>
+                    <span style="font-size: 12px;">Respondidas</span>
+                </div>
+            </div>
+            <div class="user-info">
+                <i class="fas fa-user-circle" style="font-size: 20px;"></i>
+                <div>
+                    <div class="user-name" id="userName">Cargando...</div>
+                    <div class="user-role">Supervisor</div>
+                </div>
             </div>
         </div>
-        <button onclick="cerrarSesion()" style="border:none; background:none; font-size: 1.2rem; color: var(--danger);">
-            <i class="fas fa-sign-out-alt"></i>
-        </button>
     </div>
 
-    <div class="nav-tabs">
-        <div class="tab-item active" onclick="cambiarTab(this, 'pendientes')">Pendientes</div>
-        <div class="tab-item" onclick="cambiarTab(this, 'respondidas')">Completas</div>
-        <div class="tab-item" onclick="cambiarTab(this, 'todas')">Historial</div>
-    </div>
-
-    <div class="content-area" id="mainList">
-        <div style="text-align:center; padding: 40px;">
-            <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--primary);"></i>
+    <div class="container">
+        <div class="page-header">
+            <h2>Reprogramaciones Recibidas</h2>
+            <p>Completa la fecha y observación para cada registro</p>
         </div>
+
+        <div class="alert alert-success" id="successAlert">
+            <i class="fas fa-check-circle"></i>
+            <span id="successMsg"></span>
+        </div>
+
+        <div class="alert alert-error" id="errorAlert">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="errorMsg"></span>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="pendientes">
+                <i class="fas fa-clock"></i>
+                Pendientes
+                <span class="tab-badge" id="pendingBadge">0</span>
+            </button>
+            <button class="tab" data-tab="respondidas">
+                <i class="fas fa-check-circle"></i>
+                Respondidas
+            </button>
+            <button class="tab" data-tab="todas">
+                <i class="fas fa-list"></i>
+                Todas
+            </button>
+        </div>
+
+        <div class="loader active" id="loader">
+            <div class="spinner"></div>
+            <div style="color: #9ca3af; font-size: 13px;">Cargando reprogramaciones...</div>
+        </div>
+
+        <div id="reprogContainer"></div>
     </div>
 
-    <div id="customToast" class="toast">
-        <i class="fas fa-info-circle"></i>
-        <span id="toastMsg">Mensaje</span>
-    </div>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getDatabase, ref, get, update, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // Prevenir zoom en double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (event) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Monitorear estado de conexión
+        window.addEventListener('online', () => {
+            document.getElementById('offlineBanner').classList.remove('show');
+        });
+
+        window.addEventListener('offline', () => {
+            document.getElementById('offlineBanner').classList.add('show');
+        });
+
+        // Prevenir comportamiento de arrastrar para recargar (pull to refresh nativo)
+        document.body.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
 
         const firebaseConfig = {
             apiKey: "AIzaSyBDRqsZI8EQaGn1lCc4Y5rIcfmLE7969zY",
@@ -235,184 +794,692 @@
             projectId: "reprogramacionesme",
             storageBucket: "reprogramacionesme.firebasestorage.app",
             messagingSenderId: "674035461204",
-            appId: "1:674035461204:web:a70b7793f71ae1c5e311c1"
+            appId: "1:674035461204:web:a70b7793f71ae1c5e311c1",
+            measurementId: "G-T4VJ4EQKNT"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        let userSession = null;
-        let activeTab = 'pendientes';
-        let allData = [];
-        let isOnline = true;
+        let currentUser = null;
+        let userData = null;
+        let todasReprogramaciones = [];
+        let tabActual = 'pendientes';
+        let datosEditados = {};
 
-        // --- GESTIÓN DE ESTADO ONLINE/OFFLINE ---
-        const connectedRef = ref(db, '.info/connected');
-        onValue(connectedRef, (snap) => {
-            const statusIcon = document.querySelector('.status-pill i');
-            const statusText = document.getElementById('statusText');
-            if (snap.val() === true) {
-                isOnline = true;
-                statusIcon.className = "fas fa-circle status-online";
-                statusText.innerText = "Conectado";
-            } else {
-                isOnline = false;
-                statusIcon.className = "fas fa-circle status-offline";
-                statusText.innerText = "Modo Local";
-            }
-        });
-
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                userSession = user;
-                loadData();
+                console.log('✅ Usuario autenticado:', user.email);
+                console.log('🆔 UID:', user.uid);
+                currentUser = user;
+                
+                try {
+                    console.log('📥 Cargando datos del usuario...');
+                    await cargarDatosUsuario();
+                    
+                    console.log('📋 Cargando reprogramaciones...');
+                    cargarReprogramaciones();
+                } catch (error) {
+                    console.error('❌ Error en la inicialización:', error);
+                    if (error.code === 'PERMISSION_DENIED' || error.message?.includes('Permission denied')) {
+                        mostrarAlerta('error', '⚠️ Error de permisos. Verifica las reglas de Firebase.');
+                    } else {
+                        mostrarAlerta('error', 'Error al cargar datos: ' + error.message);
+                    }
+                }
             } else {
+                console.log('❌ Usuario no autenticado');
                 window.location.href = 'login.html';
             }
         });
 
-        async function loadData() {
+        async function cargarDatosUsuario() {
             try {
-                const meses = obtenerMeses(3);
-                const results = await Promise.all(meses.map(async m => {
-                    const s = await get(ref(db, `reprogramaciones/${m}`));
-                    return s.exists() ? Object.entries(s.val()).map(([id, val]) => ({ id, mes: m, ...val })) : [];
-                }));
+                console.log('🔍 Consultando datos del usuario...');
+                const userRef = ref(db, `usuarios/${currentUser.uid}`);
+                const snapshot = await get(userRef);
                 
-                allData = results.flat().filter(r => r.supervisorId === userSession.uid);
-                renderList();
-            } catch (e) {
-                showToast("Error al cargar datos");
+                if (snapshot.exists()) {
+                    userData = snapshot.val();
+                    console.log('✅ Datos cargados:', userData);
+                    console.log('👤 Nombre:', userData.nombre);
+                    console.log('🎭 Rol:', userData.rol);
+                    document.getElementById('userName').textContent = userData.nombre;
+                    
+                    if (userData.rol !== 'supervisor') {
+                        console.warn('⚠️ Este usuario NO es supervisor, es:', userData.rol);
+                        mostrarAlerta('error', 'Tu usuario no tiene rol de supervisor');
+                    }
+                } else {
+                    console.error('❌ No se encontraron datos para este usuario');
+                    mostrarAlerta('error', 'Usuario no encontrado en la base de datos');
+                }
+            } catch (error) {
+                console.error('❌ Error al cargar usuario:', error);
+                throw error;
             }
         }
 
-        function renderList() {
-            const container = document.getElementById('mainList');
-            let filtered = allData;
-            if (activeTab === 'pendientes') filtered = allData.filter(r => r.estado === 'pendiente');
-            if (activeTab === 'respondidas') filtered = allData.filter(r => r.estado === 'respondida');
+        let paginaActual = 1;
+        const ITEMS_POR_PAGINA = 10;
+        
+        async function cargarReprogramaciones() {
+            console.log('📥 Cargando reprogramaciones del supervisor...');
+            const loader = document.getElementById('loader');
+            
+            try {
+                const meses = obtenerUltimosMeses(3);
+                console.log('📅 Consultando meses:', meses);
+                
+                // Cargar todos los meses en paralelo (optimización)
+                const promesas = meses.map(async mes => {
+                    const reprogRef = ref(db, `reprogramaciones/${mes}`);
+                    const snapshot = await get(reprogRef);
 
-            if (filtered.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding:50px; color:var(--text-muted);">
-                    <i class="fas fa-folder-open" style="font-size:3rem; opacity:0.2;"></i>
-                    <p style="margin-top:10px;">No hay registros</p>
-                </div>`;
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        const misSupervisiones = [];
+                        
+                        Object.entries(data).forEach(([id, reprog]) => {
+                            // Filtrar solo las del supervisor actual
+                            if (reprog.supervisorId === currentUser.uid) {
+                                misSupervisiones.push({ id, mes, ...reprog });
+                            }
+                        });
+                        
+                        return misSupervisiones;
+                    }
+                    return [];
+                });
+
+                const resultados = await Promise.all(promesas);
+                todasReprogramaciones = [];
+                resultados.forEach(reprogs => todasReprogramaciones.push(...reprogs));
+                
+                // Ordenar por fecha más reciente
+                todasReprogramaciones.sort((a, b) => new Date(b.fechaSubida) - new Date(a.fechaSubida));
+                
+                console.log(`✅ ${todasReprogramaciones.length} reprogramaciones encontradas para este supervisor`);
+                
+                loader.classList.remove('active');
+                actualizarEstadisticas();
+                mostrarReprogramaciones();
+                
+            } catch (error) {
+                console.error('❌ Error al cargar reprogramaciones:', error);
+                loader.classList.remove('active');
+                
+                if (error.code === 'PERMISSION_DENIED') {
+                    mostrarAlerta('error', '⚠️ Error de permisos. Verifica las reglas de Firebase.');
+                } else {
+                    mostrarAlerta('error', 'Error al cargar: ' + error.message);
+                }
+                
+                document.getElementById('reprogContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i></div>
+                        <div class="empty-text" style="color: #ef4444;">Error al cargar datos</div>
+                    </div>
+                `;
+            }
+        }
+
+        function actualizarEstadisticas() {
+            const pendientes = todasReprogramaciones.filter(r => r.estado === 'pendiente').length;
+            const respondidas = todasReprogramaciones.filter(r => r.estado === 'respondida').length;
+            
+            document.getElementById('pendingCount').textContent = pendientes;
+            document.getElementById('answeredCount').textContent = respondidas;
+            document.getElementById('pendingBadge').textContent = pendientes;
+        }
+
+        function mostrarReprogramaciones() {
+            let filtradas = todasReprogramaciones;
+            
+            // Aplicar filtro de tab
+            if (tabActual === 'pendientes') {
+                filtradas = todasReprogramaciones.filter(r => r.estado === 'pendiente');
+            } else if (tabActual === 'respondidas') {
+                filtradas = todasReprogramaciones.filter(r => r.estado === 'respondida');
+            }
+
+            const container = document.getElementById('reprogContainer');
+            
+            if (filtradas.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state fade-in">
+                        <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+                        <div class="empty-text">No hay reprogramaciones ${tabActual}</div>
+                    </div>
+                `;
                 return;
             }
 
-            container.innerHTML = filtered.map(item => `
-                <div class="reprog-card">
-                    <div class="card-header">
-                        <span class="user-tag">${item.auxiliarNombre}</span>
-                        <span class="date-tag">${new Date(item.fechaSubida).toLocaleDateString()}</span>
-                    </div>
-                    
-                    ${item.estado === 'pendiente' ? `
-                        <div class="input-group">
-                            <label>Nueva Fecha de Reprogramación</label>
-                            <input type="date" id="date-${item.id}" value="${item.datosExcel[0]['FECHA REPROGRAMACION'] || ''}">
-                        </div>
-                        <div class="input-group">
-                            <label>Observación del Supervisor</label>
-                            <textarea id="obs-${item.id}" rows="2" placeholder="Escribe aquí...">${item.datosExcel[0]['OBSERVACION'] || ''}</textarea>
-                        </div>
-                        <button class="btn-send" onclick="guardarGestion('${item.mes}', '${item.id}')">
-                            <i class="fas fa-cloud-upload-alt"></i> GUARDAR GESTIÓN
+            // Paginación: mostrar solo ITEMS_POR_PAGINA
+            const inicio = 0;
+            const fin = ITEMS_POR_PAGINA;
+            const reprogsPagina = filtradas.slice(inicio, fin);
+            
+            console.log(`📄 Mostrando ${reprogsPagina.length} de ${filtradas.length} reprogramaciones (página 1)`);
+            
+            let html = reprogsPagina.map(reprog => crearCardReprog(reprog)).join('');
+            
+            // Agregar paginación si hay más items
+            if (filtradas.length > ITEMS_POR_PAGINA) {
+                html += `
+                    <div style="text-align: center; padding: 24px; background: white; border-radius: 16px; margin-top: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                        <p style="color: #6b7280; margin-bottom: 16px; font-size: 14px;">
+                            Mostrando ${reprogsPagina.length} de ${filtradas.length} reprogramaciones
+                        </p>
+                        <button class="btn btn-primary" onclick="cargarMasSupervisiones()" id="btnCargarMas">
+                            <i class="fas fa-chevron-down"></i>
+                            Cargar más (${filtradas.length - ITEMS_POR_PAGINA} restantes)
                         </button>
-                    ` : `
-                        <div style="background:#f0fdf4; padding:10px; border-radius:10px; color:#166534; font-size:0.85rem;">
-                            <i class="fas fa-check-circle"></i> Gestionado el ${new Date(item.fechaRespuesta).toLocaleDateString()}
-                        </div>
-                    `}
-                </div>
-            `).join('');
+                    </div>
+                `;
+                
+                // Guardar filtradas en variable global para paginación
+                window.reprogramacionesFiltradas = filtradas;
+                paginaActual = 1;
+            }
+            
+            container.innerHTML = html;
+            // Añadir animación
+            container.classList.add('fade-in');
+        }
+        
+        window.cargarMasSupervisiones = function() {
+            if (!window.reprogramacionesFiltradas) return;
+            
+            paginaActual++;
+            const inicio = paginaActual * ITEMS_POR_PAGINA;
+            const fin = inicio + ITEMS_POR_PAGINA;
+            const siguientePagina = window.reprogramacionesFiltradas.slice(inicio, fin);
+            
+            if (siguientePagina.length === 0) return;
+            
+            console.log(`📄 Cargando página ${paginaActual + 1}: ${siguientePagina.length} items`);
+            
+            const container = document.getElementById('reprogContainer');
+            const paginacionDiv = container.querySelector('[id="btnCargarMas"]')?.parentElement;
+            
+            // Remover div de paginación anterior
+            if (paginacionDiv) paginacionDiv.remove();
+            
+            // Agregar nuevos items
+            const htmlNuevos = siguientePagina.map(reprog => crearCardReprog(reprog)).join('');
+            container.innerHTML += htmlNuevos;
+            
+            // Agregar nueva paginación si quedan más
+            const totalMostrados = (paginaActual + 1) * ITEMS_POR_PAGINA;
+            const restantes = window.reprogramacionesFiltradas.length - totalMostrados;
+            
+            if (restantes > 0) {
+                container.innerHTML += `
+                    <div style="text-align: center; padding: 24px; background: white; border-radius: 16px; margin-top: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                        <p style="color: #6b7280; margin-bottom: 16px; font-size: 14px;">
+                            Mostrando ${totalMostrados} de ${window.reprogramacionesFiltradas.length} reprogramaciones
+                        </p>
+                        <button class="btn btn-primary" onclick="cargarMasSupervisiones()" id="btnCargarMas">
+                            <i class="fas fa-chevron-down"></i>
+                            Cargar más (${restantes} restantes)
+                        </button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML += `
+                    <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 14px;">
+                        <i class="fas fa-check-circle"></i> Todas las reprogramaciones cargadas
+                    </div>
+                `;
+            }
         }
 
-        // --- LÓGICA DE GUARDADO ROBUSTA ---
-        window.guardarGestion = async (mes, id) => {
-            const dateVal = document.getElementById(`date-${id}`).value;
-            const obsVal = document.getElementById(`obs-${id}`).value;
+        function convertirFechaExcel(serial) {
+            if (!serial || typeof serial !== 'number') return serial;
+            
+            // Excel cuenta los días desde 1900-01-01
+            const fechaBase = new Date(1900, 0, 1);
+            const dias = serial - 2; // Ajuste por el bug de 1900 en Excel
+            const fecha = new Date(fechaBase.getTime() + dias * 24 * 60 * 60 * 1000);
+            
+            const dia = fecha.getDate();
+            const mes = fecha.getMonth() + 1;
+            const anio = fecha.getFullYear();
+            
+            return `${dia}/${mes}/${anio}`;
+        }
 
-            if (!dateVal) return showToast("La fecha es obligatoria");
+        function crearCardReprog(reprog) {
+            const fecha = new Date(reprog.fechaSubida).toLocaleString('es-CO');
+            const estadoClass = reprog.estado === 'respondida' ? 'badge-answered' : 'badge-pending';
+            const estadoTexto = reprog.estado === 'respondida' ? 'Respondida' : 'Pendiente';
+            const estadoIcon = reprog.estado === 'respondida' ? 'fa-check-circle' : 'fa-clock';
 
-            const btn = event.currentTarget;
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Sincronizando...`;
+            const datosExcel = reprog.datosExcel || [];
+            const totalRegistros = datosExcel.length;
+            
+            // Inicializar datos editados solo si es pendiente
+            if (!datosEditados[reprog.id] && reprog.estado === 'pendiente') {
+                datosEditados[reprog.id] = datosExcel.map(row => ({
+                    ...row,
+                    'FECHA REPROGRAMACION': row['FECHA REPROGRAMACION'] || '',
+                    'OBSERVACION': row['OBSERVACION'] || ''
+                }));
+            }
+
+            let tableHTML = '';
+            
+            if (reprog.estado === 'pendiente' && totalRegistros > 0) {
+                // Renderizar solo las primeras 50 filas (optimización)
+                const MAX_FILAS_INICIAL = 50;
+                const datosARenderizar = datosEditados[reprog.id].slice(0, MAX_FILAS_INICIAL);
+                const hayMasFilas = totalRegistros > MAX_FILAS_INICIAL;
+                
+                tableHTML = `
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        Completa la FECHA REPROGRAMACION y OBSERVACION para cada fila y guarda los cambios
+                        ${hayMasFilas ? `<br><strong>Mostrando primeras ${MAX_FILAS_INICIAL} de ${totalRegistros} filas</strong>` : ''}
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="tabla-${reprog.id}">
+                            <thead>
+                                <tr>
+                                    <th>FECHA REPROG.</th>
+                                    <th>OBSERVACIÓN</th>
+                                    <th>AID PROMOTOR</th>
+                                    <th>ID PV</th>
+                                    <th>NOMBRE PROMOTOR</th>
+                                    <th>PUNTO DE VENTA</th>
+                                    <th>FECHA</th>
+                                    <th>ZONA</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${datosARenderizar.map((row, index) => `
+                                    <tr>
+                                        <td class="editable-cell">
+                                            <input 
+                                                type="date" 
+                                                data-reprog="${reprog.id}" 
+                                                data-row="${index}" 
+                                                data-field="FECHA REPROGRAMACION"
+                                                value="${row['FECHA REPROGRAMACION'] || ''}"
+                                                onchange="actualizarCelda(this)"
+                                            >
+                                        </td>
+                                        <td class="editable-cell">
+                                            <textarea 
+                                                data-reprog="${reprog.id}" 
+                                                data-row="${index}" 
+                                                data-field="OBSERVACION"
+                                                onchange="actualizarCelda(this)"
+                                                placeholder="Escribe observación..."
+                                            >${row['OBSERVACION'] || ''}</textarea>
+                                        </td>
+                                        <td>${row['AID PROMOTOR'] || ''}</td>
+                                        <td>${row['ID PV'] || ''}</td>
+                                        <td>${row['NOMBRE PROMOTOR'] || ''}</td>
+                                        <td>${row['NOMBRE PUNTO DE VENTA'] || ''}</td>
+                                        <td>${convertirFechaExcel(row['FECHA']) || row['FECHA'] || ''}</td>
+                                        <td>${row['ZONA'] || ''}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        ${hayMasFilas ? `
+                            <div style="text-align: center; padding: 16px; background: #fffbeb; border-top: 1px solid #fcd34d; border-radius: 0 0 8px 8px;">
+                                <button class="btn btn-primary" onclick="cargarMasFilas('${reprog.id}', ${MAX_FILAS_INICIAL})" style="max-width: 300px;">
+                                    <i class="fas fa-chevron-down"></i>
+                                    Ver todas las filas (${totalRegistros - MAX_FILAS_INICIAL} más)
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="actions-bar">
+                        <button class="btn btn-success" onclick="guardarRespuestas('${reprog.mes}', '${reprog.id}')">
+                            <i class="fas fa-save"></i>
+                            Guardar y Marcar como Respondida
+                        </button>
+                    </div>
+                `;
+            } else if (reprog.estado === 'respondida' && totalRegistros > 0) {
+                // Vista de solo lectura - también limitada
+                const MAX_FILAS_VISTA = 50;
+                const datosVista = datosExcel.slice(0, MAX_FILAS_VISTA);
+                const hayMas = totalRegistros > MAX_FILAS_VISTA;
+                
+                tableHTML = `
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>FECHA REPROG.</th>
+                                    <th>OBSERVACIÓN</th>
+                                    <th>AID PROMOTOR</th>
+                                    <th>ID PV</th>
+                                    <th>NOMBRE PROMOTOR</th>
+                                    <th>PUNTO DE VENTA</th>
+                                    <th>FECHA</th>
+                                    <th>ZONA</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${datosVista.map(row => `
+                                    <tr>
+                                        <td style="font-weight: 600; color: #059669;">${row['FECHA REPROGRAMACION'] || '-'}</td>
+                                        <td style="max-width: 200px; white-space: normal;">${row['OBSERVACION'] || '-'}</td>
+                                        <td>${row['AID PROMOTOR'] || ''}</td>
+                                        <td>${row['ID PV'] || ''}</td>
+                                        <td>${row['NOMBRE PROMOTOR'] || ''}</td>
+                                        <td>${row['NOMBRE PUNTO DE VENTA'] || ''}</td>
+                                        <td>${convertirFechaExcel(row['FECHA']) || row['FECHA'] || ''}</td>
+                                        <td>${row['ZONA'] || ''}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        ${hayMas ? `
+                            <div style="text-align: center; padding: 16px; background: #f0fdf4; border-top: 1px solid #86efac; border-radius: 0 0 8px 8px;">
+                                <p style="color: #166534; font-size: 13px;">
+                                    <i class="fas fa-info-circle"></i>
+                                    Mostrando primeras ${MAX_FILAS_VISTA} de ${totalRegistros} filas
+                                </p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="reprog-card fade-in">
+                    <div class="card-header">
+                        <div class="card-info">
+                            <h3>De: ${reprog.auxiliarNombre}</h3>
+                            <div class="card-meta">
+                                <div class="meta-item">
+                                    <i class="far fa-calendar"></i>
+                                    ${new Date(fecha).toLocaleDateString('es-CO')}
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-list-ol"></i>
+                                    ${totalRegistros} registros
+                                </div>
+                            </div>
+                        </div>
+                        <span class="status-badge ${estadoClass}">
+                            <i class="fas ${estadoIcon}"></i>
+                            ${estadoTexto}
+                        </span>
+                    </div>
+                    ${tableHTML}
+                </div>
+            `;
+        }
+        
+        // Función para cargar más filas en tablas grandes
+        window.cargarMasFilas = function(reprogId, filasMostradas) {
+            const datosCompletos = datosEditados[reprogId];
+            if (!datosCompletos) return;
+            
+            const tabla = document.getElementById('tabla-' + reprogId);
+            if (!tabla) return;
+            
+            const tbody = tabla.querySelector('tbody');
+            const siguientes50 = datosCompletos.slice(filasMostradas, filasMostradas + 50);
+            
+            siguientes50.forEach((row, i) => {
+                const index = filasMostradas + i;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="editable-cell">
+                        <input 
+                            type="date" 
+                            data-reprog="${reprogId}" 
+                            data-row="${index}" 
+                            data-field="FECHA REPROGRAMACION"
+                            value="${row['FECHA REPROGRAMACION'] || ''}"
+                            onchange="actualizarCelda(this)"
+                        >
+                    </td>
+                    <td class="editable-cell">
+                        <textarea 
+                            data-reprog="${reprogId}" 
+                            data-row="${index}" 
+                            data-field="OBSERVACION"
+                            onchange="actualizarCelda(this)"
+                        >${row['OBSERVACION'] || ''}</textarea>
+                    </td>
+                    <td>${row['AID PROMOTOR'] || ''}</td>
+                    <td>${row['ID PV'] || ''}</td>
+                    <td>${row['ID EMPRESA'] || ''}</td>
+                    <td>${row['N_DIA'] || ''}</td>
+                    <td>${convertirFechaExcel(row['FECHA']) || row['FECHA'] || ''}</td>
+                    <td>${row['MINUTOS'] || ''}</td>
+                    <td>${row['HORAS'] || ''}</td>
+                    <td>${row['NOMBRE PROMOTOR'] || ''}</td>
+                    <td>${row['NOMBRE PUNTO DE VENTA'] || ''}</td>
+                    <td>${row['NOMBRE EMPRESA'] || ''}</td>
+                    <td>${row['CIUDAD PV'] || ''}</td>
+                    <td>${row['DEPARTAMENTO PV'] || ''}</td>
+                    <td>${row['ZONA'] || ''}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            // Actualizar o remover botón
+            const btnContainer = tabla.parentElement.querySelector('[style*="background: #fffbeb"]');
+            if (btnContainer) {
+                const nuevoTotal = filasMostradas + 50;
+                if (nuevoTotal >= datosCompletos.length) {
+                    btnContainer.remove();
+                } else {
+                    const btn = btnContainer.querySelector('button');
+                    btn.onclick = () => cargarMasFilas(reprogId, nuevoTotal);
+                    btn.innerHTML = `
+                        <i class="fas fa-chevron-down"></i>
+                        Ver más filas (${datosCompletos.length - nuevoTotal} restantes)
+                    `;
+                }
+            }
+        }
+
+        window.actualizarCelda = function(input) {
+            const reprogId = input.dataset.reprog;
+            const rowIndex = parseInt(input.dataset.row);
+            const field = input.dataset.field;
+            const value = input.value;
+
+            if (datosEditados[reprogId]) {
+                datosEditados[reprogId][rowIndex][field] = value;
+                // Feedback visual mejorado
+                input.style.borderColor = '#10b981';
+                input.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
+                
+                // Vibración táctil si está disponible
+                if (navigator.vibrate) {
+                    navigator.vibrate(10);
+                }
+                
+                setTimeout(() => {
+                    input.style.borderColor = '';
+                    input.style.boxShadow = '';
+                }, 1000);
+            } else {
+                console.error('❌ No se encontró reprogramación:', reprogId);
+            }
+        };
+
+        window.guardarRespuestas = async function(mes, id) {
+            console.log('💾 Intentando guardar:', { mes, id });
+            
+            const datosActualizados = datosEditados[id];
+            
+            if (!datosActualizados) {
+                console.error('❌ No hay datos para ID:', id);
+                mostrarAlerta('error', 'No hay datos para guardar. Recarga la página e intenta de nuevo.');
+                return;
+            }
+
+            console.log('✅ Datos encontrados:', datosActualizados.length, 'filas');
+            const todasCompletas = datosActualizados.every(row => 
+                row['FECHA REPROGRAMACION'] && row['OBSERVACION']
+            );
+
+            if (!todasCompletas) {
+                if (!confirm('⚠️ Algunas filas no tienen fecha u observación.\n\n¿Deseas continuar de todos modos?')) {
+                    return;
+                }
+            }
+
+            // Mostrar indicador de carga
+            const btnGuardar = event.target;
+            const textoOriginal = btnGuardar.innerHTML;
+            btnGuardar.disabled = true;
+            btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
 
             try {
-                const item = allData.find(r => r.id === id);
-                const nuevosDatos = [...item.datosExcel];
-                nuevosDatos[0]['FECHA REPROGRAMACION'] = dateVal;
-                nuevosDatos[0]['OBSERVACION'] = obsVal;
-
-                const updates = {
+                const reprogRef = ref(db, `reprogramaciones/${mes}/${id}`);
+                const fechaRespuesta = new Date().toISOString();
+                
+                await update(reprogRef, {
                     estado: 'respondida',
-                    datosExcel: nuevosDatos,
-                    fechaRespuesta: new Date().toISOString()
-                };
+                    datosExcel: datosActualizados,
+                    fechaRespuesta: fechaRespuesta
+                });
 
-                // Firebase gestionará esto offline si no hay red
-                await update(ref(db, `reprogramaciones/${mes}/${id}`), updates);
-
-                // Intento de envío de correo (Solo si hay internet)
-                if (isOnline) {
-                    try {
-                        // Aquí llamamos a tu servicio de Brevo
-                        if (window.notificarAuxiliarReprogramacionCompletada) {
-                            // Buscamos el email del auxiliar (asumiendo que está en el registro)
-                            const auxSnap = await get(ref(db, `usuarios/${item.auxiliarId}`));
-                            if (auxSnap.exists()) {
-                                await notificarAuxiliarReprogramacionCompletada({
-                                    auxiliarEmail: auxSnap.val().email,
-                                    auxiliarNombre: item.auxiliarNombre,
-                                    supervisorNombre: userSession.displayName || "Supervisor",
-                                    archivoNombre: item.archivoNombre,
-                                    fechaRespuesta: updates.fechaRespuesta
-                                });
-                            }
-                        }
-                    } catch (mailErr) {
-                        console.log("Error de correo (pero datos guardados):", mailErr);
-                    }
+                // Vibración de éxito
+                if (navigator.vibrate) {
+                    navigator.vibrate([50, 100, 50]);
                 }
 
-                showToast(isOnline ? "¡Guardado y Sincronizado!" : "Guardado localmente. Se subirá al tener red.");
-                setTimeout(() => loadData(), 1500);
-
+                mostrarAlerta('success', '✓ Reprogramación completada exitosamente');
+                delete datosEditados[id];
+                
+                // 📧 Enviar correo a la auxiliar
+                try {
+                    const reprog = todasReprogramaciones.find(r => r.id === id && r.mes === mes);
+                    if (reprog) {
+                        const auxSnap = await get(ref(db, `usuarios/${reprog.auxiliarId}`));
+                        if (auxSnap.exists()) {
+                            await notificarAuxiliarReprogramacionCompletada({
+                                auxiliarEmail: auxSnap.val().email,
+                                auxiliarNombre: auxSnap.val().nombre,
+                                supervisorNombre: userData.nombre,
+                                archivoNombre: reprog.archivoNombre,
+                                totalRegistros: reprog.totalRegistros,
+                                fechaRespuesta: fechaRespuesta
+                            });
+                        }
+                    }
+                } catch (e) { console.warn('⚠️ Error email:', e); }
+                
+                // 🔄 RECARGAR LISTA AUTOMÁTICAMENTE
+                console.log('🔄 Recargando lista de reprogramaciones...');
+                setTimeout(async () => {
+                    await cargarReprogramaciones();
+                    // Cambiar a pestaña de respondidas para ver el cambio
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelector('[data-tab="respondidas"]').classList.add('active');
+                    tabActual = 'respondidas';
+                    mostrarReprogramaciones();
+                }, 1000);
+                
             } catch (error) {
-                showToast("Error al guardar gestión");
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fas fa-cloud-upload-alt"></i> REINTENTAR`;
+                console.error('Error:', error);
+                mostrarAlerta('error', 'Error al guardar: ' + error.message);
+                btnGuardar.disabled = false;
+                btnGuardar.innerHTML = textoOriginal;
+                
+                // Vibración de error
+                if (navigator.vibrate) {
+                    navigator.vibrate([100, 50, 100, 50, 100]);
+                }
             }
         };
 
-        window.cambiarTab = (el, tab) => {
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-            activeTab = tab;
-            renderList();
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                tabActual = this.dataset.tab;
+                mostrarReprogramaciones();
+            });
+        });
+
+        window.cerrarSesion = async function() {
+            try {
+                await signOut(auth);
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Error:', error);
+            }
         };
 
-        function showToast(msg) {
-            const t = document.getElementById('customToast');
-            document.getElementById('toastMsg').innerText = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
-        }
-
-        function obtenerMeses(n) {
-            const m = [];
-            const d = new Date();
-            for(let i=0; i<n; i++) {
-                const f = new Date(d.getFullYear(), d.getMonth()-i, 1);
-                m.push(f.toISOString().slice(0,7).replace('-',''));
+        function obtenerUltimosMeses(cantidad) {
+            const meses = [];
+            const ahora = new Date();
+            for (let i = 0; i < cantidad; i++) {
+                const fecha = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1);
+                const mes = fecha.toISOString().slice(0, 7).replace('-', '');
+                meses.push(mes);
             }
-            return m;
+            return meses;
         }
 
-        window.cerrarSesion = () => signOut(auth);
+        function mostrarAlerta(tipo, mensaje) {
+            const successAlert = document.getElementById('successAlert');
+            const errorAlert = document.getElementById('errorAlert');
+            
+            if (tipo === 'success') {
+                document.getElementById('successMsg').textContent = mensaje;
+                successAlert.classList.add('show');
+                setTimeout(() => successAlert.classList.remove('show'), 5000);
+            } else {
+                document.getElementById('errorMsg').textContent = mensaje;
+                errorAlert.classList.add('show');
+                setTimeout(() => errorAlert.classList.remove('show'), 5000);
+            }
+            
+            // Vibración para alertas
+            if (navigator.vibrate) {
+                navigator.vibrate(tipo === 'success' ? [50, 50, 50] : [100, 50, 100]);
+            }
+            
+            // Scroll suave a la alerta
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
+        // Optimización: Lazy loading de imágenes (si agregas en el futuro)
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src;
+                        imageObserver.unobserve(img);
+                    }
+                });
+            });
+        }
+
+        // Compatibilidad con Android WebView
+        if (typeof Android !== 'undefined') {
+            console.log('✅ Ejecutando en WebView de Android');
+            
+            // Funciones de puente con Android (si las necesitas)
+            window.notificarAndroid = function(mensaje) {
+                try {
+                    if (Android.mostrarToast) {
+                        Android.mostrarToast(mensaje);
+                    }
+                } catch (e) {
+                    console.log('No se puede comunicar con Android:', e);
+                }
+            };
+        }
     </script>
 </body>
 </html>
