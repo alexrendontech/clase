@@ -133,6 +133,74 @@
             font-size: 16px;
         }
 
+        .password-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: color 0.2s;
+            font-size: 14px;
+        }
+
+        .password-toggle:hover {
+            color: #6b7280;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 400;
+            color: #374151;
+            margin-bottom: 0;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .checkmark {
+            height: 18px;
+            width: 18px;
+            background-color: #fff;
+            border: 2px solid #d1d5db;
+            border-radius: 4px;
+            margin-right: 10px;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .checkbox-container input:checked ~ .checkmark {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+            left: 5px;
+            top: 2px;
+            width: 4px;
+            height: 8px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .checkbox-container input:checked ~ .checkmark:after {
+            display: block;
+        }
+
         input {
             width: 100%;
             padding: 11px 14px 11px 44px;
@@ -317,7 +385,18 @@
                             required
                             autocomplete="current-password"
                         >
+                        <button type="button" class="password-toggle" id="passwordToggle" title="Mostrar contraseña">
+                            <i class="fas fa-eye"></i>
+                        </button>
                     </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="rememberUser">
+                        <span class="checkmark"></span>
+                        Recordar usuario
+                    </label>
                 </div>
 
                 <div class="loader" id="loader">
@@ -479,6 +558,54 @@
         });
 
         document.getElementById('email').focus();
+
+        // Funcionalidad para mostrar/ocultar contraseña
+        const passwordToggle = document.getElementById('passwordToggle');
+        const passwordInput = document.getElementById('password');
+
+        passwordToggle.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Cambiar el icono
+            const icon = this.querySelector('i');
+            if (type === 'password') {
+                icon.className = 'fas fa-eye';
+                this.title = 'Mostrar contraseña';
+            } else {
+                icon.className = 'fas fa-eye-slash';
+                this.title = 'Ocultar contraseña';
+            }
+        });
+
+        // Funcionalidad para recordar usuario
+        const rememberCheckbox = document.getElementById('rememberUser');
+        const emailInput = document.getElementById('email');
+
+        // Cargar usuario recordado al cargar la página
+        window.addEventListener('load', function() {
+            const rememberedUser = localStorage.getItem('rememberedUser');
+            if (rememberedUser) {
+                emailInput.value = rememberedUser;
+                rememberCheckbox.checked = true;
+            }
+        });
+
+        // Guardar o eliminar usuario recordado
+        rememberCheckbox.addEventListener('change', function() {
+            if (this.checked && emailInput.value.trim()) {
+                localStorage.setItem('rememberedUser', emailInput.value.trim());
+            } else {
+                localStorage.removeItem('rememberedUser');
+            }
+        });
+
+        // Actualizar localStorage cuando se cambia el email si está marcado recordar
+        emailInput.addEventListener('input', function() {
+            if (rememberCheckbox.checked) {
+                localStorage.setItem('rememberedUser', this.value.trim());
+            }
+        });
     </script>
 </body>
 </html>
