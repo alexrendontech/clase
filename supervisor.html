@@ -7,55 +7,27 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#8b5cf6">
-    <title>Supervisión</title>
+    <title>Supervisión Offline</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="email-service.js"></script>
+    <link rel="manifest" href="/manifest.json">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-        }
-
-        html {
-            /* Prevenir zoom en inputs en iOS */
-            font-size: 16px;
-            -webkit-text-size-adjust: 100%;
-            -ms-text-size-adjust: 100%;
-            text-size-adjust: 100%;
-            /* Scroll suave */
-            scroll-behavior: smooth;
-            /* Optimizaciones de rendimiento */
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
             background: #f5f5f5;
             color: #2d3748;
             line-height: 1.5;
             overflow-x: hidden;
-            /* Prevenir sobre-scroll */
             overscroll-behavior: none;
-            /* Safe areas para notch/botones Android */
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
             min-height: 100vh;
-            min-height: -webkit-fill-available;
-        }
-
-        /* Optimización de imágenes y contenido */
-        img, video {
-            max-width: 100%;
-            height: auto;
-        }
-
-        /* Mejorar rendimiento de animaciones */
-        * {
-            will-change: auto;
         }
 
         .topbar {
@@ -69,14 +41,12 @@
             top: 0;
             z-index: 1000;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            backdrop-filter: blur(10px);
         }
 
         .brand {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            width: 100%;
         }
 
         .brand-left {
@@ -85,15 +55,9 @@
             gap: 10px;
         }
 
-        .brand i {
-            color: white;
-            font-size: 24px;
-        }
-
         .brand h1 {
             font-size: 18px;
             font-weight: 700;
-            color: white;
         }
 
         .user-section {
@@ -101,7 +65,6 @@
             align-items: center;
             justify-content: space-between;
             gap: 12px;
-            width: 100%;
             flex-wrap: wrap;
         }
 
@@ -116,26 +79,17 @@
             align-items: center;
             gap: 6px;
             font-size: 13px;
-            color: rgba(255,255,255,0.9);
             background: rgba(255,255,255,0.1);
             padding: 6px 10px;
             border-radius: 8px;
             flex: 1;
-            min-width: 0;
-        }
-
-        .stat-item i {
-            font-size: 14px;
-            flex-shrink: 0;
         }
 
         .stat-number {
             font-weight: 700;
-            color: white;
             background: rgba(255,255,255,0.2);
             padding: 3px 8px;
             border-radius: 6px;
-            flex-shrink: 0;
         }
 
         .stat-number.pending {
@@ -143,25 +97,18 @@
             color: #78350f;
         }
 
+        .stat-number.offline {
+            background: #ef4444;
+            color: white;
+        }
+
         .user-info {
             display: flex;
             align-items: center;
             gap: 8px;
-            color: white;
             background: rgba(255,255,255,0.1);
             padding: 6px 12px;
             border-radius: 8px;
-        }
-
-        .user-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: white;
-        }
-
-        .user-role {
-            font-size: 11px;
-            color: rgba(255,255,255,0.8);
         }
 
         .logout-btn {
@@ -173,41 +120,127 @@
             color: white;
             font-size: 13px;
             transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 500;
-            /* Mejor área táctil */
             min-height: 44px;
             min-width: 44px;
         }
 
-        .logout-btn:active {
-            background: rgba(255,255,255,0.25);
-            transform: scale(0.95);
+        /* BANNER DE ESTADO DE CONEXIÓN */
+        .connection-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 12px 16px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .connection-banner.show {
+            transform: translateY(0);
+        }
+
+        .connection-banner.offline {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .connection-banner.online {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .connection-banner.syncing {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .spinner-small {
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .container {
             max-width: 100%;
             margin: 0;
             padding: 16px;
-            padding-bottom: max(env(safe-area-inset-bottom), 16px);
         }
 
-        .page-header {
-            margin-bottom: 20px;
+        .sync-status {
+            background: white;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
 
-        .page-header h2 {
-            font-size: 22px;
-            color: #111827;
-            margin-bottom: 6px;
+        .sync-status.show {
+            display: flex;
+        }
+
+        .sync-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .sync-icon.pending {
+            background: #fef3c7;
+            color: #f59e0b;
+        }
+
+        .sync-icon.success {
+            background: #d1fae5;
+            color: #10b981;
+        }
+
+        .sync-info {
+            flex: 1;
+        }
+
+        .sync-title {
             font-weight: 700;
+            color: #111827;
+            font-size: 14px;
+            margin-bottom: 2px;
         }
 
-        .page-header p {
+        .sync-desc {
+            font-size: 12px;
             color: #6b7280;
-            font-size: 14px;
         }
 
         .tabs {
@@ -217,12 +250,6 @@
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
-            -ms-overflow-style: none;
-            padding-bottom: 2px;
-        }
-
-        .tabs::-webkit-scrollbar {
-            display: none;
         }
 
         .tab {
@@ -233,20 +260,14 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            position: relative;
-            transition: all 0.2s;
             border-radius: 12px;
             white-space: nowrap;
             flex-shrink: 0;
-            /* Mejor área táctil */
             min-height: 44px;
             display: flex;
             align-items: center;
             gap: 6px;
-        }
-
-        .tab:active {
-            transform: scale(0.95);
+            transition: all 0.2s;
         }
 
         .tab.active {
@@ -299,28 +320,43 @@
 
         .alert-success {
             background: #d1fae5;
-            border: none;
             color: #065f46;
         }
 
         .alert-error {
             background: #fee2e2;
-            border: none;
             color: #991b1b;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
         }
 
         .reprog-card {
             background: white;
-            border: none;
             border-radius: 16px;
             padding: 16px;
             margin-bottom: 16px;
-            transition: all 0.2s;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: all 0.2s;
         }
 
-        .reprog-card:active {
-            transform: scale(0.98);
+        .reprog-card.offline-saved {
+            border: 2px solid #f59e0b;
+            background: #fffbeb;
+        }
+
+        .offline-badge {
+            background: #f59e0b;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .card-header {
@@ -340,28 +376,12 @@
             margin-bottom: 6px;
         }
 
-        .card-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            font-size: 12px;
-            color: #9ca3af;
-        }
-
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            white-space: nowrap;
-        }
-
         .status-badge {
             padding: 6px 12px;
             border-radius: 12px;
             font-size: 12px;
             font-weight: 700;
             white-space: nowrap;
-            flex-shrink: 0;
         }
 
         .badge-pending {
@@ -392,13 +412,6 @@
             overflow: hidden;
         }
 
-        .data-table thead {
-            background: #f9fafb;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
         .data-table th {
             padding: 12px 10px;
             text-align: left;
@@ -407,18 +420,13 @@
             border-bottom: 2px solid #e5e7eb;
             white-space: nowrap;
             font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            background: #f9fafb;
         }
 
         .data-table td {
             padding: 12px 10px;
             border-bottom: 1px solid #f3f4f6;
             color: #1f2937;
-        }
-
-        .data-table tbody tr:active {
-            background: #f9fafb;
         }
 
         .editable-cell input,
@@ -429,9 +437,8 @@
             border-radius: 8px;
             font-size: 14px;
             font-family: inherit;
-            transition: all 0.2s;
-            /* Tamaño mínimo 16px para prevenir zoom en iOS */
             min-height: 44px;
+            transition: all 0.2s;
         }
 
         .editable-cell input:focus,
@@ -459,7 +466,6 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            /* Mejor área táctil */
             min-height: 48px;
             width: 100%;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -474,15 +480,19 @@
             color: white;
         }
 
-        .btn-primary:disabled {
-            background: #c4b5fd;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
         .btn-success {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .actions-bar {
@@ -506,12 +516,6 @@
             opacity: 0.4;
         }
 
-        .empty-text {
-            font-size: 15px;
-            color: #6b7280;
-            font-weight: 500;
-        }
-
         .loader {
             display: none;
             text-align: center;
@@ -532,11 +536,6 @@
             margin: 0 auto 16px;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
         .info-box {
             background: #eff6ff;
             border-left: 4px solid #3b82f6;
@@ -545,334 +544,371 @@
             margin-bottom: 14px;
             font-size: 13px;
             color: #1e40af;
-            line-height: 1.6;
         }
 
-        /* Pull to refresh indicator (opcional) */
-        .pull-to-refresh {
-            position: fixed;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%) translateY(-100%);
-            padding: 10px 20px;
-            background: white;
-            border-radius: 0 0 12px 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-            z-index: 999;
-        }
-
-        .pull-to-refresh.active {
-            transform: translateX(-50%) translateY(0);
-        }
-
-        /* Optimización de rendimiento */
-        .reprog-card,
-        .btn,
-        .tab {
-            transform: translateZ(0);
-            backface-visibility: hidden;
-        }
-
-        /* Scroll suave en contenedores */
-        .table-container,
-        .tabs {
-            scroll-padding: 16px;
-        }
-
-        /* Mejorar legibilidad en móvil */
-        @media (max-width: 768px) {
-            .data-table {
-                font-size: 12px;
-            }
-
-            .data-table th,
-            .data-table td {
-                padding: 10px 8px;
-            }
-
-            .card-meta {
-                flex-direction: column;
-                gap: 6px;
-            }
-        }
-
-        /* Landscape mobile */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .topbar {
-                padding: 8px 16px;
-            }
-
-            .page-header {
-                margin-bottom: 12px;
-            }
-
-            .page-header h2 {
-                font-size: 18px;
-            }
-        }
-
-        /* Prevenir selección de texto en elementos interactivos */
-        .btn,
-        .tab,
-        .logout-btn {
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        /* Animación de carga de contenido */
         .fade-in {
             animation: fadeIn 0.3s ease;
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        /* Skeleton loading (opcional para mejora futura) */
-        .skeleton {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s ease-in-out infinite;
-            border-radius: 8px;
-        }
-
-        @keyframes loading {
-            0% {
-                background-position: 200% 0;
-            }
-            100% {
-                background-position: -200% 0;
-            }
-        }
-
-        /* Indicador de conexión offline */
-        .offline-banner {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: #dc2626;
-            color: white;
-            padding: 8px;
-            text-align: center;
-            font-size: 13px;
-            font-weight: 600;
-            z-index: 10000;
-            display: none;
-        }
-
-        .offline-banner.show {
-            display: block;
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <!-- Indicador offline -->
-    <div class="offline-banner" id="offlineBanner">
-        <i class="fas fa-wifi-slash"></i> Sin conexión a internet
+
+<!-- BANNER DE CONEXIÓN -->
+<div class="connection-banner" id="connectionBanner">
+    <i class="fas fa-wifi"></i>
+    <span id="connectionText">Conectado</span>
+</div>
+
+<div class="topbar">
+    <div class="brand">
+        <div class="brand-left">
+            <i class="fas fa-tasks"></i>
+            <h1>Supervisión Offline</h1>
+        </div>
+        <button class="logout-btn" onclick="cerrarSesion()">
+            <i class="fas fa-sign-out-alt"></i>
+        </button>
     </div>
-
-    <div class="topbar">
-        <div class="brand">
-            <div class="brand-left">
-                <i class="fas fa-tasks"></i>
-                <h1>Supervisión</h1>
-            </div>
-            <div class="brand-left">
-                <i class="fas fa-tasks"></i>
-                <h1>Supervisión</h1>
-            </div>
-            <button class="logout-btn" onclick="cerrarSesion()">
-                <i class="fas fa-sign-out-alt"></i>
-            </button>
-        </div>
-        <div class="user-section">
-            <div class="stats-mini">
-                <div class="stat-item">
-                    <i class="fas fa-clock"></i>
-                    <span class="stat-number pending" id="pendingCount">0</span>
-                    <span style="font-size: 12px;">Pendientes</span>
-                </div>
-                <div class="stat-item">
-                    <i class="fas fa-check-circle"></i>
-                    <span class="stat-number" id="answeredCount">0</span>
-                    <span style="font-size: 12px;">Respondidas</span>
-                </div>
-            </div>
-            <div class="user-info">
-                <i class="fas fa-user-circle" style="font-size: 20px;"></i>
-                <div>
-                    <div class="user-name" id="userName">Cargando...</div>
-                    <div class="user-role">Supervisor</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="page-header">
-            <h2>Reprogramaciones Recibidas</h2>
-            <p>Completa la fecha y observación para cada registro</p>
-        </div>
-
-        <div class="alert alert-success" id="successAlert">
-            <i class="fas fa-check-circle"></i>
-            <span id="successMsg"></span>
-        </div>
-
-        <div class="alert alert-error" id="errorAlert">
-            <i class="fas fa-exclamation-circle"></i>
-            <span id="errorMsg"></span>
-        </div>
-
-        <div class="tabs">
-            <button class="tab active" data-tab="pendientes">
+    <div class="user-section">
+        <div class="stats-mini">
+            <div class="stat-item">
                 <i class="fas fa-clock"></i>
-                Pendientes
-                <span class="tab-badge" id="pendingBadge">0</span>
-            </button>
-            <button class="tab" data-tab="respondidas">
-                <i class="fas fa-check-circle"></i>
-                Respondidas
-            </button>
-            <button class="tab" data-tab="todas">
-                <i class="fas fa-list"></i>
-                Todas
-            </button>
+                <span class="stat-number pending" id="pendingCount">0</span>
+                <span style="font-size: 12px;">Pendientes</span>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-save"></i>
+                <span class="stat-number offline" id="offlineCount">0</span>
+                <span style="font-size: 12px;">Sin sincronizar</span>
+            </div>
         </div>
-
-        <div class="loader active" id="loader">
-            <div class="spinner"></div>
-            <div style="color: #9ca3af; font-size: 13px;">Cargando reprogramaciones...</div>
+        <div class="user-info">
+            <i class="fas fa-user-circle" style="font-size: 20px;"></i>
+            <div>
+                <div class="user-name" style="font-weight: 600; font-size: 13px;" id="userName">Cargando...</div>
+                <div style="font-size: 11px; opacity: 0.8;">Supervisor</div>
+            </div>
         </div>
+    </div>
+</div>
 
-        <div id="reprogContainer"></div>
+<div class="container">
+    <!-- ESTADO DE SINCRONIZACIÓN -->
+    <div class="sync-status" id="syncStatus">
+        <div class="sync-icon pending">
+            <i class="fas fa-cloud-upload-alt"></i>
+        </div>
+        <div class="sync-info">
+            <div class="sync-title" id="syncTitle">Sincronizando...</div>
+            <div class="sync-desc" id="syncDesc">Guardando cambios pendientes</div>
+        </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getDatabase, ref, get, update, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+    <div class="alert alert-success" id="successAlert">
+        <i class="fas fa-check-circle"></i>
+        <span id="successMsg"></span>
+    </div>
 
-        // Prevenir zoom en double tap
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', (event) => {
-            const now = Date.now();
-            if (now - lastTouchEnd <= 300) {
-                event.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
+    <div class="alert alert-error" id="errorAlert">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="errorMsg"></span>
+    </div>
 
-        // Monitorear estado de conexión
-        window.addEventListener('online', () => {
-            document.getElementById('offlineBanner').classList.remove('show');
-        });
+    <div class="alert alert-warning" id="warningAlert">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span id="warningMsg"></span>
+    </div>
 
-        window.addEventListener('offline', () => {
-            document.getElementById('offlineBanner').classList.add('show');
-        });
+    <div class="tabs">
+        <button class="tab active" data-tab="pendientes">
+            <i class="fas fa-clock"></i>
+            Pendientes
+            <span class="tab-badge" id="pendingBadge">0</span>
+        </button>
+        <button class="tab" data-tab="respondidas">
+            <i class="fas fa-check-circle"></i>
+            Respondidas
+        </button>
+        <button class="tab" data-tab="todas">
+            <i class="fas fa-list"></i>
+            Todas
+        </button>
+    </div>
 
-        // Prevenir comportamiento de arrastrar para recargar (pull to refresh nativo)
-        document.body.addEventListener('touchmove', (e) => {
-            if (e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
+    <div class="loader active" id="loader">
+        <div class="spinner"></div>
+        <div style="color: #9ca3af; font-size: 13px;">Cargando reprogramaciones...</div>
+    </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBDRqsZI8EQaGn1lCc4Y5rIcfmLE7969zY",
-            authDomain: "reprogramacionesme.firebaseapp.com",
-            databaseURL: "https://reprogramacionesme-default-rtdb.firebaseio.com",
-            projectId: "reprogramacionesme",
-            storageBucket: "reprogramacionesme.firebasestorage.app",
-            messagingSenderId: "674035461204",
-            appId: "1:674035461204:web:a70b7793f71ae1c5e311c1",
-            measurementId: "G-T4VJ4EQKNT"
-        };
+    <div id="reprogContainer"></div>
+</div>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getDatabase, ref, get, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-        let currentUser = null;
-        let userData = null;
-        let todasReprogramaciones = [];
-        let tabActual = 'pendientes';
-        let datosEditados = {};
+    // ========================================
+    // 🔧 CONFIGURACIÓN FIREBASE
+    // ========================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyBDRqsZI8EQaGn1lCc4Y5rIcfmLE7969zY",
+        authDomain: "reprogramacionesme.firebaseapp.com",
+        databaseURL: "https://reprogramacionesme-default-rtdb.firebaseio.com",
+        projectId: "reprogramacionesme",
+        storageBucket: "reprogramacionesme.firebasestorage.app",
+        messagingSenderId: "674035461204",
+        appId: "1:674035461204:web:a70b7793f71ae1c5e311c1"
+    };
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                console.log('✅ Usuario autenticado:', user.email);
-                console.log('🆔 UID:', user.uid);
-                currentUser = user;
-                
-                try {
-                    console.log('📥 Cargando datos del usuario...');
-                    await cargarDatosUsuario();
-                    
-                    console.log('📋 Cargando reprogramaciones...');
-                    cargarReprogramaciones();
-                } catch (error) {
-                    console.error('❌ Error en la inicialización:', error);
-                    if (error.code === 'PERMISSION_DENIED' || error.message?.includes('Permission denied')) {
-                        mostrarAlerta('error', '⚠️ Error de permisos. Verifica las reglas de Firebase.');
-                    } else {
-                        mostrarAlerta('error', 'Error al cargar datos: ' + error.message);
-                    }
-                }
-            } else {
-                console.log('❌ Usuario no autenticado');
-                window.location.href = 'login.html';
-            }
-        });
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
 
-        async function cargarDatosUsuario() {
-            try {
-                console.log('🔍 Consultando datos del usuario...');
-                const userRef = ref(db, `usuarios/${currentUser.uid}`);
-                const snapshot = await get(userRef);
-                
-                if (snapshot.exists()) {
-                    userData = snapshot.val();
-                    console.log('✅ Datos cargados:', userData);
-                    console.log('👤 Nombre:', userData.nombre);
-                    console.log('🎭 Rol:', userData.rol);
-                    document.getElementById('userName').textContent = userData.nombre;
-                    
-                    if (userData.rol !== 'supervisor') {
-                        console.warn('⚠️ Este usuario NO es supervisor, es:', userData.rol);
-                        mostrarAlerta('error', 'Tu usuario no tiene rol de supervisor');
-                    }
-                } else {
-                    console.error('❌ No se encontraron datos para este usuario');
-                    mostrarAlerta('error', 'Usuario no encontrado en la base de datos');
-                }
-            } catch (error) {
-                console.error('❌ Error al cargar usuario:', error);
-                throw error;
-            }
+    // ========================================
+    // 💾 INDEXEDDB - ALMACENAMIENTO OFFLINE
+    // ========================================
+    class OfflineStorage {
+        constructor() {
+            this.dbName = 'SupervisionOfflineDB';
+            this.version = 1;
+            this.db = null;
         }
 
-        let paginaActual = 1;
-        const ITEMS_POR_PAGINA = 10;
-        
-        async function cargarReprogramaciones() {
-            console.log('📥 Cargando reprogramaciones del supervisor...');
-            const loader = document.getElementById('loader');
+        async init() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(this.dbName, this.version);
+
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    this.db = request.result;
+                    resolve(this.db);
+                };
+
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+
+                    // Store para reprogramaciones
+                    if (!db.objectStoreNames.contains('reprogramaciones')) {
+                        db.createObjectStore('reprogramaciones', { keyPath: 'id' });
+                    }
+
+                    // Store para cambios pendientes
+                    if (!db.objectStoreNames.contains('cambiosPendientes')) {
+                        const store = db.createObjectStore('cambiosPendientes', { keyPath: 'timestamp' });
+                        store.createIndex('reprogId', 'reprogId', { unique: false });
+                    }
+
+                    // Store para datos de usuario
+                    if (!db.objectStoreNames.contains('usuario')) {
+                        db.createObjectStore('usuario', { keyPath: 'uid' });
+                    }
+                };
+            });
+        }
+
+        async guardarReprogramaciones(reprogs) {
+            const tx = this.db.transaction(['reprogramaciones'], 'readwrite');
+            const store = tx.objectStore('reprogramaciones');
             
+            for (const reprog of reprogs) {
+                await store.put(reprog);
+            }
+            
+            return tx.complete;
+        }
+
+        async obtenerReprogramaciones() {
+            const tx = this.db.transaction(['reprogramaciones'], 'readonly');
+            const store = tx.objectStore('reprogramaciones');
+            return new Promise((resolve) => {
+                const request = store.getAll();
+                request.onsuccess = () => resolve(request.result || []);
+            });
+        }
+
+        async guardarCambioPendiente(reprogId, mes, datos) {
+            const tx = this.db.transaction(['cambiosPendientes'], 'readwrite');
+            const store = tx.objectStore('cambiosPendientes');
+            
+            const cambio = {
+                timestamp: Date.now(),
+                reprogId,
+                mes,
+                datos,
+                sincronizado: false
+            };
+            
+            await store.put(cambio);
+            return cambio;
+        }
+
+        async obtenerCambiosPendientes() {
+            const tx = this.db.transaction(['cambiosPendientes'], 'readonly');
+            const store = tx.objectStore('cambiosPendientes');
+            return new Promise((resolve) => {
+                const request = store.getAll();
+                request.onsuccess = () => {
+                    const todos = request.result || [];
+                    resolve(todos.filter(c => !c.sincronizado));
+                };
+            });
+        }
+
+        async marcarCambioSincronizado(timestamp) {
+            const tx = this.db.transaction(['cambiosPendientes'], 'readwrite');
+            const store = tx.objectStore('cambiosPendientes');
+            await store.delete(timestamp);
+        }
+
+        async guardarUsuario(userData) {
+            const tx = this.db.transaction(['usuario'], 'readwrite');
+            const store = tx.objectStore('usuario');
+            await store.put(userData);
+        }
+
+        async obtenerUsuario(uid) {
+            const tx = this.db.transaction(['usuario'], 'readonly');
+            const store = tx.objectStore('usuario');
+            return new Promise((resolve) => {
+                const request = store.get(uid);
+                request.onsuccess = () => resolve(request.result);
+            });
+        }
+    }
+
+    const offlineStorage = new OfflineStorage();
+
+    // ========================================
+    // 🌐 GESTIÓN DE CONEXIÓN
+    // ========================================
+    let isOnline = navigator.onLine;
+    const connectionBanner = document.getElementById('connectionBanner');
+    const connectionText = document.getElementById('connectionText');
+
+    function mostrarEstadoConexion(online, mensaje = '') {
+        isOnline = online;
+        
+        if (online) {
+            connectionBanner.className = 'connection-banner online show';
+            connectionText.innerHTML = `<i class="fas fa-check-circle"></i> ${mensaje || 'Conectado'}`;
+            setTimeout(() => connectionBanner.classList.remove('show'), 3000);
+            
+            // Sincronizar cambios pendientes
+            sincronizarCambiosPendientes();
+        } else {
+            connectionBanner.className = 'connection-banner offline show pulse';
+            connectionText.innerHTML = `<i class="fas fa-wifi-slash"></i> Sin conexión - Modo Offline Activado`;
+            
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        }
+    }
+
+    window.addEventListener('online', () => {
+        console.log('✅ Conexión restaurada');
+        mostrarEstadoConexion(true, 'Conexión restaurada');
+    });
+
+    window.addEventListener('offline', () => {
+        console.log('❌ Sin conexión');
+        mostrarEstadoConexion(false);
+    });
+
+    // ========================================
+    // 📊 VARIABLES GLOBALES
+    // ========================================
+    let currentUser = null;
+    let userData = null;
+    let todasReprogramaciones = [];
+    let tabActual = 'pendientes';
+    let datosEditados = {};
+
+    // ========================================
+    // 🚀 INICIALIZACIÓN
+    // ========================================
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUser = user;
+            console.log('✅ Usuario autenticado:', user.email);
+
             try {
-                const meses = obtenerUltimosMeses(3);
-                console.log('📅 Consultando meses:', meses);
+                await offlineStorage.init();
+                console.log('✅ IndexedDB inicializado');
+
+                await cargarDatosUsuario();
+                await cargarReprogramaciones();
                 
-                // Cargar todos los meses en paralelo (optimización)
+                // Verificar cambios pendientes
+                const pendientes = await offlineStorage.obtenerCambiosPendientes();
+                actualizarContadorOffline(pendientes.length);
+                
+                if (pendientes.length > 0 && isOnline) {
+                    mostrarAlerta('warning', `Tienes ${pendientes.length} cambio(s) sin sincronizar. Sincronizando...`);
+                    await sincronizarCambiosPendientes();
+                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+                mostrarAlerta('error', 'Error al inicializar: ' + error.message);
+            }
+        } else {
+            window.location.href = 'login.html';
+        }
+    });
+
+    async function cargarDatosUsuario() {
+        try {
+            // Primero intentar desde cache local
+            const cached = await offlineStorage.obtenerUsuario(currentUser.uid);
+            
+            if (cached) {
+                userData = cached;
+                document.getElementById('userName').textContent = userData.nombre;
+                console.log('✅ Usuario cargado desde cache');
+            }
+
+            // Si hay internet, actualizar
+            if (isOnline) {
+                const userRef = ref(db, `usuarios/${currentUser.uid}`);
+                const snapshot = await get(userRef);
+
+                if (snapshot.exists()) {
+                    userData = { ...snapshot.val(), uid: currentUser.uid };
+                    document.getElementById('userName').textContent = userData.nombre;
+                    
+                    // Guardar en cache
+                    await offlineStorage.guardarUsuario(userData);
+                    console.log('✅ Usuario actualizado desde Firebase');
+                }
+            }
+        } catch (error) {
+            console.error('❌ Error al cargar usuario:', error);
+            if (!cached) throw error;
+        }
+    }
+
+    async function cargarReprogramaciones() {
+        const loader = document.getElementById('loader');
+        
+        try {
+            // Cargar desde cache primero
+            const cached = await offlineStorage.obtenerReprogramaciones();
+            
+            if (cached.length > 0) {
+                todasReprogramaciones = cached;
+                loader.classList.remove('active');
+                actualizarEstadisticas();
+                mostrarReprogramaciones();
+                console.log(`✅ ${cached.length} reprogramaciones desde cache`);
+            }
+
+            // Si hay internet, actualizar
+            if (isOnline) {
+                const meses = obtenerUltimosMeses(3);
                 const promesas = meses.map(async mes => {
                     const reprogRef = ref(db, `reprogramaciones/${mes}`);
                     const snapshot = await get(reprogRef);
@@ -880,14 +916,13 @@
                     if (snapshot.exists()) {
                         const data = snapshot.val();
                         const misSupervisiones = [];
-                        
+
                         Object.entries(data).forEach(([id, reprog]) => {
-                            // Filtrar solo las del supervisor actual
                             if (reprog.supervisorId === currentUser.uid) {
                                 misSupervisiones.push({ id, mes, ...reprog });
                             }
                         });
-                        
+
                         return misSupervisiones;
                     }
                     return [];
@@ -896,26 +931,23 @@
                 const resultados = await Promise.all(promesas);
                 todasReprogramaciones = [];
                 resultados.forEach(reprogs => todasReprogramaciones.push(...reprogs));
-                
-                // Ordenar por fecha más reciente
+
                 todasReprogramaciones.sort((a, b) => new Date(b.fechaSubida) - new Date(a.fechaSubida));
-                
-                console.log(`✅ ${todasReprogramaciones.length} reprogramaciones encontradas para este supervisor`);
+
+                // Guardar en cache
+                await offlineStorage.guardarReprogramaciones(todasReprogramaciones);
                 
                 loader.classList.remove('active');
                 actualizarEstadisticas();
                 mostrarReprogramaciones();
                 
-            } catch (error) {
-                console.error('❌ Error al cargar reprogramaciones:', error);
-                loader.classList.remove('active');
-                
-                if (error.code === 'PERMISSION_DENIED') {
-                    mostrarAlerta('error', '⚠️ Error de permisos. Verifica las reglas de Firebase.');
-                } else {
-                    mostrarAlerta('error', 'Error al cargar: ' + error.message);
-                }
-                
+                console.log(`✅ ${todasReprogramaciones.length} reprogramaciones actualizadas`);
+            }
+        } catch (error) {
+            console.error('❌ Error:', error);
+            loader.classList.remove('active');
+            
+            if (cached.length === 0) {
                 document.getElementById('reprogContainer').innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon"><i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i></div>
@@ -924,562 +956,387 @@
                 `;
             }
         }
+    }
 
-        function actualizarEstadisticas() {
-            const pendientes = todasReprogramaciones.filter(r => r.estado === 'pendiente').length;
-            const respondidas = todasReprogramaciones.filter(r => r.estado === 'respondida').length;
-            
-            document.getElementById('pendingCount').textContent = pendientes;
-            document.getElementById('answeredCount').textContent = respondidas;
-            document.getElementById('pendingBadge').textContent = pendientes;
+    // ========================================
+    // 🔄 SINCRONIZACIÓN AUTOMÁTICA
+    // ========================================
+    async function sincronizarCambiosPendientes() {
+        if (!isOnline) {
+            console.log('⚠️ Sin conexión, esperando para sincronizar');
+            return;
         }
 
-        function mostrarReprogramaciones() {
-            let filtradas = todasReprogramaciones;
-            
-            // Aplicar filtro de tab
-            if (tabActual === 'pendientes') {
-                filtradas = todasReprogramaciones.filter(r => r.estado === 'pendiente');
-            } else if (tabActual === 'respondidas') {
-                filtradas = todasReprogramaciones.filter(r => r.estado === 'respondida');
-            }
-
-            const container = document.getElementById('reprogContainer');
-            
-            if (filtradas.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state fade-in">
-                        <div class="empty-icon"><i class="fas fa-inbox"></i></div>
-                        <div class="empty-text">No hay reprogramaciones ${tabActual}</div>
-                    </div>
-                `;
-                return;
-            }
-
-            // Paginación: mostrar solo ITEMS_POR_PAGINA
-            const inicio = 0;
-            const fin = ITEMS_POR_PAGINA;
-            const reprogsPagina = filtradas.slice(inicio, fin);
-            
-            console.log(`📄 Mostrando ${reprogsPagina.length} de ${filtradas.length} reprogramaciones (página 1)`);
-            
-            let html = reprogsPagina.map(reprog => crearCardReprog(reprog)).join('');
-            
-            // Agregar paginación si hay más items
-            if (filtradas.length > ITEMS_POR_PAGINA) {
-                html += `
-                    <div style="text-align: center; padding: 24px; background: white; border-radius: 16px; margin-top: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-                        <p style="color: #6b7280; margin-bottom: 16px; font-size: 14px;">
-                            Mostrando ${reprogsPagina.length} de ${filtradas.length} reprogramaciones
-                        </p>
-                        <button class="btn btn-primary" onclick="cargarMasSupervisiones()" id="btnCargarMas">
-                            <i class="fas fa-chevron-down"></i>
-                            Cargar más (${filtradas.length - ITEMS_POR_PAGINA} restantes)
-                        </button>
-                    </div>
-                `;
-                
-                // Guardar filtradas en variable global para paginación
-                window.reprogramacionesFiltradas = filtradas;
-                paginaActual = 1;
-            }
-            
-            container.innerHTML = html;
-            // Añadir animación
-            container.classList.add('fade-in');
-        }
+        const pendientes = await offlineStorage.obtenerCambiosPendientes();
         
-        window.cargarMasSupervisiones = function() {
-            if (!window.reprogramacionesFiltradas) return;
-            
-            paginaActual++;
-            const inicio = paginaActual * ITEMS_POR_PAGINA;
-            const fin = inicio + ITEMS_POR_PAGINA;
-            const siguientePagina = window.reprogramacionesFiltradas.slice(inicio, fin);
-            
-            if (siguientePagina.length === 0) return;
-            
-            console.log(`📄 Cargando página ${paginaActual + 1}: ${siguientePagina.length} items`);
-            
-            const container = document.getElementById('reprogContainer');
-            const paginacionDiv = container.querySelector('[id="btnCargarMas"]')?.parentElement;
-            
-            // Remover div de paginación anterior
-            if (paginacionDiv) paginacionDiv.remove();
-            
-            // Agregar nuevos items
-            const htmlNuevos = siguientePagina.map(reprog => crearCardReprog(reprog)).join('');
-            container.innerHTML += htmlNuevos;
-            
-            // Agregar nueva paginación si quedan más
-            const totalMostrados = (paginaActual + 1) * ITEMS_POR_PAGINA;
-            const restantes = window.reprogramacionesFiltradas.length - totalMostrados;
-            
-            if (restantes > 0) {
-                container.innerHTML += `
-                    <div style="text-align: center; padding: 24px; background: white; border-radius: 16px; margin-top: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-                        <p style="color: #6b7280; margin-bottom: 16px; font-size: 14px;">
-                            Mostrando ${totalMostrados} de ${window.reprogramacionesFiltradas.length} reprogramaciones
-                        </p>
-                        <button class="btn btn-primary" onclick="cargarMasSupervisiones()" id="btnCargarMas">
-                            <i class="fas fa-chevron-down"></i>
-                            Cargar más (${restantes} restantes)
-                        </button>
-                    </div>
-                `;
-            } else {
-                container.innerHTML += `
-                    <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 14px;">
-                        <i class="fas fa-check-circle"></i> Todas las reprogramaciones cargadas
-                    </div>
-                `;
-            }
+        if (pendientes.length === 0) {
+            console.log('✅ No hay cambios pendientes');
+            return;
         }
 
-        function convertirFechaExcel(serial) {
-            if (!serial || typeof serial !== 'number') return serial;
-            
-            // Excel cuenta los días desde 1900-01-01
-            const fechaBase = new Date(1900, 0, 1);
-            const dias = serial - 2; // Ajuste por el bug de 1900 en Excel
-            const fecha = new Date(fechaBase.getTime() + dias * 24 * 60 * 60 * 1000);
-            
-            const dia = fecha.getDate();
-            const mes = fecha.getMonth() + 1;
-            const anio = fecha.getFullYear();
-            
-            return `${dia}/${mes}/${anio}`;
-        }
+        mostrarSyncStatus(true, pendientes.length);
 
-        function crearCardReprog(reprog) {
-            const fecha = new Date(reprog.fechaSubida).toLocaleString('es-CO');
-            const estadoClass = reprog.estado === 'respondida' ? 'badge-answered' : 'badge-pending';
-            const estadoTexto = reprog.estado === 'respondida' ? 'Respondida' : 'Pendiente';
-            const estadoIcon = reprog.estado === 'respondida' ? 'fa-check-circle' : 'fa-clock';
+        let sincronizados = 0;
+        let errores = 0;
 
-            const datosExcel = reprog.datosExcel || [];
-            const totalRegistros = datosExcel.length;
-            
-            // Inicializar datos editados solo si es pendiente
-            if (!datosEditados[reprog.id] && reprog.estado === 'pendiente') {
-                datosEditados[reprog.id] = datosExcel.map(row => ({
-                    ...row,
-                    'FECHA REPROGRAMACION': row['FECHA REPROGRAMACION'] || '',
-                    'OBSERVACION': row['OBSERVACION'] || ''
-                }));
-            }
-
-            let tableHTML = '';
-            
-            if (reprog.estado === 'pendiente' && totalRegistros > 0) {
-                // Renderizar solo las primeras 50 filas (optimización)
-                const MAX_FILAS_INICIAL = 50;
-                const datosARenderizar = datosEditados[reprog.id].slice(0, MAX_FILAS_INICIAL);
-                const hayMasFilas = totalRegistros > MAX_FILAS_INICIAL;
-                
-                tableHTML = `
-                    <div class="info-box">
-                        <i class="fas fa-info-circle"></i>
-                        Completa la FECHA REPROGRAMACION y OBSERVACION para cada fila y guarda los cambios
-                        ${hayMasFilas ? `<br><strong>Mostrando primeras ${MAX_FILAS_INICIAL} de ${totalRegistros} filas</strong>` : ''}
-                    </div>
-                    <div class="table-container">
-                        <table class="data-table" id="tabla-${reprog.id}">
-                            <thead>
-                                <tr>
-                                    <th>FECHA REPROG.</th>
-                                    <th>OBSERVACIÓN</th>
-                                    <th>AID PROMOTOR</th>
-                                    <th>ID PV</th>
-                                    <th>NOMBRE PROMOTOR</th>
-                                    <th>PUNTO DE VENTA</th>
-                                    <th>FECHA</th>
-                                    <th>ZONA</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${datosARenderizar.map((row, index) => `
-                                    <tr>
-                                        <td class="editable-cell">
-                                            <input 
-                                                type="date" 
-                                                data-reprog="${reprog.id}" 
-                                                data-row="${index}" 
-                                                data-field="FECHA REPROGRAMACION"
-                                                value="${row['FECHA REPROGRAMACION'] || ''}"
-                                                onchange="actualizarCelda(this)"
-                                            >
-                                        </td>
-                                        <td class="editable-cell">
-                                            <textarea 
-                                                data-reprog="${reprog.id}" 
-                                                data-row="${index}" 
-                                                data-field="OBSERVACION"
-                                                onchange="actualizarCelda(this)"
-                                                placeholder="Escribe observación..."
-                                            >${row['OBSERVACION'] || ''}</textarea>
-                                        </td>
-                                        <td>${row['AID PROMOTOR'] || ''}</td>
-                                        <td>${row['ID PV'] || ''}</td>
-                                        <td>${row['NOMBRE PROMOTOR'] || ''}</td>
-                                        <td>${row['NOMBRE PUNTO DE VENTA'] || ''}</td>
-                                        <td>${convertirFechaExcel(row['FECHA']) || row['FECHA'] || ''}</td>
-                                        <td>${row['ZONA'] || ''}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                        ${hayMasFilas ? `
-                            <div style="text-align: center; padding: 16px; background: #fffbeb; border-top: 1px solid #fcd34d; border-radius: 0 0 8px 8px;">
-                                <button class="btn btn-primary" onclick="cargarMasFilas('${reprog.id}', ${MAX_FILAS_INICIAL})" style="max-width: 300px;">
-                                    <i class="fas fa-chevron-down"></i>
-                                    Ver todas las filas (${totalRegistros - MAX_FILAS_INICIAL} más)
-                                </button>
-                            </div>
-                        ` : ''}
-                    </div>
-                    <div class="actions-bar">
-                        <button class="btn btn-success" onclick="guardarRespuestas('${reprog.mes}', '${reprog.id}')">
-                            <i class="fas fa-save"></i>
-                            Guardar y Marcar como Respondida
-                        </button>
-                    </div>
-                `;
-            } else if (reprog.estado === 'respondida' && totalRegistros > 0) {
-                // Vista de solo lectura - también limitada
-                const MAX_FILAS_VISTA = 50;
-                const datosVista = datosExcel.slice(0, MAX_FILAS_VISTA);
-                const hayMas = totalRegistros > MAX_FILAS_VISTA;
-                
-                tableHTML = `
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>FECHA REPROG.</th>
-                                    <th>OBSERVACIÓN</th>
-                                    <th>AID PROMOTOR</th>
-                                    <th>ID PV</th>
-                                    <th>NOMBRE PROMOTOR</th>
-                                    <th>PUNTO DE VENTA</th>
-                                    <th>FECHA</th>
-                                    <th>ZONA</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${datosVista.map(row => `
-                                    <tr>
-                                        <td style="font-weight: 600; color: #059669;">${row['FECHA REPROGRAMACION'] || '-'}</td>
-                                        <td style="max-width: 200px; white-space: normal;">${row['OBSERVACION'] || '-'}</td>
-                                        <td>${row['AID PROMOTOR'] || ''}</td>
-                                        <td>${row['ID PV'] || ''}</td>
-                                        <td>${row['NOMBRE PROMOTOR'] || ''}</td>
-                                        <td>${row['NOMBRE PUNTO DE VENTA'] || ''}</td>
-                                        <td>${convertirFechaExcel(row['FECHA']) || row['FECHA'] || ''}</td>
-                                        <td>${row['ZONA'] || ''}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                        ${hayMas ? `
-                            <div style="text-align: center; padding: 16px; background: #f0fdf4; border-top: 1px solid #86efac; border-radius: 0 0 8px 8px;">
-                                <p style="color: #166534; font-size: 13px;">
-                                    <i class="fas fa-info-circle"></i>
-                                    Mostrando primeras ${MAX_FILAS_VISTA} de ${totalRegistros} filas
-                                </p>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            }
-
-            return `
-                <div class="reprog-card fade-in">
-                    <div class="card-header">
-                        <div class="card-info">
-                            <h3>De: ${reprog.auxiliarNombre}</h3>
-                            <div class="card-meta">
-                                <div class="meta-item">
-                                    <i class="far fa-calendar"></i>
-                                    ${new Date(fecha).toLocaleDateString('es-CO')}
-                                </div>
-                                <div class="meta-item">
-                                    <i class="fas fa-list-ol"></i>
-                                    ${totalRegistros} registros
-                                </div>
-                            </div>
-                        </div>
-                        <span class="status-badge ${estadoClass}">
-                            <i class="fas ${estadoIcon}"></i>
-                            ${estadoTexto}
-                        </span>
-                    </div>
-                    ${tableHTML}
-                </div>
-            `;
-        }
-        
-        // Función para cargar más filas en tablas grandes
-        window.cargarMasFilas = function(reprogId, filasMostradas) {
-            const datosCompletos = datosEditados[reprogId];
-            if (!datosCompletos) return;
-            
-            const tabla = document.getElementById('tabla-' + reprogId);
-            if (!tabla) return;
-            
-            const tbody = tabla.querySelector('tbody');
-            const siguientes50 = datosCompletos.slice(filasMostradas, filasMostradas + 50);
-            
-            siguientes50.forEach((row, i) => {
-                const index = filasMostradas + i;
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="editable-cell">
-                        <input 
-                            type="date" 
-                            data-reprog="${reprogId}" 
-                            data-row="${index}" 
-                            data-field="FECHA REPROGRAMACION"
-                            value="${row['FECHA REPROGRAMACION'] || ''}"
-                            onchange="actualizarCelda(this)"
-                        >
-                    </td>
-                    <td class="editable-cell">
-                        <textarea 
-                            data-reprog="${reprogId}" 
-                            data-row="${index}" 
-                            data-field="OBSERVACION"
-                            onchange="actualizarCelda(this)"
-                        >${row['OBSERVACION'] || ''}</textarea>
-                    </td>
-                    <td>${row['AID PROMOTOR'] || ''}</td>
-                    <td>${row['ID PV'] || ''}</td>
-                    <td>${row['ID EMPRESA'] || ''}</td>
-                    <td>${row['N_DIA'] || ''}</td>
-                    <td>${convertirFechaExcel(row['FECHA']) || row['FECHA'] || ''}</td>
-                    <td>${row['MINUTOS'] || ''}</td>
-                    <td>${row['HORAS'] || ''}</td>
-                    <td>${row['NOMBRE PROMOTOR'] || ''}</td>
-                    <td>${row['NOMBRE PUNTO DE VENTA'] || ''}</td>
-                    <td>${row['NOMBRE EMPRESA'] || ''}</td>
-                    <td>${row['CIUDAD PV'] || ''}</td>
-                    <td>${row['DEPARTAMENTO PV'] || ''}</td>
-                    <td>${row['ZONA'] || ''}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-            
-            // Actualizar o remover botón
-            const btnContainer = tabla.parentElement.querySelector('[style*="background: #fffbeb"]');
-            if (btnContainer) {
-                const nuevoTotal = filasMostradas + 50;
-                if (nuevoTotal >= datosCompletos.length) {
-                    btnContainer.remove();
-                } else {
-                    const btn = btnContainer.querySelector('button');
-                    btn.onclick = () => cargarMasFilas(reprogId, nuevoTotal);
-                    btn.innerHTML = `
-                        <i class="fas fa-chevron-down"></i>
-                        Ver más filas (${datosCompletos.length - nuevoTotal} restantes)
-                    `;
-                }
-            }
-        }
-
-        window.actualizarCelda = function(input) {
-            const reprogId = input.dataset.reprog;
-            const rowIndex = parseInt(input.dataset.row);
-            const field = input.dataset.field;
-            const value = input.value;
-
-            if (datosEditados[reprogId]) {
-                datosEditados[reprogId][rowIndex][field] = value;
-                // Feedback visual mejorado
-                input.style.borderColor = '#10b981';
-                input.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
-                
-                // Vibración táctil si está disponible
-                if (navigator.vibrate) {
-                    navigator.vibrate(10);
-                }
-                
-                setTimeout(() => {
-                    input.style.borderColor = '';
-                    input.style.boxShadow = '';
-                }, 1000);
-            } else {
-                console.error('❌ No se encontró reprogramación:', reprogId);
-            }
-        };
-
-        window.guardarRespuestas = async function(mes, id) {
-            console.log('💾 Intentando guardar:', { mes, id });
-            
-            const datosActualizados = datosEditados[id];
-            
-            if (!datosActualizados) {
-                console.error('❌ No hay datos para ID:', id);
-                mostrarAlerta('error', 'No hay datos para guardar. Recarga la página e intenta de nuevo.');
-                return;
-            }
-
-            console.log('✅ Datos encontrados:', datosActualizados.length, 'filas');
-            const todasCompletas = datosActualizados.every(row => 
-                row['FECHA REPROGRAMACION'] && row['OBSERVACION']
-            );
-
-            if (!todasCompletas) {
-                if (!confirm('⚠️ Algunas filas no tienen fecha u observación.\n\n¿Deseas continuar de todos modos?')) {
-                    return;
-                }
-            }
-
-            // Mostrar indicador de carga
-            const btnGuardar = event.target;
-            const textoOriginal = btnGuardar.innerHTML;
-            btnGuardar.disabled = true;
-            btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-
+        for (const cambio of pendientes) {
             try {
-                const reprogRef = ref(db, `reprogramaciones/${mes}/${id}`);
-                const fechaRespuesta = new Date().toISOString();
+                const reprogRef = ref(db, `reprogramaciones/${cambio.mes}/${cambio.reprogId}`);
                 
                 await update(reprogRef, {
                     estado: 'respondida',
-                    datosExcel: datosActualizados,
-                    fechaRespuesta: fechaRespuesta
+                    datosExcel: cambio.datos,
+                    fechaRespuesta: new Date().toISOString()
                 });
 
-                // Vibración de éxito
-                if (navigator.vibrate) {
-                    navigator.vibrate([50, 100, 50]);
-                }
-
-                mostrarAlerta('success', '✓ Reprogramación completada exitosamente');
-                delete datosEditados[id];
+                await offlineStorage.marcarCambioSincronizado(cambio.timestamp);
+                sincronizados++;
                 
-                // 📧 Enviar correo a la auxiliar
-                try {
-                    const reprog = todasReprogramaciones.find(r => r.id === id && r.mes === mes);
-                    if (reprog) {
-                        const auxSnap = await get(ref(db, `usuarios/${reprog.auxiliarId}`));
-                        if (auxSnap.exists()) {
-                            await notificarAuxiliarReprogramacionCompletada({
-                                auxiliarEmail: auxSnap.val().email,
-                                auxiliarNombre: auxSnap.val().nombre,
-                                supervisorNombre: userData.nombre,
-                                archivoNombre: reprog.archivoNombre,
-                                totalRegistros: reprog.totalRegistros,
-                                fechaRespuesta: fechaRespuesta
-                            });
-                        }
-                    }
-                } catch (e) { console.warn('⚠️ Error email:', e); }
-                
-                // 🔄 RECARGAR LISTA AUTOMÁTICAMENTE
-                console.log('🔄 Recargando lista de reprogramaciones...');
-                setTimeout(async () => {
-                    await cargarReprogramaciones();
-                    // Cambiar a pestaña de respondidas para ver el cambio
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    document.querySelector('[data-tab="respondidas"]').classList.add('active');
-                    tabActual = 'respondidas';
-                    mostrarReprogramaciones();
-                }, 1000);
-                
+                console.log(`✅ Sincronizado: ${cambio.reprogId}`);
             } catch (error) {
-                console.error('Error:', error);
-                mostrarAlerta('error', 'Error al guardar: ' + error.message);
-                btnGuardar.disabled = false;
-                btnGuardar.innerHTML = textoOriginal;
-                
-                // Vibración de error
-                if (navigator.vibrate) {
-                    navigator.vibrate([100, 50, 100, 50, 100]);
-                }
+                console.error(`❌ Error sincronizando ${cambio.reprogId}:`, error);
+                errores++;
             }
-        };
-
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-                tabActual = this.dataset.tab;
-                mostrarReprogramaciones();
-            });
-        });
-
-        window.cerrarSesion = async function() {
-            try {
-                await signOut(auth);
-                window.location.href = 'login.html';
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        };
-
-        function obtenerUltimosMeses(cantidad) {
-            const meses = [];
-            const ahora = new Date();
-            for (let i = 0; i < cantidad; i++) {
-                const fecha = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1);
-                const mes = fecha.toISOString().slice(0, 7).replace('-', '');
-                meses.push(mes);
-            }
-            return meses;
         }
 
-        function mostrarAlerta(tipo, mensaje) {
-            const successAlert = document.getElementById('successAlert');
-            const errorAlert = document.getElementById('errorAlert');
+        actualizarContadorOffline(await offlineStorage.obtenerCambiosPendientes().then(p => p.length));
+
+        if (errores === 0) {
+            mostrarSyncStatus(false);
+            mostrarAlerta('success', `✅ ${sincronizados} cambio(s) sincronizado(s) exitosamente`);
+            await cargarReprogramaciones();
+        } else {
+            mostrarAlerta('warning', `⚠️ ${sincronizados} sincronizados, ${errores} con error`);
+        }
+    }
+
+    function mostrarSyncStatus(show, cantidad = 0) {
+        const syncStatus = document.getElementById('syncStatus');
+        
+        if (show) {
+            document.getElementById('syncTitle').textContent = 'Sincronizando cambios...';
+            document.getElementById('syncDesc').textContent = `${cantidad} operación(es) pendiente(s)`;
+            syncStatus.classList.add('show');
             
-            if (tipo === 'success') {
-                document.getElementById('successMsg').textContent = mensaje;
-                successAlert.classList.add('show');
-                setTimeout(() => successAlert.classList.remove('show'), 5000);
+            connectionBanner.className = 'connection-banner syncing show';
+            connectionText.innerHTML = `
+                <div class="spinner-small"></div>
+                Sincronizando ${cantidad} cambio(s)...
+            `;
+        } else {
+            syncStatus.classList.remove('show');
+            connectionBanner.classList.remove('show');
+        }
+    }
+
+    function actualizarContadorOffline(cantidad) {
+        const contador = document.getElementById('offlineCount');
+        contador.textContent = cantidad;
+        
+        if (cantidad > 0) {
+            contador.classList.add('offline');
+        } else {
+            contador.classList.remove('offline');
+        }
+    }
+
+    // ========================================
+    // 💾 GUARDAR RESPUESTAS (OFFLINE FIRST)
+    // ========================================
+    window.guardarRespuestas = async function(mes, id) {
+        const datosActualizados = datosEditados[id];
+
+        if (!datosActualizados) {
+            mostrarAlerta('error', 'No hay datos para guardar');
+            return;
+        }
+
+        const todasCompletas = datosActualizados.every(row =>
+            row['FECHA REPROGRAMACION'] && row['OBSERVACION']
+        );
+
+        if (!todasCompletas) {
+            if (!confirm('⚠️ Algunas filas no están completas.\n\n¿Deseas continuar?')) {
+                return;
+            }
+        }
+
+        const btnGuardar = event.target;
+        const textoOriginal = btnGuardar.innerHTML;
+        btnGuardar.disabled = true;
+        btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+        try {
+            // 1. GUARDAR LOCAL PRIMERO (OFFLINE FIRST)
+            await offlineStorage.guardarCambioPendiente(id, mes, datosActualizados);
+            console.log('✅ Guardado localmente');
+
+            // Actualizar contador
+            const pendientes = await offlineStorage.obtenerCambiosPendientes();
+            actualizarContadorOffline(pendientes.length);
+
+            // 2. SI HAY INTERNET, SINCRONIZAR
+            if (isOnline) {
+                try {
+                    const reprogRef = ref(db, `reprogramaciones/${mes}/${id}`);
+                    
+                    await update(reprogRef, {
+                        estado: 'respondida',
+                        datosExcel: datosActualizados,
+                        fechaRespuesta: new Date().toISOString()
+                    });
+
+                    // Marcar como sincronizado
+                    const cambios = await offlineStorage.obtenerCambiosPendientes();
+                    const miCambio = cambios.find(c => c.reprogId === id);
+                    if (miCambio) {
+                        await offlineStorage.marcarCambioSincronizado(miCambio.timestamp);
+                    }
+
+                    actualizarContadorOffline(await offlineStorage.obtenerCambiosPendientes().then(p => p.length));
+
+                    mostrarAlerta('success', '✅ Guardado y sincronizado con Firebase');
+                    console.log('✅ Sincronizado con Firebase');
+                } catch (syncError) {
+                    console.warn('⚠️ Guardado localmente, error al sincronizar:', syncError);
+                    mostrarAlerta('warning', '⚠️ Guardado localmente. Se sincronizará cuando haya conexión.');
+                }
             } else {
-                document.getElementById('errorMsg').textContent = mensaje;
-                errorAlert.classList.add('show');
-                setTimeout(() => errorAlert.classList.remove('show'), 5000);
+                mostrarAlerta('warning', '📱 Guardado en modo offline. Se sincronizará automáticamente.');
             }
+
+            if (navigator.vibrate) navigator.vibrate([50, 100, 50]);
+
+            delete datosEditados[id];
             
-            // Vibración para alertas
-            if (navigator.vibrate) {
-                navigator.vibrate(tipo === 'success' ? [50, 50, 50] : [100, 50, 100]);
-            }
-            
-            // Scroll suave a la alerta
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(async () => {
+                await cargarReprogramaciones();
+                tabActual = 'respondidas';
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelector('[data-tab="respondidas"]').classList.add('active');
+                mostrarReprogramaciones();
+            }, 1000);
+
+        } catch (error) {
+            console.error('❌ Error:', error);
+            mostrarAlerta('error', 'Error al guardar: ' + error.message);
+            btnGuardar.disabled = false;
+            btnGuardar.innerHTML = textoOriginal;
+        }
+    };
+
+    // ========================================
+    // 📊 FUNCIONES DE VISUALIZACIÓN
+    // ========================================
+    function actualizarEstadisticas() {
+        const pendientes = todasReprogramaciones.filter(r => r.estado === 'pendiente').length;
+        const respondidas = todasReprogramaciones.filter(r => r.estado === 'respondida').length;
+
+        document.getElementById('pendingCount').textContent = pendientes;
+        document.getElementById('pendingBadge').textContent = pendientes;
+    }
+
+    function mostrarReprogramaciones() {
+        let filtradas = todasReprogramaciones;
+
+        if (tabActual === 'pendientes') {
+            filtradas = todasReprogramaciones.filter(r => r.estado === 'pendiente');
+        } else if (tabActual === 'respondidas') {
+            filtradas = todasReprogramaciones.filter(r => r.estado === 'respondida');
         }
 
-        // Optimización: Lazy loading de imágenes (si agregas en el futuro)
-        if ('IntersectionObserver' in window) {
-            const imageObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const img = entry.target;
-                        img.src = img.dataset.src;
-                        imageObserver.unobserve(img);
-                    }
-                });
-            });
+        const container = document.getElementById('reprogContainer');
+
+        if (filtradas.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state fade-in">
+                    <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+                    <div class="empty-text">No hay reprogramaciones ${tabActual}</div>
+                </div>
+            `;
+            return;
         }
 
-        // Compatibilidad con Android WebView
-        if (typeof Android !== 'undefined') {
-            console.log('✅ Ejecutando en WebView de Android');
-            
-            // Funciones de puente con Android (si las necesitas)
-            window.notificarAndroid = function(mensaje) {
-                try {
-                    if (Android.mostrarToast) {
-                        Android.mostrarToast(mensaje);
-                    }
-                } catch (e) {
-                    console.log('No se puede comunicar con Android:', e);
-                }
-            };
+        const html = filtradas.slice(0, 10).map(reprog => crearCardReprog(reprog)).join('');
+        container.innerHTML = html;
+        container.classList.add('fade-in');
+    }
+
+    function crearCardReprog(reprog) {
+        const fecha = new Date(reprog.fechaSubida).toLocaleDateString('es-CO');
+        const estadoClass = reprog.estado === 'respondida' ? 'badge-answered' : 'badge-pending';
+        const estadoTexto = reprog.estado === 'respondida' ? 'Respondida' : 'Pendiente';
+
+        const datosExcel = reprog.datosExcel || [];
+
+        if (!datosEditados[reprog.id] && reprog.estado === 'pendiente') {
+            datosEditados[reprog.id] = datosExcel.map(row => ({
+                ...row,
+                'FECHA REPROGRAMACION': row['FECHA REPROGRAMACION'] || '',
+                'OBSERVACION': row['OBSERVACION'] || ''
+            }));
         }
-    </script>
+
+        let tableHTML = '';
+
+        if (reprog.estado === 'pendiente' && datosExcel.length > 0) {
+            tableHTML = `
+                <div class="info-box">
+                    <i class="fas fa-info-circle"></i>
+                    ${!isOnline ? '📱 <strong>Modo Offline:</strong> Tus cambios se guardarán localmente y se sincronizarán automáticamente cuando tengas conexión.<br>' : ''}
+                    Completa la FECHA REPROGRAMACION y OBSERVACION para cada fila
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>FECHA REPROG.</th>
+                                <th>OBSERVACIÓN</th>
+                                <th>PROMOTOR</th>
+                                <th>PUNTO DE VENTA</th>
+                                <th>FECHA</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${datosExcel.slice(0, 5).map((row, index) => `
+                                <tr>
+                                    <td class="editable-cell">
+                                        <input type="date" data-reprog="${reprog.id}" data-row="${index}" 
+                                               data-field="FECHA REPROGRAMACION" value="${row['FECHA REPROGRAMACION'] || ''}"
+                                               onchange="actualizarCelda(this)">
+                                    </td>
+                                    <td class="editable-cell">
+                                        <textarea data-reprog="${reprog.id}" data-row="${index}" data-field="OBSERVACION"
+                                                  onchange="actualizarCelda(this)">${row['OBSERVACION'] || ''}</textarea>
+                                    </td>
+                                    <td>${row['NOMBRE PROMOTOR'] || ''}</td>
+                                    <td>${row['NOMBRE PUNTO DE VENTA'] || ''}</td>
+                                    <td>${row['FECHA'] || ''}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="actions-bar">
+                    <button class="btn ${isOnline ? 'btn-success' : 'btn-warning'}" onclick="guardarRespuestas('${reprog.mes}', '${reprog.id}')">
+                        <i class="fas ${isOnline ? 'fa-save' : 'fa-cloud-upload-alt'}"></i>
+                        ${isOnline ? 'Guardar y Sincronizar' : 'Guardar Offline'}
+                    </button>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="reprog-card fade-in">
+                <div class="card-header">
+                    <div class="card-info">
+                        <h3>De: ${reprog.auxiliarNombre}</h3>
+                        <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
+                            <i class="far fa-calendar"></i> ${fecha} · 
+                            <i class="fas fa-list-ol"></i> ${datosExcel.length} registros
+                        </div>
+                    </div>
+                    <span class="status-badge ${estadoClass}">
+                        <i class="fas fa-${reprog.estado === 'respondida' ? 'check-circle' : 'clock'}"></i>
+                        ${estadoTexto}
+                    </span>
+                </div>
+                ${tableHTML}
+            </div>
+        `;
+    }
+
+    window.actualizarCelda = function(input) {
+        const reprogId = input.dataset.reprog;
+        const rowIndex = parseInt(input.dataset.row);
+        const field = input.dataset.field;
+        const value = input.value;
+
+        if (datosEditados[reprogId]) {
+            datosEditados[reprogId][rowIndex][field] = value;
+            input.style.borderColor = '#10b981';
+            
+            if (navigator.vibrate) navigator.vibrate(10);
+            
+            setTimeout(() => input.style.borderColor = '', 1000);
+        }
+    };
+
+    // ========================================
+    // 🔧 FUNCIONES AUXILIARES
+    // ========================================
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            tabActual = this.dataset.tab;
+            mostrarReprogramaciones();
+        });
+    });
+
+    window.cerrarSesion = async function() {
+        const pendientes = await offlineStorage.obtenerCambiosPendientes();
+        
+        if (pendientes.length > 0) {
+            if (!confirm(`⚠️ Tienes ${pendientes.length} cambio(s) sin sincronizar.\n\n¿Deseas cerrar sesión de todos modos?`)) {
+                return;
+            }
+        }
+        
+        try {
+            await signOut(auth);
+            window.location.href = 'login.html';
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    function obtenerUltimosMeses(cantidad) {
+        const meses = [];
+        const ahora = new Date();
+        for (let i = 0; i < cantidad; i++) {
+            const fecha = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1);
+            const mes = fecha.toISOString().slice(0, 7).replace('-', '');
+            meses.push(mes);
+        }
+        return meses;
+    }
+
+    function mostrarAlerta(tipo, mensaje) {
+        const alerts = {
+            'success': 'successAlert',
+            'error': 'errorAlert',
+            'warning': 'warningAlert'
+        };
+
+        const alertId = alerts[tipo];
+        const alert = document.getElementById(alertId);
+        const msgElement = document.getElementById(tipo === 'warning' ? 'warningMsg' : tipo + 'Msg');
+        
+        msgElement.textContent = mensaje;
+        alert.classList.add('show');
+        
+        if (navigator.vibrate) {
+            navigator.vibrate(tipo === 'success' ? [50, 50, 50] : [100, 50, 100]);
+        }
+        
+        setTimeout(() => alert.classList.remove('show'), 5000);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Verificar estado inicial
+    mostrarEstadoConexion(isOnline);
+
+    // Auto-sincronizar cada 30 segundos si hay cambios
+    setInterval(async () => {
+        if (isOnline) {
+            const pendientes = await offlineStorage.obtenerCambiosPendientes();
+            if (pendientes.length > 0) {
+                console.log('🔄 Auto-sincronización...');
+                await sincronizarCambiosPendientes();
+            }
+        }
+    }, 30000);
+</script>
 </body>
 </html>
