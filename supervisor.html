@@ -229,13 +229,15 @@
 
         /* Tabs */
         .tabs-container {
-            display: flex;
+            display: flex !important;
             gap: 8px;
             margin-bottom: 16px;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             scroll-snap-type: x mandatory;
             scrollbar-width: none;
+            position: relative;
+            z-index: 10;
         }
 
         .tabs-container::-webkit-scrollbar {
@@ -254,11 +256,13 @@
             white-space: nowrap;
             flex-shrink: 0;
             min-height: 44px;
-            display: flex;
+            display: flex !important;
             align-items: center;
             gap: 6px;
             transition: all 0.2s ease;
             scroll-snap-align: start;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
 
         .tab.active {
@@ -1211,10 +1215,18 @@
                         <div class="empty-text">No hay reprogramaciones</div>
                     </div>
                 `;
-                return;
+            } else {
+                container.innerHTML = filtradas.map(reprog => crearCardReprog(reprog)).join('');
             }
-
-            container.innerHTML = filtradas.map(reprog => crearCardReprog(reprog)).join('');
+            
+            // Asegurar que los tabs permanezcan visibles (crítico para webview)
+            setTimeout(() => {
+                const tabsContainer = document.querySelector('.tabs-container');
+                if (tabsContainer) {
+                    tabsContainer.style.display = 'flex';
+                    tabsContainer.style.visibility = 'visible';
+                }
+            }, 10);
         }
 
         function crearCardReprog(reprog) {
@@ -1376,10 +1388,7 @@
                 
                 // Actualizar estadísticas y cambiar a pestaña respondidas
                 actualizarEstadisticas();
-                tabActual = 'respondidas';
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelector('[data-tab="respondidas"]').classList.add('active');
-                mostrarReprogramaciones();
+                cambiarTab('respondidas');
             } catch (error) {
                 mostrarAlerta('error', 'Error: ' + error.message);
                 btn.disabled = false;
@@ -1387,12 +1396,35 @@
             }
         };
 
+        // Función para cambiar de tab (más robusta para webview)
+        function cambiarTab(nuevoTab) {
+            tabActual = nuevoTab;
+            
+            // Actualizar clases de los tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(t => {
+                t.classList.remove('active');
+                if (t.dataset.tab === nuevoTab) {
+                    t.classList.add('active');
+                }
+            });
+            
+            // Mostrar reprogramaciones
+            mostrarReprogramaciones();
+            
+            // Forzar re-render en webview
+            const tabsContainer = document.querySelector('.tabs-container');
+            if (tabsContainer) {
+                tabsContainer.style.display = 'flex';
+            }
+        }
+
+        // Agregar event listeners a los tabs
         document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-                tabActual = this.dataset.tab;
-                mostrarReprogramaciones();
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                cambiarTab(this.dataset.tab);
             });
         });
 
