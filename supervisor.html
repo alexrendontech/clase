@@ -1006,6 +1006,7 @@
         let datosEditados = {};
         let reprogramacionesIds = new Set(); // Para rastrear IDs ya cargadas
         let primeraCargar = true; // Flag para evitar notificaciones en carga inicial
+        let dbReady = false; // Flag para indicar que IndexedDB está listo
 
         const connectionBanner = document.getElementById('connectionBanner');
         const connectionText = document.getElementById('connectionText');
@@ -1016,7 +1017,9 @@
                 connectionBanner.className = 'connection-banner online show';
                 connectionText.innerHTML = '<i class="fas fa-check-circle"></i> Conectado';
                 setTimeout(() => connectionBanner.classList.remove('show'), 2500);
-                sincronizarCambiosPendientes();
+                if (dbReady) {
+                    sincronizarCambiosPendientes();
+                }
             } else {
                 connectionBanner.className = 'connection-banner offline show';
                 connectionText.innerHTML = '<i class="fas fa-wifi-slash"></i> Modo offline';
@@ -1032,12 +1035,15 @@
                 currentUser = user;
                 try {
                     await offlineStorage.init();
+                    dbReady = true; // Marcar que IndexedDB está listo
+                    console.log('✅ IndexedDB inicializado correctamente');
                     await cargarDatosUsuario(); // Cargar datos del supervisor
                     await cargarReprogramaciones();
                     const pendientes = await offlineStorage.obtenerCambiosPendientes();
                     actualizarContadorOffline(pendientes.length);
                     iniciarEscuchaNuevasReprogramaciones(); // Iniciar escucha en tiempo real
                 } catch (error) {
+                    console.error('❌ Error en inicialización:', error);
                     mostrarAlerta('error', 'Error: ' + error.message);
                 }
             } else {
@@ -1210,7 +1216,7 @@
         }
 
         async function sincronizarCambiosPendientes() {
-            if (!isOnline) return;
+            if (!isOnline || !dbReady) return;
 
             const pendientes = await offlineStorage.obtenerCambiosPendientes();
             if (pendientes.length === 0) return;
@@ -1545,7 +1551,7 @@
         mostrarEstadoConexion(isOnline);
 
         setInterval(async () => {
-            if (isOnline) {
+            if (isOnline && dbReady) {
                 const pendientes = await offlineStorage.obtenerCambiosPendientes();
                 if (pendientes.length > 0) await sincronizarCambiosPendientes();
             }
