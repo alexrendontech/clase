@@ -1157,7 +1157,7 @@
             return;
         }
 
-        const html = filtradas.slice(0, 10).map(reprog => crearCardReprog(reprog)).join('');
+        const html = filtradas.map(reprog => crearCardReprog(reprog)).join('');
         container.innerHTML = html;
         container.classList.add('fade-in');
     }
@@ -1198,7 +1198,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${datosExcel.slice(0, 5).map((row, index) => `
+                            ${datosExcel.map((row, index) => `
                                 <tr>
                                     <td class="editable-cell">
                                         <input type="date" data-reprog="${reprog.id}" data-row="${index}" 
