@@ -7,10 +7,27 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#8b5cf6">
-    <title>Supervisión Offline</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="description" content="Aplicación de supervisión offline">
+    <title>Supervisión</title>
     <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -18,113 +35,121 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: #f5f5f5;
-            color: #2d3748;
-            line-height: 1.5;
-            overflow-x: hidden;
-            overscroll-behavior: none;
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-            min-height: 100vh;
+        html, body {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            overflow: hidden;
         }
 
-        .topbar {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            color: white;
-            padding: max(env(safe-area-inset-top), 12px) 16px 12px;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            padding-top: max(env(safe-area-inset-top), 0px);
+            padding-bottom: max(env(safe-area-inset-bottom), 0px);
         }
 
-        .brand {
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 0 16px 16px;
+            box-shadow: var(--shadow-md);
+            flex-shrink: 0;
+            z-index: 100;
+        }
+
+        .header-top {
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
+            padding: 16px 0 12px;
+            gap: 12px;
         }
 
-        .brand-left {
+        .header-brand {
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-
-        .brand h1 {
+            font-weight: 700;
             font-size: 18px;
-            font-weight: 700;
         }
 
-        .user-section {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .stats-mini {
-            display: flex;
-            gap: 12px;
-            flex: 1;
-        }
-
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 13px;
-            background: rgba(255,255,255,0.1);
-            padding: 6px 10px;
-            border-radius: 8px;
-            flex: 1;
-        }
-
-        .stat-number {
-            font-weight: 700;
-            background: rgba(255,255,255,0.2);
-            padding: 3px 8px;
-            border-radius: 6px;
-        }
-
-        .stat-number.pending {
-            background: #fbbf24;
-            color: #78350f;
-        }
-
-        .stat-number.offline {
-            background: #ef4444;
-            color: white;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255,255,255,0.1);
-            padding: 6px 12px;
-            border-radius: 8px;
+        .header-brand i {
+            font-size: 22px;
         }
 
         .logout-btn {
             background: rgba(255,255,255,0.15);
             border: none;
             padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
+            border-radius: 10px;
             color: white;
-            font-size: 13px;
-            transition: all 0.2s;
-            min-height: 44px;
+            cursor: pointer;
+            font-size: 16px;
             min-width: 44px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
         }
 
-        /* BANNER DE ESTADO DE CONEXIÓN */
+        .logout-btn:active {
+            background: rgba(255,255,255,0.25);
+            transform: scale(0.95);
+        }
+
+        .header-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-number {
+            font-weight: 800;
+            font-size: 18px;
+            min-width: 28px;
+        }
+
+        .stat-card.pending .stat-number {
+            color: #fbbf24;
+        }
+
+        .stat-card.offline .stat-number {
+            color: #fca5a5;
+        }
+
+        .stat-label {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+        }
+
+        .stat-label i {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Connection Banner */
         .connection-banner {
             position: fixed;
             top: 0;
@@ -132,75 +157,480 @@
             right: 0;
             padding: 12px 16px;
             text-align: center;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
-            z-index: 10000;
+            z-index: 10001;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             transform: translateY(-100%);
-            transition: transform 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
         }
 
         .connection-banner.show {
             transform: translateY(0);
+            box-shadow: var(--shadow-md);
         }
 
         .connection-banner.offline {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            background: rgba(239, 68, 68, 0.95);
             color: white;
         }
 
         .connection-banner.online {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            background: rgba(16, 185, 129, 0.95);
             color: white;
         }
 
         .connection-banner.syncing {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            background: rgba(245, 158, 11, 0.95);
             color: white;
         }
 
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .spinner-small {
+        .spinner-sm {
+            width: 14px;
+            height: 14px;
             border: 2px solid rgba(255,255,255,0.3);
-            border-top: 2px solid white;
+            border-top-color: white;
             border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            animation: spin 0.8s linear infinite;
+            animation: spin 0.6s linear infinite;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Main Content */
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .container {
-            max-width: 100%;
-            margin: 0;
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             padding: 16px;
+            display: flex;
+            flex-direction: column;
         }
 
-        .sync-status {
-            background: white;
-            border-radius: 12px;
-            padding: 12px 16px;
+        /* Tabs */
+        .tabs-container {
+            display: flex;
+            gap: 8px;
             margin-bottom: 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+        }
+
+        .tabs-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            padding: 10px 16px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 10px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            scroll-snap-align: start;
+        }
+
+        .tab.active {
+            color: white;
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .tab-badge {
+            background: rgba(251, 191, 36, 0.2);
+            color: #78350f;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .tab.active .tab-badge {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin-bottom: 14px;
+            font-size: 13px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 4px solid;
+        }
+
+        .alert.show {
+            display: flex;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: #ecfdf5;
+            color: #065f46;
+            border-color: var(--success);
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            color: #7f1d1d;
+            border-color: var(--error);
+        }
+
+        .alert-warning {
+            background: #fffbeb;
+            color: #78350f;
+            border-color: var(--warning);
+        }
+
+        /* Cards */
+        .reprog-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .reprog-card:active {
+            box-shadow: var(--shadow-md);
+        }
+
+        .reprog-card.offline-saved {
+            border: 2px solid var(--warning);
+            background: #fffbeb;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .card-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 12px;
+        }
+
+        .card-meta i {
+            margin-right: 4px;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-answered {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /* Table */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 12px 0;
+            border-radius: 10px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .table-scroll-hint {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(139, 92, 246, 0.9);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            opacity: 0;
+            animation: fadeOut 3s ease forwards;
+            pointer-events: none;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            background: var(--bg-secondary);
+            min-width: 100%;
+        }
+
+        .data-table th {
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border);
+            font-size: 11px;
+            background: var(--bg-primary);
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .editable-cell input,
+        .editable-cell textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+            min-height: 44px;
+            transition: all 0.2s ease;
+        }
+
+        .editable-cell input:focus,
+        .editable-cell textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .editable-cell textarea {
+            min-width: 160px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Buttons */
+        .actions-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 48px;
+            width: 100%;
+            box-shadow: var(--shadow-sm);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Info Box */
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+            font-size: 12px;
+            color: #1e40af;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .info-box i {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .empty-icon {
+            font-size: 56px;
+            margin-bottom: 16px;
+            opacity: 0.2;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        /* Loader */
+        .loader {
+            text-align: center;
+            padding: 60px 20px;
+            display: none;
+            flex: 1;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .loader.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        .loader-text {
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* Sync Status */
+        .sync-status {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 14px;
             display: none;
             align-items: center;
             gap: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            box-shadow: var(--shadow-sm);
+            border-left: 4px solid var(--warning);
+            animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .sync-status.show {
@@ -215,16 +645,12 @@
             align-items: center;
             justify-content: center;
             font-size: 18px;
+            flex-shrink: 0;
         }
 
         .sync-icon.pending {
             background: #fef3c7;
-            color: #f59e0b;
-        }
-
-        .sync-icon.success {
-            background: #d1fae5;
-            color: #10b981;
+            color: var(--warning);
         }
 
         .sync-info {
@@ -233,1110 +659,636 @@
 
         .sync-title {
             font-weight: 700;
-            color: #111827;
-            font-size: 14px;
+            color: var(--text-primary);
+            font-size: 13px;
             margin-bottom: 2px;
         }
 
         .sync-desc {
-            font-size: 12px;
-            color: #6b7280;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
-
-        .tab {
-            padding: 10px 16px;
-            background: white;
-            border: 2px solid #e5e7eb;
-            color: #6b7280;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 12px;
-            white-space: nowrap;
-            flex-shrink: 0;
-            min-height: 44px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-        }
-
-        .tab.active {
-            color: white;
-            background: #8b5cf6;
-            border-color: #8b5cf6;
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-        }
-
-        .tab-badge {
-            background: rgba(251, 191, 36, 0.2);
-            color: #78350f;
-            padding: 2px 8px;
-            border-radius: 10px;
             font-size: 11px;
-            font-weight: 700;
+            color: var(--text-secondary);
         }
 
-        .tab.active .tab-badge {
-            background: rgba(255,255,255,0.3);
-            color: white;
-        }
-
-        .alert {
-            padding: 12px 16px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            font-size: 14px;
-            display: none;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .alert.show {
-            display: flex;
-            animation: slideInDown 0.3s ease;
-        }
-
-        @keyframes slideInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .alert-success {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .alert-warning {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .reprog-card {
-            background: white;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            transition: all 0.2s;
-        }
-
-        .reprog-card.offline-saved {
-            border: 2px solid #f59e0b;
-            background: #fffbeb;
-        }
-
+        /* Offline Badge */
         .offline-badge {
-            background: #f59e0b;
+            background: var(--warning);
             color: white;
             padding: 4px 10px;
             border-radius: 8px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            margin-bottom: 8px;
         }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 14px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #f3f4f6;
-            gap: 12px;
-        }
-
-        .card-info h3 {
-            font-size: 15px;
-            color: #1f2937;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        .badge-pending {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .badge-answered {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .table-container {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            margin: 12px 0;
-            background: #fafafa;
-            border-radius: 12px;
-            padding: 12px;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .data-table th {
-            padding: 12px 10px;
-            text-align: left;
-            font-weight: 700;
-            color: #374151;
-            border-bottom: 2px solid #e5e7eb;
-            white-space: nowrap;
-            font-size: 12px;
-            background: #f9fafb;
-        }
-
-        .data-table td {
-            padding: 12px 10px;
-            border-bottom: 1px solid #f3f4f6;
-            color: #1f2937;
-        }
-
-        .editable-cell input,
-        .editable-cell textarea {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: inherit;
-            min-height: 44px;
-            transition: all 0.2s;
-        }
-
-        .editable-cell input:focus,
-        .editable-cell textarea:focus {
-            outline: none;
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-        }
-
-        .editable-cell textarea {
-            min-width: 180px;
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            min-height: 48px;
-            width: 100%;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .btn:active {
-            transform: scale(0.95);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            color: white;
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .actions-bar {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 14px;
-            padding-top: 14px;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #9ca3af;
-        }
-
-        .empty-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-            opacity: 0.4;
-        }
-
-        .loader {
-            display: none;
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .loader.active {
-            display: block;
-        }
-
-        .spinner {
-            border: 4px solid #f3f4f6;
-            border-top: 4px solid #8b5cf6;
-            border-radius: 50%;
-            width: 48px;
-            height: 48px;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 16px;
-        }
-
-        .info-box {
-            background: #eff6ff;
-            border-left: 4px solid #3b82f6;
-            padding: 12px 14px;
-            border-radius: 8px;
-            margin-bottom: 14px;
-            font-size: 13px;
-            color: #1e40af;
-        }
-
+        /* Utilities */
         .fade-in {
             animation: fadeIn 0.3s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        @media (max-height: 600px) {
+            .header-stats {
+                gap: 6px;
+            }
+
+            .stat-card {
+                padding: 8px 10px;
+                font-size: 11px;
+            }
+
+            .stat-number {
+                font-size: 16px;
+            }
+        }
+
+        /* Safe area support */
+        @supports (padding: max(0px)) {
+            .container {
+                padding-left: max(16px, env(safe-area-inset-left));
+                padding-right: max(16px, env(safe-area-inset-right));
+                padding-bottom: max(16px, env(safe-area-inset-bottom));
+            }
         }
     </style>
 </head>
 <body>
-
-<!-- BANNER DE CONEXIÓN -->
-<div class="connection-banner" id="connectionBanner">
-    <i class="fas fa-wifi"></i>
-    <span id="connectionText">Conectado</span>
-</div>
-
-<div class="topbar">
-    <div class="brand">
-        <div class="brand-left">
-            <i class="fas fa-tasks"></i>
-            <h1>Supervisión Offline</h1>
-        </div>
-        <button class="logout-btn" onclick="cerrarSesion()">
-            <i class="fas fa-sign-out-alt"></i>
-        </button>
+    <!-- Connection Banner -->
+    <div class="connection-banner" id="connectionBanner">
+        <i class="fas fa-wifi"></i>
+        <span id="connectionText">Conectado</span>
     </div>
-    <div class="user-section">
-        <div class="stats-mini">
-            <div class="stat-item">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-top">
+            <div class="header-brand">
+                <i class="fas fa-tasks"></i>
+                <span>Supervisión</span>
+            </div>
+            <button class="logout-btn" onclick="cerrarSesion()" title="Cerrar sesión">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+
+        <div class="header-stats">
+            <div class="stat-card pending">
                 <i class="fas fa-clock"></i>
-                <span class="stat-number pending" id="pendingCount">0</span>
-                <span style="font-size: 12px;">Pendientes</span>
+                <div class="stat-label">
+                    <span class="stat-number" id="pendingCount">0</span>
+                    <span>Pendientes</span>
+                </div>
             </div>
-            <div class="stat-item">
-                <i class="fas fa-save"></i>
-                <span class="stat-number offline" id="offlineCount">0</span>
-                <span style="font-size: 12px;">Sin sincronizar</span>
-            </div>
-        </div>
-        <div class="user-info">
-            <i class="fas fa-user-circle" style="font-size: 20px;"></i>
-            <div>
-                <div class="user-name" style="font-weight: 600; font-size: 13px;" id="userName">Cargando...</div>
-                <div style="font-size: 11px; opacity: 0.8;">Supervisor</div>
+            <div class="stat-card offline">
+                <i class="fas fa-cloud"></i>
+                <div class="stat-label">
+                    <span class="stat-number" id="offlineCount">0</span>
+                    <span>Sin sincronizar</span>
+                </div>
             </div>
         </div>
-    </div>
-</div>
+    </header>
 
-<div class="container">
-    <!-- ESTADO DE SINCRONIZACIÓN -->
-    <div class="sync-status" id="syncStatus">
-        <div class="sync-icon pending">
-            <i class="fas fa-cloud-upload-alt"></i>
+    <!-- Main Content -->
+    <div class="content">
+        <div class="container">
+            <!-- Sync Status -->
+            <div class="sync-status" id="syncStatus">
+                <div class="sync-icon pending">
+                    <div class="spinner-sm"></div>
+                </div>
+                <div class="sync-info">
+                    <div class="sync-title" id="syncTitle">Sincronizando...</div>
+                    <div class="sync-desc" id="syncDesc">Guardando cambios</div>
+                </div>
+            </div>
+
+            <!-- Alerts -->
+            <div class="alert alert-success" id="successAlert">
+                <i class="fas fa-check-circle"></i>
+                <span id="successMsg"></span>
+            </div>
+
+            <div class="alert alert-error" id="errorAlert">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="errorMsg"></span>
+            </div>
+
+            <div class="alert alert-warning" id="warningAlert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="warningMsg"></span>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs-container">
+                <button class="tab active" data-tab="pendientes">
+                    <i class="fas fa-clock"></i>
+                    Pendientes
+                    <span class="tab-badge" id="pendingBadge">0</span>
+                </button>
+                <button class="tab" data-tab="respondidas">
+                    <i class="fas fa-check-circle"></i>
+                    Respondidas
+                </button>
+                <button class="tab" data-tab="todas">
+                    <i class="fas fa-list"></i>
+                    Todas
+                </button>
+            </div>
+
+            <!-- Loader -->
+            <div class="loader active" id="loader">
+                <div class="spinner"></div>
+                <div class="loader-text">Cargando reprogramaciones...</div>
+            </div>
+
+            <!-- Content -->
+            <div id="reprogContainer"></div>
         </div>
-        <div class="sync-info">
-            <div class="sync-title" id="syncTitle">Sincronizando...</div>
-            <div class="sync-desc" id="syncDesc">Guardando cambios pendientes</div>
-        </div>
     </div>
 
-    <div class="alert alert-success" id="successAlert">
-        <i class="fas fa-check-circle"></i>
-        <span id="successMsg"></span>
-    </div>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getDatabase, ref, get, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-    <div class="alert alert-error" id="errorAlert">
-        <i class="fas fa-exclamation-circle"></i>
-        <span id="errorMsg"></span>
-    </div>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBDRqsZI8EQaGn1lCc4Y5rIcfmLE7969zY",
+            authDomain: "reprogramacionesme.firebaseapp.com",
+            databaseURL: "https://reprogramacionesme-default-rtdb.firebaseio.com",
+            projectId: "reprogramacionesme",
+            storageBucket: "reprogramacionesme.firebasestorage.app",
+            messagingSenderId: "674035461204",
+            appId: "1:674035461204:web:a70b7793f71ae1c5e311c1"
+        };
 
-    <div class="alert alert-warning" id="warningAlert">
-        <i class="fas fa-exclamation-triangle"></i>
-        <span id="warningMsg"></span>
-    </div>
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
 
-    <div class="tabs">
-        <button class="tab active" data-tab="pendientes">
-            <i class="fas fa-clock"></i>
-            Pendientes
-            <span class="tab-badge" id="pendingBadge">0</span>
-        </button>
-        <button class="tab" data-tab="respondidas">
-            <i class="fas fa-check-circle"></i>
-            Respondidas
-        </button>
-        <button class="tab" data-tab="todas">
-            <i class="fas fa-list"></i>
-            Todas
-        </button>
-    </div>
-
-    <div class="loader active" id="loader">
-        <div class="spinner"></div>
-        <div style="color: #9ca3af; font-size: 13px;">Cargando reprogramaciones...</div>
-    </div>
-
-    <div id="reprogContainer"></div>
-</div>
-
-<script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getDatabase, ref, get, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-
-    // ========================================
-    // 🔧 CONFIGURACIÓN FIREBASE
-    // ========================================
-    const firebaseConfig = {
-        apiKey: "AIzaSyBDRqsZI8EQaGn1lCc4Y5rIcfmLE7969zY",
-        authDomain: "reprogramacionesme.firebaseapp.com",
-        databaseURL: "https://reprogramacionesme-default-rtdb.firebaseio.com",
-        projectId: "reprogramacionesme",
-        storageBucket: "reprogramacionesme.firebasestorage.app",
-        messagingSenderId: "674035461204",
-        appId: "1:674035461204:web:a70b7793f71ae1c5e311c1"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-
-    // ========================================
-    // 💾 INDEXEDDB - ALMACENAMIENTO OFFLINE
-    // ========================================
-    class OfflineStorage {
-        constructor() {
-            this.dbName = 'SupervisionOfflineDB';
-            this.version = 1;
-            this.db = null;
-        }
-
-        async init() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(this.dbName, this.version);
-
-                request.onerror = () => reject(request.error);
-                request.onsuccess = () => {
-                    this.db = request.result;
-                    resolve(this.db);
-                };
-
-                request.onupgradeneeded = (event) => {
-                    const db = event.target.result;
-
-                    // Store para reprogramaciones
-                    if (!db.objectStoreNames.contains('reprogramaciones')) {
-                        db.createObjectStore('reprogramaciones', { keyPath: 'id' });
-                    }
-
-                    // Store para cambios pendientes
-                    if (!db.objectStoreNames.contains('cambiosPendientes')) {
-                        const store = db.createObjectStore('cambiosPendientes', { keyPath: 'timestamp' });
-                        store.createIndex('reprogId', 'reprogId', { unique: false });
-                    }
-
-                    // Store para datos de usuario
-                    if (!db.objectStoreNames.contains('usuario')) {
-                        db.createObjectStore('usuario', { keyPath: 'uid' });
-                    }
-                };
-            });
-        }
-
-        async guardarReprogramaciones(reprogs) {
-            const tx = this.db.transaction(['reprogramaciones'], 'readwrite');
-            const store = tx.objectStore('reprogramaciones');
-            
-            for (const reprog of reprogs) {
-                await store.put(reprog);
+        class OfflineStorage {
+            constructor() {
+                this.dbName = 'SupervisionOfflineDB';
+                this.version = 1;
+                this.db = null;
             }
-            
-            return tx.complete;
+
+            async init() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(this.dbName, this.version);
+                    request.onerror = () => reject(request.error);
+                    request.onsuccess = () => {
+                        this.db = request.result;
+                        resolve(this.db);
+                    };
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        if (!db.objectStoreNames.contains('reprogramaciones')) {
+                            db.createObjectStore('reprogramaciones', { keyPath: 'id' });
+                        }
+                        if (!db.objectStoreNames.contains('cambiosPendientes')) {
+                            const store = db.createObjectStore('cambiosPendientes', { keyPath: 'timestamp' });
+                            store.createIndex('reprogId', 'reprogId', { unique: false });
+                        }
+                        if (!db.objectStoreNames.contains('usuario')) {
+                            db.createObjectStore('usuario', { keyPath: 'uid' });
+                        }
+                    };
+                });
+            }
+
+            async guardarReprogramaciones(reprogs) {
+                const tx = this.db.transaction(['reprogramaciones'], 'readwrite');
+                const store = tx.objectStore('reprogramaciones');
+                for (const reprog of reprogs) await store.put(reprog);
+                return tx.complete;
+            }
+
+            async obtenerReprogramaciones() {
+                const tx = this.db.transaction(['reprogramaciones'], 'readonly');
+                const store = tx.objectStore('reprogramaciones');
+                return new Promise((resolve) => {
+                    const request = store.getAll();
+                    request.onsuccess = () => resolve(request.result || []);
+                });
+            }
+
+            async guardarCambioPendiente(reprogId, mes, datos) {
+                const tx = this.db.transaction(['cambiosPendientes'], 'readwrite');
+                const store = tx.objectStore('cambiosPendientes');
+                const cambio = { timestamp: Date.now(), reprogId, mes, datos, sincronizado: false };
+                await store.put(cambio);
+                return cambio;
+            }
+
+            async obtenerCambiosPendientes() {
+                const tx = this.db.transaction(['cambiosPendientes'], 'readonly');
+                const store = tx.objectStore('cambiosPendientes');
+                return new Promise((resolve) => {
+                    const request = store.getAll();
+                    request.onsuccess = () => {
+                        const todos = request.result || [];
+                        resolve(todos.filter(c => !c.sincronizado));
+                    };
+                });
+            }
+
+            async marcarCambioSincronizado(timestamp) {
+                const tx = this.db.transaction(['cambiosPendientes'], 'readwrite');
+                const store = tx.objectStore('cambiosPendientes');
+                await store.delete(timestamp);
+            }
+
+            async guardarUsuario(userData) {
+                const tx = this.db.transaction(['usuario'], 'readwrite');
+                const store = tx.objectStore('usuario');
+                await store.put(userData);
+            }
+
+            async obtenerUsuario(uid) {
+                const tx = this.db.transaction(['usuario'], 'readonly');
+                const store = tx.objectStore('usuario');
+                return new Promise((resolve) => {
+                    const request = store.get(uid);
+                    request.onsuccess = () => resolve(request.result);
+                });
+            }
         }
 
-        async obtenerReprogramaciones() {
-            const tx = this.db.transaction(['reprogramaciones'], 'readonly');
-            const store = tx.objectStore('reprogramaciones');
-            return new Promise((resolve) => {
-                const request = store.getAll();
-                request.onsuccess = () => resolve(request.result || []);
-            });
+        const offlineStorage = new OfflineStorage();
+        let isOnline = navigator.onLine;
+        let currentUser = null;
+        let todasReprogramaciones = [];
+        let tabActual = 'pendientes';
+        let datosEditados = {};
+
+        const connectionBanner = document.getElementById('connectionBanner');
+        const connectionText = document.getElementById('connectionText');
+
+        function mostrarEstadoConexion(online) {
+            isOnline = online;
+            if (online) {
+                connectionBanner.className = 'connection-banner online show';
+                connectionText.innerHTML = '<i class="fas fa-check-circle"></i> Conectado';
+                setTimeout(() => connectionBanner.classList.remove('show'), 2500);
+                sincronizarCambiosPendientes();
+            } else {
+                connectionBanner.className = 'connection-banner offline show';
+                connectionText.innerHTML = '<i class="fas fa-wifi-slash"></i> Modo offline';
+                if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+            }
         }
 
-        async guardarCambioPendiente(reprogId, mes, datos) {
-            const tx = this.db.transaction(['cambiosPendientes'], 'readwrite');
-            const store = tx.objectStore('cambiosPendientes');
-            
-            const cambio = {
-                timestamp: Date.now(),
-                reprogId,
-                mes,
-                datos,
-                sincronizado: false
-            };
-            
-            await store.put(cambio);
-            return cambio;
-        }
+        window.addEventListener('online', () => mostrarEstadoConexion(true));
+        window.addEventListener('offline', () => mostrarEstadoConexion(false));
 
-        async obtenerCambiosPendientes() {
-            const tx = this.db.transaction(['cambiosPendientes'], 'readonly');
-            const store = tx.objectStore('cambiosPendientes');
-            return new Promise((resolve) => {
-                const request = store.getAll();
-                request.onsuccess = () => {
-                    const todos = request.result || [];
-                    resolve(todos.filter(c => !c.sincronizado));
-                };
-            });
-        }
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                try {
+                    await offlineStorage.init();
+                    await cargarReprogramaciones();
+                    const pendientes = await offlineStorage.obtenerCambiosPendientes();
+                    actualizarContadorOffline(pendientes.length);
+                } catch (error) {
+                    mostrarAlerta('error', 'Error: ' + error.message);
+                }
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
 
-        async marcarCambioSincronizado(timestamp) {
-            const tx = this.db.transaction(['cambiosPendientes'], 'readwrite');
-            const store = tx.objectStore('cambiosPendientes');
-            await store.delete(timestamp);
-        }
-
-        async guardarUsuario(userData) {
-            const tx = this.db.transaction(['usuario'], 'readwrite');
-            const store = tx.objectStore('usuario');
-            await store.put(userData);
-        }
-
-        async obtenerUsuario(uid) {
-            const tx = this.db.transaction(['usuario'], 'readonly');
-            const store = tx.objectStore('usuario');
-            return new Promise((resolve) => {
-                const request = store.get(uid);
-                request.onsuccess = () => resolve(request.result);
-            });
-        }
-    }
-
-    const offlineStorage = new OfflineStorage();
-
-    // ========================================
-    // 🌐 GESTIÓN DE CONEXIÓN
-    // ========================================
-    let isOnline = navigator.onLine;
-    const connectionBanner = document.getElementById('connectionBanner');
-    const connectionText = document.getElementById('connectionText');
-
-    function mostrarEstadoConexion(online, mensaje = '') {
-        isOnline = online;
-        
-        if (online) {
-            connectionBanner.className = 'connection-banner online show';
-            connectionText.innerHTML = `<i class="fas fa-check-circle"></i> ${mensaje || 'Conectado'}`;
-            setTimeout(() => connectionBanner.classList.remove('show'), 3000);
-            
-            // Sincronizar cambios pendientes
-            sincronizarCambiosPendientes();
-        } else {
-            connectionBanner.className = 'connection-banner offline show pulse';
-            connectionText.innerHTML = `<i class="fas fa-wifi-slash"></i> Sin conexión - Modo Offline Activado`;
-            
-            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-        }
-    }
-
-    window.addEventListener('online', () => {
-        console.log('✅ Conexión restaurada');
-        mostrarEstadoConexion(true, 'Conexión restaurada');
-    });
-
-    window.addEventListener('offline', () => {
-        console.log('❌ Sin conexión');
-        mostrarEstadoConexion(false);
-    });
-
-    // ========================================
-    // 📊 VARIABLES GLOBALES
-    // ========================================
-    let currentUser = null;
-    let userData = null;
-    let todasReprogramaciones = [];
-    let tabActual = 'pendientes';
-    let datosEditados = {};
-
-    // ========================================
-    // 🚀 INICIALIZACIÓN
-    // ========================================
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            currentUser = user;
-            console.log('✅ Usuario autenticado:', user.email);
-
+        async function cargarReprogramaciones() {
+            const loader = document.getElementById('loader');
             try {
-                await offlineStorage.init();
-                console.log('✅ IndexedDB inicializado');
+                const cached = await offlineStorage.obtenerReprogramaciones();
+                if (cached.length > 0) {
+                    todasReprogramaciones = cached;
+                    loader.classList.remove('active');
+                    actualizarEstadisticas();
+                    mostrarReprogramaciones();
+                }
 
-                await cargarDatosUsuario();
-                await cargarReprogramaciones();
-                
-                // Verificar cambios pendientes
-                const pendientes = await offlineStorage.obtenerCambiosPendientes();
-                actualizarContadorOffline(pendientes.length);
-                
-                if (pendientes.length > 0 && isOnline) {
-                    mostrarAlerta('warning', `Tienes ${pendientes.length} cambio(s) sin sincronizar. Sincronizando...`);
-                    await sincronizarCambiosPendientes();
+                if (isOnline) {
+                    const meses = obtenerUltimosMeses(3);
+                    const promesas = meses.map(async mes => {
+                        const reprogRef = ref(db, `reprogramaciones/${mes}`);
+                        const snapshot = await get(reprogRef);
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            return Object.entries(data)
+                                .filter(([, reprog]) => reprog.supervisorId === currentUser.uid)
+                                .map(([id, reprog]) => ({ id, mes, ...reprog }));
+                        }
+                        return [];
+                    });
+
+                    const resultados = await Promise.all(promesas);
+                    todasReprogramaciones = resultados.flat()
+                        .sort((a, b) => new Date(b.fechaSubida) - new Date(a.fechaSubida));
+
+                    await offlineStorage.guardarReprogramaciones(todasReprogramaciones);
+                    loader.classList.remove('active');
+                    actualizarEstadisticas();
+                    mostrarReprogramaciones();
                 }
             } catch (error) {
-                console.error('❌ Error:', error);
-                mostrarAlerta('error', 'Error al inicializar: ' + error.message);
+                console.error('Error:', error);
+                loader.classList.remove('active');
             }
-        } else {
-            window.location.href = 'login.html';
         }
-    });
 
-    async function cargarDatosUsuario() {
-        try {
-            // Primero intentar desde cache local
-            const cached = await offlineStorage.obtenerUsuario(currentUser.uid);
-            
-            if (cached) {
-                userData = cached;
-                document.getElementById('userName').textContent = userData.nombre;
-                console.log('✅ Usuario cargado desde cache');
-            }
+        async function sincronizarCambiosPendientes() {
+            if (!isOnline) return;
 
-            // Si hay internet, actualizar
-            if (isOnline) {
-                const userRef = ref(db, `usuarios/${currentUser.uid}`);
-                const snapshot = await get(userRef);
+            const pendientes = await offlineStorage.obtenerCambiosPendientes();
+            if (pendientes.length === 0) return;
 
-                if (snapshot.exists()) {
-                    userData = { ...snapshot.val(), uid: currentUser.uid };
-                    document.getElementById('userName').textContent = userData.nombre;
-                    
-                    // Guardar en cache
-                    await offlineStorage.guardarUsuario(userData);
-                    console.log('✅ Usuario actualizado desde Firebase');
+            mostrarSyncStatus(true, pendientes.length);
+
+            let sincronizados = 0;
+            for (const cambio of pendientes) {
+                try {
+                    const reprogRef = ref(db, `reprogramaciones/${cambio.mes}/${cambio.reprogId}`);
+                    await update(reprogRef, {
+                        estado: 'respondida',
+                        datosExcel: cambio.datos,
+                        fechaRespuesta: new Date().toISOString()
+                    });
+                    await offlineStorage.marcarCambioSincronizado(cambio.timestamp);
+                    sincronizados++;
+                } catch (error) {
+                    console.error('Error sincronizando:', error);
                 }
             }
-        } catch (error) {
-            console.error('❌ Error al cargar usuario:', error);
-            if (!cached) throw error;
+
+            const restantes = await offlineStorage.obtenerCambiosPendientes();
+            actualizarContadorOffline(restantes.length);
+
+            if (sincronizados > 0) {
+                mostrarSyncStatus(false);
+                mostrarAlerta('success', `✓ ${sincronizados} cambio(s) sincronizado(s)`);
+                await cargarReprogramaciones();
+            }
         }
-    }
 
-    async function cargarReprogramaciones() {
-        const loader = document.getElementById('loader');
-        
-        try {
-            // Cargar desde cache primero
-            const cached = await offlineStorage.obtenerReprogramaciones();
-            
-            if (cached.length > 0) {
-                todasReprogramaciones = cached;
-                loader.classList.remove('active');
-                actualizarEstadisticas();
-                mostrarReprogramaciones();
-                console.log(`✅ ${cached.length} reprogramaciones desde cache`);
+        function mostrarSyncStatus(show, cantidad = 0) {
+            const syncStatus = document.getElementById('syncStatus');
+            if (show) {
+                document.getElementById('syncTitle').textContent = 'Sincronizando cambios...';
+                document.getElementById('syncDesc').textContent = `${cantidad} operación(es) pendiente(s)`;
+                syncStatus.classList.add('show');
+            } else {
+                syncStatus.classList.remove('show');
+            }
+        }
+
+        function actualizarContadorOffline(cantidad) {
+            document.getElementById('offlineCount').textContent = cantidad;
+        }
+
+        function actualizarEstadisticas() {
+            const pendientes = todasReprogramaciones.filter(r => r.estado === 'pendiente').length;
+            document.getElementById('pendingCount').textContent = pendientes;
+            document.getElementById('pendingBadge').textContent = pendientes;
+        }
+
+        function mostrarReprogramaciones() {
+            let filtradas = todasReprogramaciones;
+            if (tabActual === 'pendientes') {
+                filtradas = todasReprogramaciones.filter(r => r.estado === 'pendiente');
+            } else if (tabActual === 'respondidas') {
+                filtradas = todasReprogramaciones.filter(r => r.estado === 'respondida');
             }
 
-            // Si hay internet, actualizar
-            if (isOnline) {
-                const meses = obtenerUltimosMeses(3);
-                const promesas = meses.map(async mes => {
-                    const reprogRef = ref(db, `reprogramaciones/${mes}`);
-                    const snapshot = await get(reprogRef);
+            const container = document.getElementById('reprogContainer');
+            if (filtradas.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state fade-in">
+                        <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+                        <div class="empty-text">No hay reprogramaciones</div>
+                    </div>
+                `;
+                return;
+            }
 
-                    if (snapshot.exists()) {
-                        const data = snapshot.val();
-                        const misSupervisiones = [];
+            container.innerHTML = filtradas.map(reprog => crearCardReprog(reprog)).join('');
+        }
 
-                        Object.entries(data).forEach(([id, reprog]) => {
-                            if (reprog.supervisorId === currentUser.uid) {
-                                misSupervisiones.push({ id, mes, ...reprog });
-                            }
-                        });
+        function crearCardReprog(reprog) {
+            const fecha = new Date(reprog.fechaSubida).toLocaleDateString('es-CO');
+            const estadoClass = reprog.estado === 'respondida' ? 'badge-answered' : 'badge-pending';
+            const estadoTexto = reprog.estado === 'respondida' ? 'Respondida' : 'Pendiente';
+            const datosExcel = reprog.datosExcel || [];
 
-                        return misSupervisiones;
-                    }
-                    return [];
+            if (!datosEditados[reprog.id] && reprog.estado === 'pendiente') {
+                datosEditados[reprog.id] = datosExcel.map(row => {
+                    const newRow = { ...row };
+                    if (!newRow['FECHA REPROGRAMACION']) newRow['FECHA REPROGRAMACION'] = '';
+                    if (!newRow['OBSERVACION']) newRow['OBSERVACION'] = '';
+                    return newRow;
                 });
-
-                const resultados = await Promise.all(promesas);
-                todasReprogramaciones = [];
-                resultados.forEach(reprogs => todasReprogramaciones.push(...reprogs));
-
-                todasReprogramaciones.sort((a, b) => new Date(b.fechaSubida) - new Date(a.fechaSubida));
-
-                // Guardar en cache
-                await offlineStorage.guardarReprogramaciones(todasReprogramaciones);
-                
-                loader.classList.remove('active');
-                actualizarEstadisticas();
-                mostrarReprogramaciones();
-                
-                console.log(`✅ ${todasReprogramaciones.length} reprogramaciones actualizadas`);
             }
-        } catch (error) {
-            console.error('❌ Error:', error);
-            loader.classList.remove('active');
-            
-            if (cached.length === 0) {
-                document.getElementById('reprogContainer').innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon"><i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i></div>
-                        <div class="empty-text" style="color: #ef4444;">Error al cargar datos</div>
+
+            let tableHTML = '';
+            if (reprog.estado === 'pendiente' && datosExcel.length > 0) {
+                // Obtener todas las columnas únicas del Excel
+                const todasLasColumnas = new Set();
+                datosExcel.forEach(row => {
+                    Object.keys(row).forEach(col => todasLasColumnas.add(col));
+                });
+                
+                const columnasOrdenadas = [
+                    'FECHA REPROGRAMACION',
+                    'OBSERVACION',
+                    ...Array.from(todasLasColumnas).filter(col => 
+                        col !== 'FECHA REPROGRAMACION' && col !== 'OBSERVACION'
+                    )
+                ];
+
+                tableHTML = `
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <div>Completa la FECHA REPROGRAMACION y OBSERVACION para cada fila</div>
+                    </div>
+                    <div class="table-wrapper" id="table-${reprog.id}">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    ${columnasOrdenadas.map(col => `<th>${col}</th>`).join('')}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${datosExcel.map((row, index) => `
+                                    <tr>
+                                        ${columnasOrdenadas.map(col => {
+                                            if (col === 'FECHA REPROGRAMACION' || col === 'OBSERVACION') {
+                                                if (col === 'OBSERVACION') {
+                                                    return `
+                                        <td class="editable-cell">
+                                            <textarea data-reprog="${reprog.id}" data-row="${index}" data-field="${col}"
+                                                      onchange="actualizarCelda(this)">${row[col] || ''}</textarea>
+                                        </td>
+                                    `;
+                                                } else {
+                                                    return `
+                                        <td class="editable-cell">
+                                            <input type="date" data-reprog="${reprog.id}" data-row="${index}" 
+                                                   data-field="${col}" value="${row[col] || ''}"
+                                                   onchange="actualizarCelda(this)">
+                                        </td>
+                                    `;
+                                                }
+                                            } else {
+                                                return `<td><span title="${row[col] || ''}">${row[col] || '-'}</span></td>`;
+                                            }
+                                        }).join('')}
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        <div class="table-scroll-hint">← Desliza para ver más →</div>
+                    </div>
+                    <div class="actions-bar">
+                        <button class="btn ${isOnline ? 'btn-success' : 'btn-warning'}" onclick="guardarRespuestas('${reprog.mes}', '${reprog.id}')">
+                            <i class="fas ${isOnline ? 'fa-save' : 'fa-cloud-upload-alt'}"></i>
+                            ${isOnline ? 'Guardar' : 'Guardar Offline'}
+                        </button>
                     </div>
                 `;
             }
-        }
-    }
 
-    // ========================================
-    // 🔄 SINCRONIZACIÓN AUTOMÁTICA
-    // ========================================
-    async function sincronizarCambiosPendientes() {
-        if (!isOnline) {
-            console.log('⚠️ Sin conexión, esperando para sincronizar');
-            return;
-        }
-
-        const pendientes = await offlineStorage.obtenerCambiosPendientes();
-        
-        if (pendientes.length === 0) {
-            console.log('✅ No hay cambios pendientes');
-            return;
-        }
-
-        mostrarSyncStatus(true, pendientes.length);
-
-        let sincronizados = 0;
-        let errores = 0;
-
-        for (const cambio of pendientes) {
-            try {
-                const reprogRef = ref(db, `reprogramaciones/${cambio.mes}/${cambio.reprogId}`);
-                
-                await update(reprogRef, {
-                    estado: 'respondida',
-                    datosExcel: cambio.datos,
-                    fechaRespuesta: new Date().toISOString()
-                });
-
-                await offlineStorage.marcarCambioSincronizado(cambio.timestamp);
-                sincronizados++;
-                
-                console.log(`✅ Sincronizado: ${cambio.reprogId}`);
-            } catch (error) {
-                console.error(`❌ Error sincronizando ${cambio.reprogId}:`, error);
-                errores++;
-            }
-        }
-
-        actualizarContadorOffline(await offlineStorage.obtenerCambiosPendientes().then(p => p.length));
-
-        if (errores === 0) {
-            mostrarSyncStatus(false);
-            mostrarAlerta('success', `✅ ${sincronizados} cambio(s) sincronizado(s) exitosamente`);
-            await cargarReprogramaciones();
-        } else {
-            mostrarAlerta('warning', `⚠️ ${sincronizados} sincronizados, ${errores} con error`);
-        }
-    }
-
-    function mostrarSyncStatus(show, cantidad = 0) {
-        const syncStatus = document.getElementById('syncStatus');
-        
-        if (show) {
-            document.getElementById('syncTitle').textContent = 'Sincronizando cambios...';
-            document.getElementById('syncDesc').textContent = `${cantidad} operación(es) pendiente(s)`;
-            syncStatus.classList.add('show');
-            
-            connectionBanner.className = 'connection-banner syncing show';
-            connectionText.innerHTML = `
-                <div class="spinner-small"></div>
-                Sincronizando ${cantidad} cambio(s)...
-            `;
-        } else {
-            syncStatus.classList.remove('show');
-            connectionBanner.classList.remove('show');
-        }
-    }
-
-    function actualizarContadorOffline(cantidad) {
-        const contador = document.getElementById('offlineCount');
-        contador.textContent = cantidad;
-        
-        if (cantidad > 0) {
-            contador.classList.add('offline');
-        } else {
-            contador.classList.remove('offline');
-        }
-    }
-
-    // ========================================
-    // 💾 GUARDAR RESPUESTAS (OFFLINE FIRST)
-    // ========================================
-    window.guardarRespuestas = async function(mes, id) {
-        const datosActualizados = datosEditados[id];
-
-        if (!datosActualizados) {
-            mostrarAlerta('error', 'No hay datos para guardar');
-            return;
-        }
-
-        const todasCompletas = datosActualizados.every(row =>
-            row['FECHA REPROGRAMACION'] && row['OBSERVACION']
-        );
-
-        if (!todasCompletas) {
-            if (!confirm('⚠️ Algunas filas no están completas.\n\n¿Deseas continuar?')) {
-                return;
-            }
-        }
-
-        const btnGuardar = event.target;
-        const textoOriginal = btnGuardar.innerHTML;
-        btnGuardar.disabled = true;
-        btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-
-        try {
-            // 1. GUARDAR LOCAL PRIMERO (OFFLINE FIRST)
-            await offlineStorage.guardarCambioPendiente(id, mes, datosActualizados);
-            console.log('✅ Guardado localmente');
-
-            // Actualizar contador
-            const pendientes = await offlineStorage.obtenerCambiosPendientes();
-            actualizarContadorOffline(pendientes.length);
-
-            // 2. SI HAY INTERNET, SINCRONIZAR
-            if (isOnline) {
-                try {
-                    const reprogRef = ref(db, `reprogramaciones/${mes}/${id}`);
-                    
-                    await update(reprogRef, {
-                        estado: 'respondida',
-                        datosExcel: datosActualizados,
-                        fechaRespuesta: new Date().toISOString()
-                    });
-
-                    // Marcar como sincronizado
-                    const cambios = await offlineStorage.obtenerCambiosPendientes();
-                    const miCambio = cambios.find(c => c.reprogId === id);
-                    if (miCambio) {
-                        await offlineStorage.marcarCambioSincronizado(miCambio.timestamp);
-                    }
-
-                    actualizarContadorOffline(await offlineStorage.obtenerCambiosPendientes().then(p => p.length));
-
-                    mostrarAlerta('success', '✅ Guardado y sincronizado con Firebase');
-                    console.log('✅ Sincronizado con Firebase');
-                } catch (syncError) {
-                    console.warn('⚠️ Guardado localmente, error al sincronizar:', syncError);
-                    mostrarAlerta('warning', '⚠️ Guardado localmente. Se sincronizará cuando haya conexión.');
-                }
-            } else {
-                mostrarAlerta('warning', '📱 Guardado en modo offline. Se sincronizará automáticamente.');
-            }
-
-            if (navigator.vibrate) navigator.vibrate([50, 100, 50]);
-
-            delete datosEditados[id];
-            
-            setTimeout(async () => {
-                await cargarReprogramaciones();
-                tabActual = 'respondidas';
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelector('[data-tab="respondidas"]').classList.add('active');
-                mostrarReprogramaciones();
-            }, 1000);
-
-        } catch (error) {
-            console.error('❌ Error:', error);
-            mostrarAlerta('error', 'Error al guardar: ' + error.message);
-            btnGuardar.disabled = false;
-            btnGuardar.innerHTML = textoOriginal;
-        }
-    };
-
-    // ========================================
-    // 📊 FUNCIONES DE VISUALIZACIÓN
-    // ========================================
-    function actualizarEstadisticas() {
-        const pendientes = todasReprogramaciones.filter(r => r.estado === 'pendiente').length;
-        const respondidas = todasReprogramaciones.filter(r => r.estado === 'respondida').length;
-
-        document.getElementById('pendingCount').textContent = pendientes;
-        document.getElementById('pendingBadge').textContent = pendientes;
-    }
-
-    function mostrarReprogramaciones() {
-        let filtradas = todasReprogramaciones;
-
-        if (tabActual === 'pendientes') {
-            filtradas = todasReprogramaciones.filter(r => r.estado === 'pendiente');
-        } else if (tabActual === 'respondidas') {
-            filtradas = todasReprogramaciones.filter(r => r.estado === 'respondida');
-        }
-
-        const container = document.getElementById('reprogContainer');
-
-        if (filtradas.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state fade-in">
-                    <div class="empty-icon"><i class="fas fa-inbox"></i></div>
-                    <div class="empty-text">No hay reprogramaciones ${tabActual}</div>
-                </div>
-            `;
-            return;
-        }
-
-        const html = filtradas.map(reprog => crearCardReprog(reprog)).join('');
-        container.innerHTML = html;
-        container.classList.add('fade-in');
-    }
-
-    function crearCardReprog(reprog) {
-        const fecha = new Date(reprog.fechaSubida).toLocaleDateString('es-CO');
-        const estadoClass = reprog.estado === 'respondida' ? 'badge-answered' : 'badge-pending';
-        const estadoTexto = reprog.estado === 'respondida' ? 'Respondida' : 'Pendiente';
-
-        const datosExcel = reprog.datosExcel || [];
-
-        if (!datosEditados[reprog.id] && reprog.estado === 'pendiente') {
-            datosEditados[reprog.id] = datosExcel.map(row => ({
-                ...row,
-                'FECHA REPROGRAMACION': row['FECHA REPROGRAMACION'] || '',
-                'OBSERVACION': row['OBSERVACION'] || ''
-            }));
-        }
-
-        let tableHTML = '';
-
-        if (reprog.estado === 'pendiente' && datosExcel.length > 0) {
-            tableHTML = `
-                <div class="info-box">
-                    <i class="fas fa-info-circle"></i>
-                    ${!isOnline ? '📱 <strong>Modo Offline:</strong> Tus cambios se guardarán localmente y se sincronizarán automáticamente cuando tengas conexión.<br>' : ''}
-                    Completa la FECHA REPROGRAMACION y OBSERVACION para cada fila
-                </div>
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>FECHA REPROG.</th>
-                                <th>OBSERVACIÓN</th>
-                                <th>PROMOTOR</th>
-                                <th>PUNTO DE VENTA</th>
-                                <th>FECHA</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${datosExcel.map((row, index) => `
-                                <tr>
-                                    <td class="editable-cell">
-                                        <input type="date" data-reprog="${reprog.id}" data-row="${index}" 
-                                               data-field="FECHA REPROGRAMACION" value="${row['FECHA REPROGRAMACION'] || ''}"
-                                               onchange="actualizarCelda(this)">
-                                    </td>
-                                    <td class="editable-cell">
-                                        <textarea data-reprog="${reprog.id}" data-row="${index}" data-field="OBSERVACION"
-                                                  onchange="actualizarCelda(this)">${row['OBSERVACION'] || ''}</textarea>
-                                    </td>
-                                    <td>${row['NOMBRE PROMOTOR'] || ''}</td>
-                                    <td>${row['NOMBRE PUNTO DE VENTA'] || ''}</td>
-                                    <td>${row['FECHA'] || ''}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-                <div class="actions-bar">
-                    <button class="btn ${isOnline ? 'btn-success' : 'btn-warning'}" onclick="guardarRespuestas('${reprog.mes}', '${reprog.id}')">
-                        <i class="fas ${isOnline ? 'fa-save' : 'fa-cloud-upload-alt'}"></i>
-                        ${isOnline ? 'Guardar y Sincronizar' : 'Guardar Offline'}
-                    </button>
-                </div>
-            `;
-        }
-
-        return `
-            <div class="reprog-card fade-in">
-                <div class="card-header">
-                    <div class="card-info">
-                        <h3>De: ${reprog.auxiliarNombre}</h3>
-                        <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
-                            <i class="far fa-calendar"></i> ${fecha} · 
-                            <i class="fas fa-list-ol"></i> ${datosExcel.length} registros
+            return `
+                <div class="reprog-card fade-in">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">De: ${reprog.auxiliarNombre}</div>
+                            <div class="card-meta">
+                                <span><i class="far fa-calendar"></i>${fecha}</span>
+                                <span><i class="fas fa-list-ol"></i>${datosExcel.length} registros</span>
+                            </div>
                         </div>
+                        <span class="status-badge ${estadoClass}">
+                            <i class="fas fa-${reprog.estado === 'respondida' ? 'check-circle' : 'clock'}"></i>
+                            ${estadoTexto}
+                        </span>
                     </div>
-                    <span class="status-badge ${estadoClass}">
-                        <i class="fas fa-${reprog.estado === 'respondida' ? 'check-circle' : 'clock'}"></i>
-                        ${estadoTexto}
-                    </span>
+                    ${tableHTML}
                 </div>
-                ${tableHTML}
-            </div>
-        `;
-    }
-
-    window.actualizarCelda = function(input) {
-        const reprogId = input.dataset.reprog;
-        const rowIndex = parseInt(input.dataset.row);
-        const field = input.dataset.field;
-        const value = input.value;
-
-        if (datosEditados[reprogId]) {
-            datosEditados[reprogId][rowIndex][field] = value;
-            input.style.borderColor = '#10b981';
-            
-            if (navigator.vibrate) navigator.vibrate(10);
-            
-            setTimeout(() => input.style.borderColor = '', 1000);
+            `;
         }
-    };
 
-    // ========================================
-    // 🔧 FUNCIONES AUXILIARES
-    // ========================================
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            tabActual = this.dataset.tab;
-            mostrarReprogramaciones();
-        });
-    });
-
-    window.cerrarSesion = async function() {
-        const pendientes = await offlineStorage.obtenerCambiosPendientes();
-        
-        if (pendientes.length > 0) {
-            if (!confirm(`⚠️ Tienes ${pendientes.length} cambio(s) sin sincronizar.\n\n¿Deseas cerrar sesión de todos modos?`)) {
-                return;
+        window.actualizarCelda = function(input) {
+            const reprogId = input.dataset.reprog;
+            const rowIndex = parseInt(input.dataset.row);
+            const field = input.dataset.field;
+            if (datosEditados[reprogId]) {
+                datosEditados[reprogId][rowIndex][field] = input.value;
+                input.style.borderColor = '#10b981';
+                if (navigator.vibrate) navigator.vibrate(10);
+                setTimeout(() => input.style.borderColor = '', 1000);
             }
-        }
-        
-        try {
-            await signOut(auth);
-            window.location.href = 'login.html';
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    };
-
-    function obtenerUltimosMeses(cantidad) {
-        const meses = [];
-        const ahora = new Date();
-        for (let i = 0; i < cantidad; i++) {
-            const fecha = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1);
-            const mes = fecha.toISOString().slice(0, 7).replace('-', '');
-            meses.push(mes);
-        }
-        return meses;
-    }
-
-    function mostrarAlerta(tipo, mensaje) {
-        const alerts = {
-            'success': 'successAlert',
-            'error': 'errorAlert',
-            'warning': 'warningAlert'
         };
 
-        const alertId = alerts[tipo];
-        const alert = document.getElementById(alertId);
-        const msgElement = document.getElementById(tipo === 'warning' ? 'warningMsg' : tipo + 'Msg');
-        
-        msgElement.textContent = mensaje;
-        alert.classList.add('show');
-        
-        if (navigator.vibrate) {
-            navigator.vibrate(tipo === 'success' ? [50, 50, 50] : [100, 50, 100]);
-        }
-        
-        setTimeout(() => alert.classList.remove('show'), 5000);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+        window.guardarRespuestas = async function(mes, id) {
+            const datos = datosEditados[id];
+            if (!datos) return;
 
-    // Verificar estado inicial
-    mostrarEstadoConexion(isOnline);
+            const incompletas = datos.some(row => !row['FECHA REPROGRAMACION'] || !row['OBSERVACION']);
+            if (incompletas && !confirm('⚠️ Algunas filas no están completas.\n\n¿Continuar?')) return;
 
-    // Auto-sincronizar cada 30 segundos si hay cambios
-    setInterval(async () => {
-        if (isOnline) {
+            const btn = event.target;
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+            try {
+                await offlineStorage.guardarCambioPendiente(id, mes, datos);
+                const pendientes = await offlineStorage.obtenerCambiosPendientes();
+                actualizarContadorOffline(pendientes.length);
+
+                if (isOnline) {
+                    const reprogRef = ref(db, `reprogramaciones/${mes}/${id}`);
+                    await update(reprogRef, {
+                        estado: 'respondida',
+                        datosExcel: datos,
+                        fechaRespuesta: new Date().toISOString()
+                    });
+                    await offlineStorage.marcarCambioSincronizado(pendientes[0]?.timestamp);
+                    const resta = await offlineStorage.obtenerCambiosPendientes();
+                    actualizarContadorOffline(resta.length);
+                    mostrarAlerta('success', '✓ Guardado y sincronizado');
+                } else {
+                    mostrarAlerta('warning', '📱 Guardado offline. Se sincronizará automáticamente');
+                }
+
+                delete datosEditados[id];
+                setTimeout(async () => {
+                    await cargarReprogramaciones();
+                    tabActual = 'respondidas';
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelector('[data-tab="respondidas"]').classList.add('active');
+                    mostrarReprogramaciones();
+                }, 1000);
+            } catch (error) {
+                mostrarAlerta('error', 'Error: ' + error.message);
+                btn.disabled = false;
+                btn.innerHTML = original;
+            }
+        };
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                tabActual = this.dataset.tab;
+                mostrarReprogramaciones();
+            });
+        });
+
+        window.cerrarSesion = async function() {
             const pendientes = await offlineStorage.obtenerCambiosPendientes();
             if (pendientes.length > 0) {
-                console.log('🔄 Auto-sincronización...');
-                await sincronizarCambiosPendientes();
+                if (!confirm(`⚠️ Tienes ${pendientes.length} cambio(s) sin sincronizar.\n\n¿Cerrar sesión?`)) return;
             }
+            try {
+                await signOut(auth);
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        };
+
+        function obtenerUltimosMeses(cantidad) {
+            const meses = [];
+            const ahora = new Date();
+            for (let i = 0; i < cantidad; i++) {
+                const fecha = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1);
+                const mes = fecha.toISOString().slice(0, 7).replace('-', '');
+                meses.push(mes);
+            }
+            return meses;
         }
-    }, 30000);
-</script>
+
+        function mostrarAlerta(tipo, mensaje) {
+            const ids = { success: 'successAlert', error: 'errorAlert', warning: 'warningAlert' };
+            const alert = document.getElementById(ids[tipo]);
+            const msgId = { success: 'successMsg', error: 'errorMsg', warning: 'warningMsg' }[tipo];
+            document.getElementById(msgId).textContent = mensaje;
+            alert.classList.add('show');
+            if (navigator.vibrate) navigator.vibrate(tipo === 'success' ? [50, 50, 50] : [100, 50, 100]);
+            setTimeout(() => alert.classList.remove('show'), 4000);
+        }
+
+        mostrarEstadoConexion(isOnline);
+
+        setInterval(async () => {
+            if (isOnline) {
+                const pendientes = await offlineStorage.obtenerCambiosPendientes();
+                if (pendientes.length > 0) await sincronizarCambiosPendientes();
+            }
+        }, 30000);
+    </script>
 </body>
 </html>
