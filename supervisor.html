@@ -811,7 +811,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getDatabase, ref, get, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getDatabase, ref, get, update, onChildAdded, query, orderByChild, equalTo } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyBDRqsZI8EQaGn1lCc4Y5rIcfmLE7969zY",
@@ -922,6 +922,8 @@
         let todasReprogramaciones = [];
         let tabActual = 'pendientes';
         let datosEditados = {};
+        let reprogramacionesIds = new Set(); // Para rastrear IDs ya cargadas
+        let primeraCargar = true; // Flag para evitar notificaciones en carga inicial
 
         const connectionBanner = document.getElementById('connectionBanner');
         const connectionText = document.getElementById('connectionText');
@@ -951,6 +953,7 @@
                     await cargarReprogramaciones();
                     const pendientes = await offlineStorage.obtenerCambiosPendientes();
                     actualizarContadorOffline(pendientes.length);
+                    iniciarEscuchaNuevasReprogramaciones(); // Iniciar escucha en tiempo real
                 } catch (error) {
                     mostrarAlerta('error', 'Error: ' + error.message);
                 }
@@ -992,10 +995,109 @@
                     loader.classList.remove('active');
                     actualizarEstadisticas();
                     mostrarReprogramaciones();
+                    
+                    // Actualizar el Set de IDs después de la carga inicial
+                    reprogramacionesIds.clear();
+                    todasReprogramaciones.forEach(r => reprogramacionesIds.add(r.id));
+                    primeraCargar = false; // Marcar que ya terminó la carga inicial
                 }
             } catch (error) {
                 console.error('Error:', error);
                 loader.classList.remove('active');
+            }
+        }
+
+        // Función para escuchar nuevas reprogramaciones en tiempo real
+        function iniciarEscuchaNuevasReprogramaciones() {
+            console.log('👂 Iniciando escucha de nuevas reprogramaciones...');
+            const meses = obtenerUltimosMeses(3);
+            
+            meses.forEach(mes => {
+                const reprogRef = ref(db, `reprogramaciones/${mes}`);
+                const q = query(reprogRef, orderByChild('supervisorId'), equalTo(currentUser.uid));
+                
+                onChildAdded(q, (snapshot) => {
+                    // Ignorar si es la primera carga
+                    if (primeraCargar) return;
+                    
+                    const reprogId = snapshot.key;
+                    const nuevaReprog = snapshot.val();
+                    
+                    // Solo notificar si es realmente nueva (no estaba en el Set)
+                    if (nuevaReprog && !reprogramacionesIds.has(reprogId)) {
+                        console.log('🔔 Nueva reprogramación detectada:', reprogId);
+                        
+                        // Agregar al Set
+                        reprogramacionesIds.add(reprogId);
+                        
+                        // Agregar a la lista
+                        const reprogConMes = { id: reprogId, mes, ...nuevaReprog };
+                        todasReprogramaciones.unshift(reprogConMes); // Agregar al inicio
+                        
+                        // Guardar en IndexedDB
+                        offlineStorage.guardarReprogramaciones(todasReprogramaciones);
+                        
+                        // Actualizar UI
+                        actualizarEstadisticas();
+                        if (tabActual === 'pendientes' || tabActual === 'todas') {
+                            mostrarReprogramaciones();
+                        }
+                        
+                        // Mostrar notificación
+                        mostrarNotificacionNuevaReprogramacion(nuevaReprog);
+                    }
+                });
+            });
+        }
+
+        // Función para mostrar notificación de nueva reprogramación
+        function mostrarNotificacionNuevaReprogramacion(reprog) {
+            // Reproducir sonido
+            reproducirSonidoNotificacion();
+            
+            // Mostrar alerta visual
+            mostrarAlerta('success', `🔔 Nueva reprogramación de ${reprog.auxiliarNombre} (${reprog.totalRegistros || 0} registros)`);
+            
+            // Vibración si está disponible
+            if (navigator.vibrate) {
+                navigator.vibrate([200, 100, 200]);
+            }
+            
+            console.log('🔔 Notificación mostrada para nueva reprogramación');
+        }
+
+        // Función para reproducir sonido de notificación
+        function reproducirSonidoNotificacion() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Crear tres tonos para un sonido de notificación agradable
+                const tiempos = [0, 0.15, 0.3];
+                const frecuencias = [587.33, 659.25, 783.99]; // Re, Mi, Sol
+                
+                tiempos.forEach((tiempo, index) => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.type = 'sine';
+                    oscillator.frequency.value = frecuencias[index];
+                    
+                    // Envelope ADSR para un sonido más suave
+                    const now = audioContext.currentTime + tiempo;
+                    gainNode.gain.setValueAtTime(0, now);
+                    gainNode.gain.linearRampToValueAtTime(0.3, now + 0.02);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    
+                    oscillator.start(now);
+                    oscillator.stop(now + 0.15);
+                });
+                
+                console.log('🔊 Sonido de notificación reproducido');
+            } catch (error) {
+                console.error('❌ Error al reproducir sonido:', error);
             }
         }
 
