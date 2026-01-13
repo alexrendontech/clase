@@ -824,6 +824,7 @@
         </div>
     </div>
 
+    <script src="email-service.js"></script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
@@ -882,53 +883,117 @@
             }
 
             async obtenerReprogramaciones() {
-                const tx = this.db.transaction(['reprogramaciones'], 'readonly');
-                const store = tx.objectStore('reprogramaciones');
-                return new Promise((resolve) => {
-                    const request = store.getAll();
-                    request.onsuccess = () => resolve(request.result || []);
-                });
+                if (!this.db) {
+                    console.warn('⚠️ IndexedDB no inicializado en obtenerReprogramaciones');
+                    return [];
+                }
+                try {
+                    const tx = this.db.transaction(['reprogramaciones'], 'readonly');
+                    const store = tx.objectStore('reprogramaciones');
+                    return new Promise((resolve) => {
+                        const request = store.getAll();
+                        request.onsuccess = () => resolve(request.result || []);
+                        request.onerror = () => {
+                            console.error('❌ Error al obtener reprogramaciones');
+                            resolve([]);
+                        };
+                    });
+                } catch (error) {
+                    console.error('❌ Error en obtenerReprogramaciones:', error);
+                    return [];
+                }
             }
 
             async guardarCambioPendiente(reprogId, mes, datos) {
-                const tx = this.db.transaction(['cambiosPendientes'], 'readwrite');
-                const store = tx.objectStore('cambiosPendientes');
-                const cambio = { timestamp: Date.now(), reprogId, mes, datos, sincronizado: false };
-                await store.put(cambio);
-                return cambio;
+                if (!this.db) {
+                    console.warn('⚠️ IndexedDB no inicializado en guardarCambioPendiente');
+                    return null;
+                }
+                try {
+                    const tx = this.db.transaction(['cambiosPendientes'], 'readwrite');
+                    const store = tx.objectStore('cambiosPendientes');
+                    const cambio = { timestamp: Date.now(), reprogId, mes, datos, sincronizado: false };
+                    await store.put(cambio);
+                    return cambio;
+                } catch (error) {
+                    console.error('❌ Error en guardarCambioPendiente:', error);
+                    return null;
+                }
             }
 
             async obtenerCambiosPendientes() {
-                const tx = this.db.transaction(['cambiosPendientes'], 'readonly');
-                const store = tx.objectStore('cambiosPendientes');
-                return new Promise((resolve) => {
-                    const request = store.getAll();
-                    request.onsuccess = () => {
-                        const todos = request.result || [];
-                        resolve(todos.filter(c => !c.sincronizado));
-                    };
-                });
+                if (!this.db) {
+                    console.warn('⚠️ IndexedDB no inicializado en obtenerCambiosPendientes');
+                    return [];
+                }
+                try {
+                    const tx = this.db.transaction(['cambiosPendientes'], 'readonly');
+                    const store = tx.objectStore('cambiosPendientes');
+                    return new Promise((resolve) => {
+                        const request = store.getAll();
+                        request.onsuccess = () => {
+                            const todos = request.result || [];
+                            resolve(todos.filter(c => !c.sincronizado));
+                        };
+                        request.onerror = () => {
+                            console.error('❌ Error al obtener cambios pendientes');
+                            resolve([]);
+                        };
+                    });
+                } catch (error) {
+                    console.error('❌ Error en obtenerCambiosPendientes:', error);
+                    return [];
+                }
             }
 
             async marcarCambioSincronizado(timestamp) {
-                const tx = this.db.transaction(['cambiosPendientes'], 'readwrite');
-                const store = tx.objectStore('cambiosPendientes');
-                await store.delete(timestamp);
+                if (!this.db) {
+                    console.warn('⚠️ IndexedDB no inicializado en marcarCambioSincronizado');
+                    return;
+                }
+                try {
+                    const tx = this.db.transaction(['cambiosPendientes'], 'readwrite');
+                    const store = tx.objectStore('cambiosPendientes');
+                    await store.delete(timestamp);
+                } catch (error) {
+                    console.error('❌ Error en marcarCambioSincronizado:', error);
+                }
             }
 
             async guardarUsuario(userData) {
-                const tx = this.db.transaction(['usuario'], 'readwrite');
-                const store = tx.objectStore('usuario');
-                await store.put(userData);
+                if (!this.db) {
+                    console.warn('⚠️ IndexedDB no inicializado en guardarUsuario');
+                    return;
+                }
+                try {
+                    const tx = this.db.transaction(['usuario'], 'readwrite');
+                    const store = tx.objectStore('usuario');
+                    await store.put(userData);
+                } catch (error) {
+                    console.error('❌ Error en guardarUsuario:', error);
+                }
             }
 
             async obtenerUsuario(uid) {
-                const tx = this.db.transaction(['usuario'], 'readonly');
-                const store = tx.objectStore('usuario');
-                return new Promise((resolve) => {
-                    const request = store.get(uid);
-                    request.onsuccess = () => resolve(request.result);
-                });
+                if (!this.db) {
+                    console.warn('⚠️ IndexedDB no inicializado en obtenerUsuario');
+                    return null;
+                }
+                try {
+                    const tx = this.db.transaction(['usuario'], 'readonly');
+                    const store = tx.objectStore('usuario');
+                    return new Promise((resolve) => {
+                        const request = store.get(uid);
+                        request.onsuccess = () => resolve(request.result);
+                        request.onerror = () => {
+                            console.error('❌ Error al obtener usuario');
+                            resolve(null);
+                        };
+                    });
+                } catch (error) {
+                    console.error('❌ Error en obtenerUsuario:', error);
+                    return null;
+                }
             }
         }
 
@@ -1363,14 +1428,29 @@
 
                 if (isOnline) {
                     const reprogRef = ref(db, `reprogramaciones/${mes}/${id}`);
+                    const fechaRespuesta = new Date().toISOString();
                     await update(reprogRef, {
                         estado: 'respondida',
                         datosExcel: datos,
-                        fechaRespuesta: new Date().toISOString()
+                        fechaRespuesta: fechaRespuesta
                     });
                     await offlineStorage.marcarCambioSincronizado(pendientes[0]?.timestamp);
                     const resta = await offlineStorage.obtenerCambiosPendientes();
                     actualizarContadorOffline(resta.length);
+                    
+                    // Enviar notificación a la auxiliar
+                    const reprogActual = todasReprogramaciones.find(r => r.id === id);
+                    if (reprogActual && reprogActual.auxiliarEmail) {
+                        await notificarAuxiliarReprogramacionCompletada({
+                            auxiliarEmail: reprogActual.auxiliarEmail,
+                            auxiliarNombre: reprogActual.auxiliarNombre,
+                            supervisorNombre: userData?.nombre || currentUser.displayName || 'Supervisor',
+                            archivoNombre: reprogActual.archivoNombre,
+                            totalRegistros: datos.length,
+                            fechaRespuesta: fechaRespuesta
+                        });
+                    }
+                    
                     mostrarAlerta('success', '✓ Guardado y sincronizado');
                 } else {
                     mostrarAlerta('warning', '📱 Guardado offline. Se sincronizará automáticamente');
