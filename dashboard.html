@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Reprogramaciones</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            color: #2d3748;
+            line-height: 1.5;
+        }
+
+        .topbar {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand i {
+            color: #f59e0b;
+            font-size: 24px;
+        }
+
+        .brand h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .period-selector {
+            display: flex;
+            gap: 6px;
+            background: #f3f4f6;
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .period-btn {
+            padding: 6px 14px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .period-btn:hover {
+            color: #374151;
+        }
+
+        .period-btn.active {
+            background: white;
+            color: #f59e0b;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .logout-btn {
+            background: #f3f4f6;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #6b7280;
+            font-size: 13px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .logout-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-header h2 {
+            font-size: 28px;
+            color: #111827;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            font-size: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 22px;
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 14px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #6b7280;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .icon-blue {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .icon-green {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .icon-yellow {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .icon-purple {
+            background: #f3e8ff;
+            color: #9333ea;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .change-positive {
+            color: #16a34a;
+        }
+
+        .change-negative {
+            color: #dc2626;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .panel {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 24px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .panel-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title i {
+            color: #f59e0b;
+        }
+
+        .ranking-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px;
+            background: #fafafa;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .ranking-item:hover {
+            background: #f3f4f6;
+        }
+
+        .rank-position {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .rank-1 {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+        }
+
+        .rank-2 {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+
+        .rank-3 {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .rank-other {
+            background: #f3f4f6;
+            color: #9ca3af;
+        }
+
+        .rank-info {
+            flex: 1;
+        }
+
+        .rank-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 2px;
+        }
+
+        .rank-stats {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .rank-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .rank-unit {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-left: 2px;
+        }
+
+        .chart-container {
+            height: 280px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            gap: 12px;
+            padding: 20px 10px;
+            background: #fafafa;
+            border-radius: 8px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 6px 6px 0 0;
+            position: relative;
+            transition: all 0.3s;
+            cursor: pointer;
+            min-width: 40px;
+        }
+
+        .chart-bar:hover {
+            opacity: 0.8;
+            transform: translateY(-4px);
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: #6b7280;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            font-weight: 600;
+            color: #1f2937;
+            background: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .full-width-panel {
+            grid-column: 1 / -1;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table thead {
+            background: #f9fafb;
+        }
+
+        .history-table th {
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .history-table td {
+            padding: 14px 12px;
+            font-size: 13px;
+            color: #1f2937;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .history-table tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .dot-pending {
+            background: #fbbf24;
+        }
+
+        .dot-answered {
+            background: #10b981;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #374151;
+            background: white;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #f59e0b;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loader.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #f59e0b;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 240px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .topbar {
+                flex-direction: column;
+                gap: 12px;
+                padding: 16px;
+            }
+
+            .top-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 20px 16px;
+            }
+
+            .history-table {
+                font-size: 12px;
+            }
+
+            .history-table th,
+            .history-table td {
+                padding: 10px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="brand">
+            <i class="fas fa-chart-line"></i>
+            <h1>Dashboard de Reprogramaciones</h1>
+        </div>
+        <div class="top-actions">
+            <div class="period-selector">
+                <button class="period-btn active" data-period="month">Este Mes</button>
+                <button class="period-btn" data-period="3months">3 Meses</button>
+                <button class="period-btn" data-period="all">Todo</button>
+            </div>
+            <div class="user-info">
+                <span class="user-name" id="userName">Admin</span>
+            </div>
+            <button class="logout-btn" onclick="cerrarSesion()">
+                <i class="fas fa-sign-out-alt"></i>
+                Salir
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h2>Resumen General</h2>
+            <p>Análisis de rendimiento y métricas del equipo</p>
+        </div>
+
+        <div class="loader active" id="mainLoader">
+            <div class="spinner"></div>
+            <div style="color: #9ca3af; font-size: 14px;">Cargando estadísticas...</div>
+        </div>
+
+        <div id="mainContent" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-label">Total Reprogramaciones</div>
+                        <div class="stat-icon icon-blue">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="totalReprogs">0</div>
+                    <div class="stat-change change-positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="totalChange">0%</span> vs mes anterior
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-label">Pendientes</div>
+                        <div class="stat-icon icon-yellow">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="pendingReprogs">0</div>
+                    <div class="stat-change">
+                        <span id="pendingPercent">0%</span> del total
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-label">Respondidas</div>
+                        <div class="stat-icon icon-green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="answeredReprogs">0</div>
+                    <div class="stat-change change-positive">
+                        <span id="answeredPercent">0%</span> del total
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-label">Tiempo Promedio</div>
+                        <div class="stat-icon icon-purple">
+                            <i class="fas fa-stopwatch"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="avgTime">0h</div>
+                    <div class="stat-change">
+                        Tiempo de respuesta
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="fas fa-trophy"></i>
+                            Supervisores Más Rápidos
+                        </div>
+                    </div>
+                    <div class="ranking-list" id="supervisorRanking"></div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="fas fa-users"></i>
+                            Auxiliares Más Activos
+                        </div>
+                    </div>
+                    <div class="ranking-list" id="auxiliarRanking"></div>
+                </div>
+
+                <div class="panel full-width-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Reprogramaciones por Mes
+                        </div>
+                    </div>
+                    <div class="chart-container" id="monthlyChart"></div>
+                </div>
+
+                <div class="panel full-width-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="fas fa-history"></i>
+                            Historial Completo
+                        </div>
+                    </div>
+                    
+                    <div class="filter-bar">
+                        <select class="filter-select" id="filterSupervisor">
+                            <option value="">Todos los supervisores</option>
+                        </select>
+                        <select class="filter-select" id="filterAuxiliar">
+                            <option value="">Todas las auxiliares</option>
+                        </select>
+                        <select class="filter-select" id="filterEstado">
+                            <option value="">Todos los estados</option>
+                            <option value="pendiente">Pendientes</option>
+                            <option value="respondida">Respondidas</option>
+                        </select>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Auxiliar</th>
+                                    <th>Supervisor</th>
+                                    <th>Estado</th>
+                                    <th>Registros</th>
+                                    <th>Tiempo Respuesta</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBDRqsZI8EQaGn1lCc4Y5rIcfmLE7969zY",
+            authDomain: "reprogramacionesme.firebaseapp.com",
+            databaseURL: "https://reprogramacionesme-default-rtdb.firebaseio.com",
+            projectId: "reprogramacionesme",
+            storageBucket: "reprogramacionesme.firebasestorage.app",
+            messagingSenderId: "674035461204",
+            appId: "1:674035461204:web:a70b7793f71ae1c5e311c1",
+            measurementId: "G-T4VJ4EQKNT"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let currentUser = null;
+        let todasReprogramaciones = [];
+        let usuarios = {};
+        let periodoActual = 'month';
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                await cargarDatosUsuario();
+                await cargarUsuarios();
+                await cargarDatos();
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        async function cargarDatosUsuario() {
+            const userRef = ref(db, `usuarios/${currentUser.uid}`);
+            const snapshot = await get(userRef);
+            if (snapshot.exists()) {
+                const userData = snapshot.val();
+                document.getElementById('userName').textContent = userData.nombre;
+            }
+        }
+
+        async function cargarUsuarios() {
+            try {
+                // Intentar caché primero
+                const cacheKey = 'usuarios_dashboard';
+                const cached = localStorage.getItem(cacheKey);
+                const cacheTime = localStorage.getItem(cacheKey + '_time');
+                
+                if (cached && cacheTime && (Date.now() - parseInt(cacheTime)) < 300000) {
+                    console.log('✅ Usando caché de usuarios');
+                    usuarios = JSON.parse(cached);
+                } else {
+                    console.log('🔄 Cargando usuarios desde Firebase...');
+                    const usuariosRef = ref(db, 'usuarios');
+                    const snapshot = await get(usuariosRef);
+                    
+                    if (snapshot.exists()) {
+                        usuarios = snapshot.val();
+                        localStorage.setItem(cacheKey, JSON.stringify(usuarios));
+                        localStorage.setItem(cacheKey + '_time', Date.now().toString());
+                    }
+                }
+                
+                // Poblar filtros
+                const filterSupervisor = document.getElementById('filterSupervisor');
+                const filterAuxiliar = document.getElementById('filterAuxiliar');
+                
+                filterSupervisor.innerHTML = '<option value="">Todos los supervisores</option>';
+                filterAuxiliar.innerHTML = '<option value="">Todas las auxiliares</option>';
+                
+                Object.entries(usuarios).forEach(([uid, user]) => {
+                    if (user.rol === 'supervisor') {
+                        const option = document.createElement('option');
+                        option.value = uid;
+                        option.textContent = user.nombre;
+                        filterSupervisor.appendChild(option);
+                    } else if (user.rol === 'auxiliar') {
+                        const option = document.createElement('option');
+                        option.value = uid;
+                        option.textContent = user.nombre;
+                        filterAuxiliar.appendChild(option);
+                    }
+                });
+            } catch (error) {
+                console.error('❌ Error al cargar usuarios:', error);
+            }
+        }
+
+        async function cargarDatos() {
+            todasReprogramaciones = [];
+            const meses = obtenerMesesSegunPeriodo(periodoActual);
+            
+            console.log(`📥 Cargando datos para ${meses.length} meses...`);
+            const inicio = performance.now();
+
+            try {
+                // Cargar todos los meses en PARALELO (mucho más rápido)
+                const promesas = meses.map(async mes => {
+                    const reprogRef = ref(db, `reprogramaciones/${mes}`);
+                    const snapshot = await get(reprogRef);
+                    
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        return Object.entries(data).map(([id, reprog]) => ({ id, mes, ...reprog }));
+                    }
+                    return [];
+                });
+
+                const resultados = await Promise.all(promesas);
+                resultados.forEach(reprogs => todasReprogramaciones.push(...reprogs));
+                
+                const fin = performance.now();
+                console.log(`✅ ${todasReprogramaciones.length} reprogramaciones cargadas en ${Math.round(fin - inicio)}ms`);
+
+                // Ordenar por fecha
+                todasReprogramaciones.sort((a, b) => new Date(b.fechaSubida) - new Date(a.fechaSubida));
+                
+                calcularEstadisticas();
+                renderizarRankings();
+                renderizarGrafico();
+                renderizarHistorial();
+                
+            } catch (error) {
+                console.error('❌ Error al cargar datos:', error);
+                mostrarError('Error al cargar datos del dashboard');
+            }
+            
+            document.getElementById('mainLoader').classList.remove('active');
+            document.getElementById('mainContent').style.display = 'block';
+        }
+        
+        function mostrarError(mensaje) {
+            document.getElementById('mainContent').innerHTML = `
+                <div style="text-align: center; padding: 60px; background: white; border-radius: 8px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #ef4444; margin-bottom: 16px;"></i>
+                    <p style="color: #6b7280; font-size: 16px;">${mensaje}</p>
+                </div>
+            `;
+            document.getElementById('mainContent').style.display = 'block';
+        }
+
+        function calcularEstadisticas() {
+            const total = todasReprogramaciones.length;
+            const pendientes = todasReprogramaciones.filter(r => r.estado === 'pendiente').length;
+            const respondidas = todasReprogramaciones.filter(r => r.estado === 'respondida').length;
+
+            document.getElementById('totalReprogs').textContent = total;
+            document.getElementById('pendingReprogs').textContent = pendientes;
+            document.getElementById('answeredReprogs').textContent = respondidas;
+
+            const pendingPercent = total > 0 ? Math.round((pendientes / total) * 100) : 0;
+            const answeredPercent = total > 0 ? Math.round((respondidas / total) * 100) : 0;
+            
+            document.getElementById('pendingPercent').textContent = pendingPercent + '%';
+            document.getElementById('answeredPercent').textContent = answeredPercent + '%';
+
+            const tiemposRespuesta = todasReprogramaciones
+                .filter(r => r.respuesta && r.respuesta.fechaRespuesta)
+                .map(r => {
+                    const inicio = new Date(r.fechaSubida);
+                    const fin = new Date(r.respuesta.fechaRespuesta);
+                    return (fin - inicio) / (1000 * 60 * 60);
+                });
+
+            const avgHoras = tiemposRespuesta.length > 0
+                ? tiemposRespuesta.reduce((a, b) => a + b, 0) / tiemposRespuesta.length
+                : 0;
+
+            document.getElementById('avgTime').textContent = avgHoras < 24
+                ? Math.round(avgHoras) + 'h'
+                : Math.round(avgHoras / 24) + 'd';
+        }
+
+        function renderizarRankings() {
+            const supervisores = {};
+            const auxiliares = {};
+
+            todasReprogramaciones.forEach(reprog => {
+                if (!supervisores[reprog.supervisorId]) {
+                    supervisores[reprog.supervisorId] = {
+                        nombre: reprog.supervisorNombre,
+                        total: 0,
+                        respondidas: 0,
+                        tiempos: []
+                    };
+                }
+                supervisores[reprog.supervisorId].total++;
+                
+                if (reprog.estado === 'respondida' && reprog.respuesta) {
+                    supervisores[reprog.supervisorId].respondidas++;
+                    const inicio = new Date(reprog.fechaSubida);
+                    const fin = new Date(reprog.respuesta.fechaRespuesta);
+                    const horas = (fin - inicio) / (1000 * 60 * 60);
+                    supervisores[reprog.supervisorId].tiempos.push(horas);
+                }
+
+                if (!auxiliares[reprog.auxiliarId]) {
+                    auxiliares[reprog.auxiliarId] = {
+                        nombre: reprog.auxiliarNombre,
+                        total: 0
+                    };
+                }
+                auxiliares[reprog.auxiliarId].total++;
+            });
+
+            const rankingSupervisores = Object.values(supervisores)
+                .map(s => ({
+                    ...s,
+                    avgTiempo: s.tiempos.length > 0
+                        ? s.tiempos.reduce((a, b) => a + b, 0) / s.tiempos.length
+                        : 999999
+                }))
+                .sort((a, b) => a.avgTiempo - b.avgTiempo)
+                .slice(0, 5);
+
+            const rankingAuxiliares = Object.values(auxiliares)
+                .sort((a, b) => b.total - a.total)
+                .slice(0, 5);
+
+            const supervisorHTML = rankingSupervisores.map((sup, index) => {
+                const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : 'rank-other';
+                const tiempo = sup.avgTiempo < 24 
+                    ? Math.round(sup.avgTiempo) + 'h' 
+                    : Math.round(sup.avgTiempo / 24) + 'd';
+                
+                return `
+                    <div class="ranking-item">
+                        <div class="rank-position ${rankClass}">${index + 1}</div>
+                        <div class="rank-info">
+                            <div class="rank-name">${sup.nombre}</div>
+                            <div class="rank-stats">${sup.respondidas} de ${sup.total} respondidas</div>
+                        </div>
+                        <div class="rank-value">${tiempo}<span class="rank-unit">promedio</span></div>
+                    </div>
+                `;
+            }).join('');
+
+            const auxiliarHTML = rankingAuxiliares.map((aux, index) => {
+                const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : 'rank-other';
+                
+                return `
+                    <div class="ranking-item">
+                        <div class="rank-position ${rankClass}">${index + 1}</div>
+                        <div class="rank-info">
+                            <div class="rank-name">${aux.nombre}</div>
+                            <div class="rank-stats">Reprogramaciones enviadas</div>
+                        </div>
+                        <div class="rank-value">${aux.total}<span class="rank-unit">envíos</span></div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('supervisorRanking').innerHTML = supervisorHTML || '<div class="empty-state"><div class="empty-icon"><i class="fas fa-inbox"></i></div><div>Sin datos</div></div>';
+            document.getElementById('auxiliarRanking').innerHTML = auxiliarHTML || '<div class="empty-state"><div class="empty-icon"><i class="fas fa-inbox"></i></div><div>Sin datos</div></div>';
+        }
+
+        function renderizarGrafico() {
+            const mesesData = {};
+            
+            todasReprogramaciones.forEach(reprog => {
+                if (!mesesData[reprog.mes]) {
+                    mesesData[reprog.mes] = 0;
+                }
+                mesesData[reprog.mes]++;
+            });
+
+            const mesesOrdenados = Object.keys(mesesData).sort();
+            const maxValue = Math.max(...Object.values(mesesData), 1);
+
+            const chartHTML = mesesOrdenados.map(mes => {
+                const valor = mesesData[mes];
+                const altura = (valor / maxValue) * 100;
+                const mesTexto = formatearMes(mes);
+                
+                return `
+                    <div class="chart-bar" style="height: ${altura}%">
+                        <div class="bar-value">${valor}</div>
+                        <div class="bar-label">${mesTexto}</div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('monthlyChart').innerHTML = chartHTML || '<div class="empty-state"><div class="empty-icon"><i class="fas fa-chart-bar"></i></div><div>Sin datos</div></div>';
+        }
+
+        let historialPaginaActual = 1;
+        const HISTORIAL_POR_PAGINA = 100;
+        
+        function renderizarHistorial() {
+            let filtradas = [...todasReprogramaciones];
+
+            const filterSupervisor = document.getElementById('filterSupervisor').value;
+            const filterAuxiliar = document.getElementById('filterAuxiliar').value;
+            const filterEstado = document.getElementById('filterEstado').value;
+
+            if (filterSupervisor) {
+                filtradas = filtradas.filter(r => r.supervisorId === filterSupervisor);
+            }
+            if (filterAuxiliar) {
+                filtradas = filtradas.filter(r => r.auxiliarId === filterAuxiliar);
+            }
+            if (filterEstado) {
+                filtradas = filtradas.filter(r => r.estado === filterEstado);
+            }
+
+            const tbody = document.getElementById('historyTableBody');
+            
+            if (filtradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #9ca3af;">No hay reprogramaciones</td></tr>';
+                return;
+            }
+
+            // Mostrar solo las primeras HISTORIAL_POR_PAGINA (optimización)
+            const inicio = 0;
+            const fin = Math.min(HISTORIAL_POR_PAGINA, filtradas.length);
+            const filasMostrar = filtradas.slice(inicio, fin);
+            
+            console.log(`📄 Renderizando ${filasMostrar.length} de ${filtradas.length} filas en historial`);
+
+            const rows = filasMostrar.map(reprog => {
+                const fecha = new Date(reprog.fechaSubida).toLocaleDateString('es-CO');
+                const dotClass = reprog.estado === 'pendiente' ? 'dot-pending' : 'dot-answered';
+                const estadoTexto = reprog.estado === 'pendiente' ? 'Pendiente' : 'Respondida';
+                const numRegistros = reprog.totalRegistros || reprog.datosExcel?.length || 0;
+
+                let tiempoRespuesta = '-';
+                if (reprog.estado === 'respondida' && reprog.fechaRespuesta) {
+                    const inicio = new Date(reprog.fechaSubida);
+                    const fin = new Date(reprog.fechaRespuesta);
+                    const horas = (fin - inicio) / (1000 * 60 * 60);
+                    tiempoRespuesta = horas < 24 ? Math.round(horas) + 'h' : Math.round(horas / 24) + 'd';
+                }
+
+                return `
+                    <tr>
+                        <td>${fecha}</td>
+                        <td>${reprog.auxiliarNombre}</td>
+                        <td>${reprog.supervisorNombre}</td>
+                        <td>
+                            <span class="status-dot ${dotClass}"></span>
+                            ${estadoTexto}
+                        </td>
+                        <td>${numRegistros}</td>
+                        <td>${tiempoRespuesta}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            tbody.innerHTML = rows;
+            
+            // Agregar indicador si hay más filas
+            if (filtradas.length > HISTORIAL_POR_PAGINA) {
+                tbody.innerHTML += `
+                    <tr style="background: #fafbfc;">
+                        <td colspan="6" style="text-align: center; padding: 20px;">
+                            <button class="btn btn-primary" onclick="cargarMasHistorial()" style="font-size: 13px; padding: 8px 16px;">
+                                <i class="fas fa-chevron-down"></i>
+                                Cargar más (${filtradas.length - HISTORIAL_POR_PAGINA} restantes)
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                window.historialFiltrado = filtradas;
+                historialPaginaActual = 1;
+            }
+        }
+        
+        window.cargarMasHistorial = function() {
+            if (!window.historialFiltrado) return;
+            
+            historialPaginaActual++;
+            const inicio = historialPaginaActual * HISTORIAL_POR_PAGINA;
+            const fin = Math.min(inicio + HISTORIAL_POR_PAGINA, window.historialFiltrado.length);
+            const siguientes = window.historialFiltrado.slice(inicio, fin);
+            
+            if (siguientes.length === 0) return;
+            
+            const tbody = document.getElementById('historyTableBody');
+            const btnRow = tbody.querySelector('tr[style*="background: #fafbfc"]');
+            if (btnRow) btnRow.remove();
+            
+            const nuevasFilas = siguientes.map(reprog => {
+                const fecha = new Date(reprog.fechaSubida).toLocaleDateString('es-CO');
+                const dotClass = reprog.estado === 'pendiente' ? 'dot-pending' : 'dot-answered';
+                const estadoTexto = reprog.estado === 'pendiente' ? 'Pendiente' : 'Respondida';
+                const numRegistros = reprog.totalRegistros || reprog.datosExcel?.length || 0;
+
+                let tiempoRespuesta = '-';
+                if (reprog.estado === 'respondida' && reprog.fechaRespuesta) {
+                    const inicio = new Date(reprog.fechaSubida);
+                    const fin = new Date(reprog.fechaRespuesta);
+                    const horas = (fin - inicio) / (1000 * 60 * 60);
+                    tiempoRespuesta = horas < 24 ? Math.round(horas) + 'h' : Math.round(horas / 24) + 'd';
+                }
+
+                return `
+                    <tr>
+                        <td>${fecha}</td>
+                        <td>${reprog.auxiliarNombre}</td>
+                        <td>${reprog.supervisorNombre}</td>
+                        <td>
+                            <span class="status-dot ${dotClass}"></span>
+                            ${estadoTexto}
+                        </td>
+                        <td>${numRegistros}</td>
+                        <td>${tiempoRespuesta}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            tbody.innerHTML += nuevasFilas;
+            
+            const totalMostradas = (historialPaginaActual + 1) * HISTORIAL_POR_PAGINA;
+            if (totalMostradas < window.historialFiltrado.length) {
+                tbody.innerHTML += `
+                    <tr style="background: #fafbfc;">
+                        <td colspan="6" style="text-align: center; padding: 20px;">
+                            <button class="btn btn-primary" onclick="cargarMasHistorial()" style="font-size: 13px; padding: 8px 16px;">
+                                <i class="fas fa-chevron-down"></i>
+                                Cargar más (${window.historialFiltrado.length - totalMostradas} restantes)
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function formatearMes(mes) {
+            const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            const year = mes.substring(0, 4);
+            const month = parseInt(mes.substring(4, 6)) - 1;
+            return `${meses[month]} ${year}`;
+        }
+
+        function obtenerMesesSegunPeriodo(periodo) {
+            const meses = [];
+            const ahora = new Date();
+            let cantidad = 1;
+
+            if (periodo === '3months') cantidad = 3;
+            else if (periodo === 'all') cantidad = 12;
+
+            for (let i = 0; i < cantidad; i++) {
+                const fecha = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1);
+                const mes = fecha.toISOString().slice(0, 7).replace('-', '');
+                meses.push(mes);
+            }
+            return meses;
+        }
+
+        document.querySelectorAll('.period-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                periodoActual = this.dataset.period;
+                
+                document.getElementById('mainContent').style.display = 'none';
+                document.getElementById('mainLoader').classList.add('active');
+                
+                setTimeout(() => cargarDatos(), 300);
+            });
+        });
+
+        document.getElementById('filterSupervisor').addEventListener('change', renderizarHistorial);
+        document.getElementById('filterAuxiliar').addEventListener('change', renderizarHistorial);
+        document.getElementById('filterEstado').addEventListener('change', renderizarHistorial);
+
+        window.cerrarSesion = async function() {
+            try {
+                await signOut(auth);
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        };
+    </script>
+</body>
+</html>
