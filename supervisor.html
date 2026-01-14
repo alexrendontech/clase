@@ -688,6 +688,143 @@
                 font-size: 16px;
             }
         }
+
+        /* Modal Personalizado */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-container {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .modal-overlay.show .modal-container {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-icon {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+
+        .modal-icon.warning {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+        }
+
+        .modal-icon.error {
+            background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+            color: white;
+        }
+
+        .modal-icon.success {
+            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+            color: white;
+        }
+
+        .modal-content {
+            padding: 24px 24px 20px 24px;
+            text-align: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .modal-message {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .modal-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 0 24px 24px 24px;
+        }
+
+        .modal-btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 52px;
+            touch-action: manipulation;
+        }
+
+        .modal-btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-cancel {
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            border: 2px solid var(--border);
+        }
+
+        .btn-cancel:active {
+            background: #e2e8f0;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-confirm.warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .btn-confirm.danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        @media (max-width: 360px) {
+            .modal-actions {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -787,6 +924,29 @@
 
         <!-- Content -->
         <div id="reprogContainer"></div>
+    </div>
+</div>
+
+<!-- Modal Personalizado -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal-container">
+        <div class="modal-icon warning">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="modal-content">
+            <h3 class="modal-title" id="modalTitle">Confirmar acción</h3>
+            <p class="modal-message" id="modalMessage">¿Estás seguro?</p>
+        </div>
+        <div class="modal-actions">
+            <button class="modal-btn btn-cancel" id="modalCancel">
+                <i class="fas fa-times"></i>
+                Cancelar
+            </button>
+            <button class="modal-btn btn-confirm" id="modalConfirm">
+                <i class="fas fa-check"></i>
+                Continuar
+            </button>
+        </div>
     </div>
 </div>
 
@@ -1375,7 +1535,16 @@
         if (!datos) return;
 
         const incompletas = datos.some(row => !row['FECHA REPROGRAMACION'] || !row['OBSERVACION']);
-        if (incompletas && !confirm('⚠️ Algunas filas no están completas.\n\n¿Continuar?')) return;
+        if (incompletas) {
+            const confirmar = await mostrarModal({
+                titulo: 'Filas incompletas',
+                mensaje: 'Algunas filas no tienen FECHA REPROGRAMACION u OBSERVACION completas. ¿Deseas continuar de todas formas?',
+                tipo: 'warning',
+                confirmText: 'Sí, continuar',
+                cancelText: 'No, revisar'
+            });
+            if (!confirmar) return;
+        }
 
         const btn = event.target.closest('.btn');
         const original = btn.innerHTML;
@@ -1445,6 +1614,70 @@
         }
     };
 
+    // Modal Personalizado
+    function mostrarModal({ titulo, mensaje, tipo = 'warning', confirmText = 'Continuar', cancelText = 'Cancelar' }) {
+        return new Promise((resolve) => {
+            const overlay = document.getElementById('modalOverlay');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalIcon = overlay.querySelector('.modal-icon');
+            const confirmBtn = document.getElementById('modalConfirm');
+            const cancelBtn = document.getElementById('modalCancel');
+
+            modalTitle.textContent = titulo;
+            modalMessage.textContent = mensaje;
+            
+            // Configurar icono según tipo
+            modalIcon.className = `modal-icon ${tipo}`;
+            if (tipo === 'warning') {
+                modalIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                confirmBtn.className = 'modal-btn btn-confirm warning';
+            } else if (tipo === 'error') {
+                modalIcon.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+                confirmBtn.className = 'modal-btn btn-confirm danger';
+            } else if (tipo === 'success') {
+                modalIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                confirmBtn.className = 'modal-btn btn-confirm';
+            }
+
+            confirmBtn.innerHTML = `<i class="fas fa-check"></i> ${confirmText}`;
+            cancelBtn.innerHTML = `<i class="fas fa-times"></i> ${cancelText}`;
+
+            // Mostrar modal
+            overlay.classList.add('show');
+            if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+
+            // Manejadores de eventos
+            const handleConfirm = () => {
+                cleanup();
+                resolve(true);
+            };
+
+            const handleCancel = () => {
+                cleanup();
+                resolve(false);
+            };
+
+            const handleOverlayClick = (e) => {
+                if (e.target === overlay) {
+                    cleanup();
+                    resolve(false);
+                }
+            };
+
+            const cleanup = () => {
+                overlay.classList.remove('show');
+                confirmBtn.removeEventListener('click', handleConfirm);
+                cancelBtn.removeEventListener('click', handleCancel);
+                overlay.removeEventListener('click', handleOverlayClick);
+            };
+
+            confirmBtn.addEventListener('click', handleConfirm);
+            cancelBtn.addEventListener('click', handleCancel);
+            overlay.addEventListener('click', handleOverlayClick);
+        });
+    }
+
     window.cambiarTab = function(nuevoTab) {
         tabActual = nuevoTab;
 
@@ -1462,7 +1695,14 @@
     window.cerrarSesion = async function() {
         const pendientes = await offlineStorage.obtenerCambiosPendientes();
         if (pendientes.length > 0) {
-            if (!confirm(`⚠️ Tienes ${pendientes.length} cambio(s) sin sincronizar.\n\n¿Cerrar sesión?`)) return;
+            const confirmar = await mostrarModal({
+                titulo: 'Cambios sin sincronizar',
+                mensaje: `Tienes ${pendientes.length} cambio(s) sin sincronizar. Si cierras sesión ahora, se perderán estos cambios. ¿Deseas cerrar sesión de todas formas?`,
+                tipo: 'warning',
+                confirmText: 'Sí, cerrar',
+                cancelText: 'Cancelar'
+            });
+            if (!confirmar) return;
         }
         try {
             await signOut(auth);
