@@ -83,6 +83,13 @@
             font-size: 22px;
         }
 
+        .supervisor-name {
+            font-size: 13px;
+            opacity: 0.9;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
         .logout-btn {
             background: rgba(255,255,255,0.15);
             border: none;
@@ -222,13 +229,15 @@
 
         /* Tabs */
         .tabs-container {
-            display: flex;
+            display: flex !important;
             gap: 8px;
             margin-bottom: 16px;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             scroll-snap-type: x mandatory;
             scrollbar-width: none;
+            position: relative;
+            z-index: 10;
         }
 
         .tabs-container::-webkit-scrollbar {
@@ -247,11 +256,13 @@
             white-space: nowrap;
             flex-shrink: 0;
             min-height: 44px;
-            display: flex;
+            display: flex !important;
             align-items: center;
             gap: 6px;
             transition: all 0.2s ease;
             scroll-snap-align: start;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
 
         .tab.active {
@@ -412,6 +423,7 @@
             background: var(--bg-primary);
             border: 1px solid var(--border);
             position: relative;
+            z-index: 1;
         }
 
         .table-scroll-hint {
@@ -496,6 +508,9 @@
             margin-top: 14px;
             padding-top: 14px;
             border-top: 1px solid var(--border);
+            position: relative;
+            z-index: 10;
+            pointer-events: auto;
         }
 
         .btn {
@@ -515,6 +530,11 @@
             box-shadow: var(--shadow-sm);
             user-select: none;
             -webkit-user-select: none;
+            -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+            touch-action: manipulation;
+            position: relative;
+            z-index: 10;
+            pointer-events: auto;
         }
 
         .btn:active {
@@ -724,8 +744,13 @@
 <header class="header">
     <div class="header-top">
         <div class="header-brand">
-            <i class="fas fa-tasks"></i>
-            <span>Supervisión</span>
+            <div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-tasks"></i>
+                    <span>Supervisión</span>
+                </div>
+                <div class="supervisor-name" id="supervisorName">Cargando...</div>
+            </div>
         </div>
         <button class="logout-btn" onclick="cerrarSesion()" title="Cerrar sesión">
             <i class="fas fa-sign-out-alt"></i>
@@ -808,6 +833,7 @@
     </div>
 </div>
 
+<script src="email-service.js"></script>
 <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
@@ -866,66 +892,130 @@
         }
 
         async obtenerReprogramaciones() {
-            const tx = this.db.transaction(['reprogramaciones'], 'readonly');
-            const store = tx.objectStore('reprogramaciones');
-            return new Promise((resolve) => {
-                const request = store.getAll();
-                request.onsuccess = () => resolve(request.result || []);
-            });
+            if (!this.db) {
+                console.warn('⚠️ IndexedDB no inicializado en obtenerReprogramaciones');
+                return [];
+            }
+            try {
+                const tx = this.db.transaction(['reprogramaciones'], 'readonly');
+                const store = tx.objectStore('reprogramaciones');
+                return new Promise((resolve) => {
+                    const request = store.getAll();
+                    request.onsuccess = () => resolve(request.result || []);
+                    request.onerror = () => {
+                        console.error('❌ Error al obtener reprogramaciones');
+                        resolve([]);
+                    };
+                });
+            } catch (error) {
+                console.error('❌ Error en obtenerReprogramaciones:', error);
+                return [];
+            }
         }
 
         async guardarCambioPendiente(reprogId, mes, datos) {
-            const tx = this.db.transaction(['cambiosPendientes'], 'readwrite');
-            const store = tx.objectStore('cambiosPendientes');
-            const cambio = { timestamp: Date.now(), reprogId, mes, datos, sincronizado: false };
-            await store.put(cambio);
-            return cambio;
+            if (!this.db) {
+                console.warn('⚠️ IndexedDB no inicializado en guardarCambioPendiente');
+                return null;
+            }
+            try {
+                const tx = this.db.transaction(['cambiosPendientes'], 'readwrite');
+                const store = tx.objectStore('cambiosPendientes');
+                const cambio = { timestamp: Date.now(), reprogId, mes, datos, sincronizado: false };
+                await store.put(cambio);
+                return cambio;
+            } catch (error) {
+                console.error('❌ Error en guardarCambioPendiente:', error);
+                return null;
+            }
         }
 
         async obtenerCambiosPendientes() {
-            const tx = this.db.transaction(['cambiosPendientes'], 'readonly');
-            const store = tx.objectStore('cambiosPendientes');
-            return new Promise((resolve) => {
-                const request = store.getAll();
-                request.onsuccess = () => {
-                    const todos = request.result || [];
-                    resolve(todos.filter(c => !c.sincronizado));
-                };
-            });
+            if (!this.db) {
+                console.warn('⚠️ IndexedDB no inicializado en obtenerCambiosPendientes');
+                return [];
+            }
+            try {
+                const tx = this.db.transaction(['cambiosPendientes'], 'readonly');
+                const store = tx.objectStore('cambiosPendientes');
+                return new Promise((resolve) => {
+                    const request = store.getAll();
+                    request.onsuccess = () => {
+                        const todos = request.result || [];
+                        resolve(todos.filter(c => !c.sincronizado));
+                    };
+                    request.onerror = () => {
+                        console.error('❌ Error al obtener cambios pendientes');
+                        resolve([]);
+                    };
+                });
+            } catch (error) {
+                console.error('❌ Error en obtenerCambiosPendientes:', error);
+                return [];
+            }
         }
 
         async marcarCambioSincronizado(timestamp) {
-            const tx = this.db.transaction(['cambiosPendientes'], 'readwrite');
-            const store = tx.objectStore('cambiosPendientes');
-            await store.delete(timestamp);
+            if (!this.db) {
+                console.warn('⚠️ IndexedDB no inicializado en marcarCambioSincronizado');
+                return;
+            }
+            try {
+                const tx = this.db.transaction(['cambiosPendientes'], 'readwrite');
+                const store = tx.objectStore('cambiosPendientes');
+                await store.delete(timestamp);
+            } catch (error) {
+                console.error('❌ Error en marcarCambioSincronizado:', error);
+            }
         }
 
         async guardarUsuario(userData) {
-            const tx = this.db.transaction(['usuario'], 'readwrite');
-            const store = tx.objectStore('usuario');
-            await store.put(userData);
+            if (!this.db) {
+                console.warn('⚠️ IndexedDB no inicializado en guardarUsuario');
+                return;
+            }
+            try {
+                const tx = this.db.transaction(['usuario'], 'readwrite');
+                const store = tx.objectStore('usuario');
+                await store.put(userData);
+            } catch (error) {
+                console.error('❌ Error en guardarUsuario:', error);
+            }
         }
 
         async obtenerUsuario(uid) {
-            const tx = this.db.transaction(['usuario'], 'readonly');
-            const store = tx.objectStore('usuario');
-            return new Promise((resolve) => {
-                const request = store.get(uid);
-                request.onsuccess = () => resolve(request.result);
-            });
+            if (!this.db) {
+                console.warn('⚠️ IndexedDB no inicializado en obtenerUsuario');
+                return null;
+            }
+            try {
+                const tx = this.db.transaction(['usuario'], 'readonly');
+                const store = tx.objectStore('usuario');
+                return new Promise((resolve) => {
+                    const request = store.get(uid);
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => {
+                        console.error('❌ Error al obtener usuario');
+                        resolve(null);
+                    };
+                });
+            } catch (error) {
+                console.error('❌ Error en obtenerUsuario:', error);
+                return null;
+            }
         }
     }
 
     const offlineStorage = new OfflineStorage();
     let isOnline = navigator.onLine;
     let currentUser = null;
+    let userData = null; // Datos del usuario supervisor
     let todasReprogramaciones = [];
     let tabActual = 'pendientes';
     let datosEditados = {};
     let reprogramacionesIds = new Set(); // Para rastrear IDs ya cargadas
     let primeraCargar = true; // Flag para evitar notificaciones en carga inicial
-    let cargaInicialCompleta = false;
-    let listenersInicializados = false;
+    let dbReady = false; // Flag para indicar que IndexedDB está listo
 
     const connectionBanner = document.getElementById('connectionBanner');
     const connectionText = document.getElementById('connectionText');
@@ -936,7 +1026,9 @@
             connectionBanner.className = 'connection-banner online show';
             connectionText.innerHTML = '<i class="fas fa-check-circle"></i> Conectado';
             setTimeout(() => connectionBanner.classList.remove('show'), 2500);
-            sincronizarCambiosPendientes();
+            if (dbReady) {
+                sincronizarCambiosPendientes();
+            }
         } else {
             connectionBanner.className = 'connection-banner offline show';
             connectionText.innerHTML = '<i class="fas fa-wifi-slash"></i> Modo offline';
@@ -952,12 +1044,16 @@
             currentUser = user;
             try {
                 await offlineStorage.init();
+                dbReady = true; // Marcar que IndexedDB está listo
+                console.log('✅ IndexedDB inicializado correctamente');
+                await cargarDatosUsuario(); // Cargar datos del supervisor
                 await cargarReprogramaciones();
                 const pendientes = await offlineStorage.obtenerCambiosPendientes();
                 actualizarContadorOffline(pendientes.length);
 
                 console.log('✅ Aplicación inicializada correctamente');
             } catch (error) {
+                console.error('❌ Error en inicialización:', error);
                 mostrarAlerta('error', 'Error: ' + error.message);
             }
         } else {
@@ -965,26 +1061,54 @@
         }
     });
 
+    async function cargarDatosUsuario() {
+        try {
+            const supervisorNameEl = document.getElementById('supervisorName');
+            
+            // Intentar cargar desde caché
+            const cached = await offlineStorage.obtenerUsuario(currentUser.uid);
+            if (cached && cached.nombre) {
+                userData = cached;
+                supervisorNameEl.textContent = userData.nombre;
+                console.log('👤 Nombre del supervisor desde cache:', userData.nombre);
+            }
+
+            // Si hay conexión, actualizar desde Firebase
+            if (isOnline) {
+                const userRef = ref(db, `usuarios/${currentUser.uid}`);
+                const snapshot = await get(userRef);
+                if (snapshot.exists()) {
+                    userData = snapshot.val();
+                    const nombreCompleto = userData.nombre || userData.displayName || currentUser.displayName || currentUser.email?.split('@')[0] || 'Supervisor';
+                    supervisorNameEl.textContent = nombreCompleto;
+                    await offlineStorage.guardarUsuario({ uid: currentUser.uid, ...userData });
+                    console.log('👤 Nombre del supervisor desde Firebase:', nombreCompleto);
+                } else {
+                    // Si no existe en Firebase, usar datos de autenticación
+                    const fallbackName = currentUser.displayName || currentUser.email?.split('@')[0] || 'Supervisor';
+                    supervisorNameEl.textContent = fallbackName;
+                    console.log('👤 Nombre del supervisor (fallback):', fallbackName);
+                }
+            }
+        } catch (error) {
+            console.error('❌ Error cargando datos usuario:', error);
+            const fallbackName = currentUser.displayName || currentUser.email?.split('@')[0] || 'Supervisor';
+            document.getElementById('supervisorName').textContent = fallbackName;
+        }
+    }
+
     async function cargarReprogramaciones() {
         const loader = document.getElementById('loader');
-        
         try {
-            // Intentar cargar desde cache primero
             const cached = await offlineStorage.obtenerReprogramaciones();
             if (cached.length > 0) {
                 todasReprogramaciones = cached;
-                reprogramacionesIds.clear();
-                cached.forEach(r => reprogramacionesIds.add(r.id));
-                
                 loader.classList.remove('active');
                 actualizarEstadisticas();
                 mostrarReprogramaciones();
-                console.log('📦 Datos cargados desde cache:', cached.length);
             }
 
-            // Cargar desde Firebase solo si estamos online
             if (isOnline) {
-                console.log('🔄 Iniciando carga desde Firebase...');
                 const meses = obtenerUltimosMeses(3);
                 const promesas = meses.map(async mes => {
                     const reprogRef = ref(db, `reprogramaciones/${mes}`);
@@ -1002,48 +1126,24 @@
                 todasReprogramaciones = resultados.flat()
                     .sort((a, b) => new Date(b.fechaSubida) - new Date(a.fechaSubida));
 
-                // Actualizar el Set de IDs
-                reprogramacionesIds.clear();
-                todasReprogramaciones.forEach(r => reprogramacionesIds.add(r.id));
-
-                // Guardar en cache
                 await offlineStorage.guardarReprogramaciones(todasReprogramaciones);
-                
                 loader.classList.remove('active');
                 actualizarEstadisticas();
                 mostrarReprogramaciones();
-                
-                console.log('✅ Carga desde Firebase completada:', todasReprogramaciones.length);
-                
-                // Marcar la carga inicial como completa y iniciar listeners
-                cargaInicialCompleta = true;
-                primeraCargar = false;
-                
-                // Inicializar listeners solo una vez y después de la carga inicial
-                if (!listenersInicializados) {
-                    setTimeout(() => {
-                        iniciarEscuchaNuevasReprogramaciones();
-                        listenersInicializados = true;
-                    }, 1000);
-                }
-            } else {
-                loader.classList.remove('active');
-                console.log('📴 Modo offline - usando datos en cache');
+
+                // Actualizar el Set de IDs después de la carga inicial
+                reprogramacionesIds.clear();
+                todasReprogramaciones.forEach(r => reprogramacionesIds.add(r.id));
+                primeraCargar = false; // Marcar que ya terminó la carga inicial
             }
         } catch (error) {
-            console.error('❌ Error en cargarReprogramaciones:', error);
+            console.error('Error:', error);
             loader.classList.remove('active');
-            mostrarAlerta('error', 'Error al cargar: ' + error.message);
         }
     }
 
     // Función para escuchar nuevas reprogramaciones en tiempo real
     function iniciarEscuchaNuevasReprogramaciones() {
-        if (listenersInicializados) {
-            console.log('⚠️ Listeners ya inicializados, evitando duplicados');
-            return;
-        }
-
         console.log('👂 Iniciando escucha de nuevas reprogramaciones...');
         const meses = obtenerUltimosMeses(3);
 
@@ -1052,45 +1152,37 @@
             const q = query(reprogRef, orderByChild('supervisorId'), equalTo(currentUser.uid));
 
             onChildAdded(q, (snapshot) => {
-                // Solo procesar si la carga inicial está completa
-                if (!cargaInicialCompleta) {
-                    console.log('⏸️ Ignorando evento (carga inicial en progreso)');
-                    return;
-                }
+                // Ignorar si es la primera carga
+                if (primeraCargar) return;
 
                 const reprogId = snapshot.key;
                 const nuevaReprog = snapshot.val();
 
-                // Verificar que la reprogramación sea realmente nueva
+                // Solo notificar si es realmente nueva (no estaba en el Set)
                 if (nuevaReprog && !reprogramacionesIds.has(reprogId)) {
                     console.log('🔔 Nueva reprogramación detectada:', reprogId);
 
+                    // Agregar al Set
                     reprogramacionesIds.add(reprogId);
 
+                    // Agregar a la lista
                     const reprogConMes = { id: reprogId, mes, ...nuevaReprog };
-                    todasReprogramaciones.unshift(reprogConMes);
+                    todasReprogramaciones.unshift(reprogConMes); // Agregar al inicio
 
-                    offlineStorage.guardarReprogramaciones(todasReprogramaciones)
-                        .catch(err => console.error('Error guardando en IndexedDB:', err));
+                    // Guardar en IndexedDB
+                    offlineStorage.guardarReprogramaciones(todasReprogramaciones);
 
-                    requestAnimationFrame(() => {
-                        try {
-                            actualizarEstadisticas();
-                            if (tabActual === 'pendientes' || tabActual === 'todas') {
-                                mostrarReprogramaciones();
-                            }
-                            mostrarNotificacionNuevaReprogramacion(nuevaReprog);
-                        } catch (err) {
-                            console.error('Error actualizando UI:', err);
-                        }
-                    });
-                } else {
-                    console.log('⏭️ Reprogramación ya existe, ignorando:', reprogId);
+                    // Actualizar UI
+                    actualizarEstadisticas();
+                    if (tabActual === 'pendientes' || tabActual === 'todas') {
+                        mostrarReprogramaciones();
+                    }
+
+                    // Mostrar notificación
+                    mostrarNotificacionNuevaReprogramacion(nuevaReprog);
                 }
             });
         });
-        
-        console.log('✅ Listeners inicializados correctamente');
     }
 
     // Función para mostrar notificación de nueva reprogramación
@@ -1145,7 +1237,7 @@
     }
 
     async function sincronizarCambiosPendientes() {
-        if (!isOnline) return;
+        if (!isOnline || !dbReady) return;
 
         const pendientes = await offlineStorage.obtenerCambiosPendientes();
         if (pendientes.length === 0) return;
@@ -1194,63 +1286,39 @@
     }
 
     function actualizarEstadisticas() {
-        try {
-            const pendientes = todasReprogramaciones.filter(r => r.estado === 'pendiente').length;
-            const pendingCountEl = document.getElementById('pendingCount');
-            const pendingBadgeEl = document.getElementById('pendingBadge');
-            
-            if (pendingCountEl) pendingCountEl.textContent = pendientes;
-            if (pendingBadgeEl) pendingBadgeEl.textContent = pendientes;
-            
-            console.log('📊 Estadísticas actualizadas - Pendientes:', pendientes);
-        } catch (error) {
-            console.error('❌ Error actualizando estadísticas:', error);
-        }
+        const pendientes = todasReprogramaciones.filter(r => r.estado === 'pendiente').length;
+        document.getElementById('pendingCount').textContent = pendientes;
+        document.getElementById('pendingBadge').textContent = pendientes;
     }
 
     function mostrarReprogramaciones() {
-        try {
-            let filtradas = todasReprogramaciones;
-            
-            if (tabActual === 'pendientes') {
-                filtradas = todasReprogramaciones.filter(r => r.estado === 'pendiente');
-            } else if (tabActual === 'respondidas') {
-                filtradas = todasReprogramaciones.filter(r => r.estado === 'respondida');
-            }
-
-            const container = document.getElementById('reprogContainer');
-            
-            if (!container) {
-                console.error('❌ No se encontró el contenedor de reprogramaciones');
-                return;
-            }
-
-            if (filtradas.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state fade-in">
-                        <div class="empty-icon"><i class="fas fa-inbox"></i></div>
-                        <div class="empty-text">No hay reprogramaciones</div>
-                    </div>
-                `;
-                console.log('📭 No hay reprogramaciones para mostrar en tab:', tabActual);
-                return;
-            }
-
-            const fragment = document.createDocumentFragment();
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = filtradas.map(reprog => crearCardReprog(reprog)).join('');
-            
-            while (tempDiv.firstChild) {
-                fragment.appendChild(tempDiv.firstChild);
-            }
-            
-            container.innerHTML = '';
-            container.appendChild(fragment);
-            
-            console.log('✅ Mostrando', filtradas.length, 'reprogramaciones en tab:', tabActual);
-        } catch (error) {
-            console.error('❌ Error en mostrarReprogramaciones:', error);
+        let filtradas = todasReprogramaciones;
+        if (tabActual === 'pendientes') {
+            filtradas = todasReprogramaciones.filter(r => r.estado === 'pendiente');
+        } else if (tabActual === 'respondidas') {
+            filtradas = todasReprogramaciones.filter(r => r.estado === 'respondida');
         }
+
+        const container = document.getElementById('reprogContainer');
+        if (filtradas.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state fade-in">
+                    <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+                    <div class="empty-text">No hay reprogramaciones</div>
+                </div>
+            `;
+        } else {
+            container.innerHTML = filtradas.map(reprog => crearCardReprog(reprog)).join('');
+        }
+
+        // Asegurar que los tabs permanezcan visibles (crítico para webview)
+        setTimeout(() => {
+            const tabsContainer = document.querySelector('.tabs-container');
+            if (tabsContainer) {
+                tabsContainer.style.display = 'flex';
+                tabsContainer.style.visibility = 'visible';
+            }
+        }, 10);
     }
 
     function crearCardReprog(reprog) {
@@ -1387,27 +1455,47 @@
 
             if (isOnline) {
                 const reprogRef = ref(db, `reprogramaciones/${mes}/${id}`);
+                const fechaRespuesta = new Date().toISOString();
                 await update(reprogRef, {
                     estado: 'respondida',
                     datosExcel: datos,
-                    fechaRespuesta: new Date().toISOString()
+                    fechaRespuesta: fechaRespuesta
                 });
                 await offlineStorage.marcarCambioSincronizado(pendientes[0]?.timestamp);
                 const resta = await offlineStorage.obtenerCambiosPendientes();
                 actualizarContadorOffline(resta.length);
+
+                // Enviar notificación a la auxiliar
+                const reprogActual = todasReprogramaciones.find(r => r.id === id);
+                if (reprogActual && reprogActual.auxiliarEmail) {
+                    await notificarAuxiliarReprogramacionCompletada({
+                        auxiliarEmail: reprogActual.auxiliarEmail,
+                        auxiliarNombre: reprogActual.auxiliarNombre,
+                        supervisorNombre: userData?.nombre || currentUser.displayName || 'Supervisor',
+                        archivoNombre: reprogActual.archivoNombre,
+                        totalRegistros: datos.length,
+                        fechaRespuesta: fechaRespuesta
+                    });
+                }
+
                 mostrarAlerta('success', '✓ Guardado y sincronizado');
             } else {
                 mostrarAlerta('warning', '📱 Guardado offline. Se sincronizará automáticamente');
             }
 
             delete datosEditados[id];
-            setTimeout(async () => {
-                await cargarReprogramaciones();
-                tabActual = 'respondidas';
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelector('[data-tab="respondidas"]').classList.add('active');
-                mostrarReprogramaciones();
-            }, 1000);
+
+            // Actualizar el estado de la reprogramación en la lista local
+            const index = todasReprogramaciones.findIndex(r => r.id === id);
+            if (index !== -1) {
+                todasReprogramaciones[index].estado = 'respondida';
+                todasReprogramaciones[index].datosExcel = datos;
+                todasReprogramaciones[index].fechaRespuesta = new Date().toISOString();
+            }
+
+            // Actualizar estadísticas y cambiar a pestaña respondidas
+            actualizarEstadisticas();
+            cambiarTab('respondidas');
         } catch (error) {
             mostrarAlerta('error', 'Error: ' + error.message);
             btn.disabled = false;
@@ -1415,21 +1503,35 @@
         }
     };
 
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-            try {
-                console.log('🔄 Cambiando a tab:', this.dataset.tab);
-                
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-                tabActual = this.dataset.tab;
-                
-                requestAnimationFrame(() => {
-                    mostrarReprogramaciones();
-                });
-            } catch (error) {
-                console.error('❌ Error al cambiar tab:', error);
+    // Función para cambiar de tab (más robusta para webview)
+    function cambiarTab(nuevoTab) {
+        tabActual = nuevoTab;
+
+        // Actualizar clases de los tabs
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(t => {
+            t.classList.remove('active');
+            if (t.dataset.tab === nuevoTab) {
+                t.classList.add('active');
             }
+        });
+
+        // Mostrar reprogramaciones
+        mostrarReprogramaciones();
+
+        // Forzar re-render en webview
+        const tabsContainer = document.querySelector('.tabs-container');
+        if (tabsContainer) {
+            tabsContainer.style.display = 'flex';
+        }
+    }
+
+    // Agregar event listeners a los tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            cambiarTab(this.dataset.tab);
         });
     });
 
@@ -1470,7 +1572,7 @@
     mostrarEstadoConexion(isOnline);
 
     setInterval(async () => {
-        if (isOnline) {
+        if (isOnline && dbReady) {
             const pendientes = await offlineStorage.obtenerCambiosPendientes();
             if (pendientes.length > 0) await sincronizarCambiosPendientes();
         }
