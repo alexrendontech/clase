@@ -53,7 +53,6 @@
             padding-bottom: max(env(safe-area-inset-bottom), 0px);
         }
 
-        /* Header */
         .header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
@@ -61,6 +60,7 @@
             box-shadow: var(--shadow-md);
             flex-shrink: 0;
             z-index: 100;
+            position: relative;
         }
 
         .header-top {
@@ -105,6 +105,8 @@
             justify-content: center;
             transition: all 0.2s ease;
             backdrop-filter: blur(10px);
+            z-index: 101;
+            position: relative;
         }
 
         .logout-btn:active {
@@ -156,7 +158,6 @@
             opacity: 0.9;
         }
 
-        /* Connection Banner */
         .connection-banner {
             position: fixed;
             top: 0;
@@ -192,11 +193,6 @@
             color: white;
         }
 
-        .connection-banner.syncing {
-            background: rgba(245, 158, 11, 0.95);
-            color: white;
-        }
-
         .spinner-sm {
             width: 14px;
             height: 14px;
@@ -210,12 +206,13 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Main Content */
         .content {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            position: relative;
+            z-index: 1;
         }
 
         .container {
@@ -223,21 +220,17 @@
             overflow-y: auto;
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
-            padding: 16px;
-            padding-bottom: 24px;
+            padding: 16px 0;
             display: flex;
             flex-direction: column;
             position: relative;
             z-index: 0;
         }
 
-        /* Tabs */
         .tabs-container {
-            display: flex !important;
+            display: flex;
             gap: 8px;
-            margin-bottom: 16px;
-            padding-right: 16px;
-            padding-bottom: 8px;
+            padding: 12px 16px;
             overflow-x: auto;
             overflow-y: visible;
             -webkit-overflow-scrolling: touch;
@@ -245,8 +238,12 @@
             scrollbar-width: none;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 99;
             background: var(--bg-primary);
+            flex-shrink: 0;
+            border-bottom: 1px solid var(--border);
+            min-height: 60px;
+            align-items: center;
         }
 
         .tabs-container::-webkit-scrollbar {
@@ -254,7 +251,7 @@
         }
 
         .tab {
-            padding: 10px 18px;
+            padding: 10px 16px;
             background: var(--bg-secondary);
             border: 2px solid var(--border);
             color: var(--text-secondary);
@@ -266,14 +263,16 @@
             flex-shrink: 0;
             min-height: 44px;
             min-width: fit-content;
-            display: flex !important;
+            display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
             transition: all 0.2s ease;
-            scroll-snap-align: start;
-            visibility: visible !important;
-            opacity: 1 !important;
+            scroll-snap-align: center;
+            position: relative;
+            z-index: 99;
             box-sizing: border-box;
+            touch-action: manipulation;
         }
 
         .tab.active {
@@ -290,6 +289,7 @@
             border-radius: 8px;
             font-size: 11px;
             font-weight: 700;
+            margin-left: 4px;
         }
 
         .tab.active .tab-badge {
@@ -297,11 +297,10 @@
             color: white;
         }
 
-        /* Alerts */
         .alert {
             padding: 12px 14px;
             border-radius: 10px;
-            margin-bottom: 14px;
+            margin: 0 16px 14px 16px;
             font-size: 13px;
             display: none;
             align-items: center;
@@ -343,22 +342,17 @@
             border-color: var(--warning);
         }
 
-        /* Cards */
         .reprog-card {
             background: var(--bg-secondary);
             border-radius: 12px;
             padding: 16px;
-            padding-bottom: 32px;
-            margin-bottom: 24px;
+            margin: 0 16px 24px 16px;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border);
             transition: all 0.2s ease;
             animation: fadeIn 0.3s ease;
             position: relative;
             z-index: 1;
-            transform: translateZ(0);
-            -webkit-transform: translateZ(0);
-            overflow: visible !important;
         }
 
         .reprog-card:active {
@@ -431,7 +425,6 @@
             color: #065f46;
         }
 
-        /* Table */
         .table-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -440,26 +433,6 @@
             background: var(--bg-primary);
             border: 1px solid var(--border);
             position: relative;
-        }
-
-        .table-scroll-hint {
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-            background: rgba(139, 92, 246, 0.9);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 10px;
-            opacity: 0;
-            animation: fadeOut 3s ease forwards;
-            pointer-events: none;
-        }
-
-        @keyframes fadeOut {
-            0% { opacity: 1; }
-            80% { opacity: 1; }
-            100% { opacity: 0; }
         }
 
         .data-table {
@@ -516,20 +489,15 @@
             min-height: 80px;
         }
 
-        /* Buttons */
         .actions-bar {
             display: flex;
             flex-direction: column;
             gap: 10px;
             margin-top: 16px;
             padding-top: 16px;
-            padding-bottom: 8px; /* Added padding to prevent bottom clipping */
             border-top: 1px solid var(--border);
             position: relative;
-            z-index: 1000;
-            pointer-events: auto;
-            isolation: isolate;
-            overflow: visible;
+            z-index: 50;
         }
 
         .btn {
@@ -549,13 +517,9 @@
             box-shadow: var(--shadow-sm);
             user-select: none;
             -webkit-user-select: none;
-            -webkit-tap-highlight-color: rgba(139, 92, 246, 0.3);
             touch-action: manipulation;
             position: relative;
-            z-index: 999;
-            pointer-events: auto;
-            isolation: isolate;
-            will-change: transform;
+            z-index: 50;
         }
 
         .btn:active {
@@ -586,7 +550,6 @@
             box-shadow: var(--shadow-md);
         }
 
-        /* Info Box */
         .info-box {
             background: #eff6ff;
             border-left: 4px solid #3b82f6;
@@ -605,7 +568,6 @@
             margin-top: 2px;
         }
 
-        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -629,7 +591,6 @@
             margin-bottom: 8px;
         }
 
-        /* Loader */
         .loader {
             text-align: center;
             padding: 60px 20px;
@@ -660,12 +621,11 @@
             font-weight: 500;
         }
 
-        /* Sync Status */
         .sync-status {
             background: var(--bg-secondary);
             border-radius: 10px;
             padding: 12px 14px;
-            margin-bottom: 14px;
+            margin: 0 16px 14px 16px;
             display: none;
             align-items: center;
             gap: 12px;
@@ -710,21 +670,6 @@
             color: var(--text-secondary);
         }
 
-        /* Offline Badge */
-        .offline-badge {
-            background: var(--warning);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 10px;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 8px;
-        }
-
-        /* Utilities */
         .fade-in {
             animation: fadeIn 0.3s ease;
         }
@@ -742,55 +687,6 @@
             .stat-number {
                 font-size: 16px;
             }
-        }
-
-        /* Safe area support */
-        @supports (padding: max(0px)) {
-            .container {
-                padding-left: max(16px, env(safe-area-inset-left));
-                padding-right: max(16px, env(safe-area-inset-right));
-                padding-bottom: max(16px, env(safe-area-inset-bottom));
-            }
-        }
-
-        /* WebView specific fixes - Force button visibility */
-        @supports (-webkit-touch-callout: none) {
-            .btn {
-                transform: translateZ(0);
-                -webkit-transform: translateZ(0);
-                backface-visibility: hidden;
-                -webkit-backface-visibility: hidden;
-            }
-            
-            .actions-bar {
-                transform: translateZ(0);
-                -webkit-transform: translateZ(0);
-            }
-        }
-
-        /* Force button rendering on top in all scenarios */
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: -1;
-        }
-
-        /* Ensure container has enough space for buttons */
-        #reprogContainer {
-            padding-bottom: 40px;
-            min-height: 0;
-            position: relative;
-            z-index: 0;
-            overflow: visible;
-        }
-
-        #reprogContainer .reprog-card:last-child {
-            margin-bottom: 60px;
-            padding-bottom: 24px;
         }
     </style>
 </head>
@@ -836,6 +732,23 @@
     </div>
 </header>
 
+<!-- Tabs (STICKY - FUERA DEL SCROLL) -->
+<div class="tabs-container">
+    <button class="tab active" data-tab="pendientes" onclick="cambiarTab('pendientes')">
+        <i class="fas fa-clock"></i>
+        Pendientes
+        <span class="tab-badge" id="pendingBadge">0</span>
+    </button>
+    <button class="tab" data-tab="respondidas" onclick="cambiarTab('respondidas')">
+        <i class="fas fa-check-circle"></i>
+        Respondidas
+    </button>
+    <button class="tab" data-tab="todas" onclick="cambiarTab('todas')">
+        <i class="fas fa-list"></i>
+        Todas
+    </button>
+</div>
+
 <!-- Main Content -->
 <div class="content">
     <div class="container">
@@ -866,23 +779,6 @@
             <span id="warningMsg"></span>
         </div>
 
-        <!-- Tabs -->
-        <div class="tabs-container">
-            <button class="tab active" data-tab="pendientes">
-                <i class="fas fa-clock"></i>
-                Pendientes
-                <span class="tab-badge" id="pendingBadge">0</span>
-            </button>
-            <button class="tab" data-tab="respondidas">
-                <i class="fas fa-check-circle"></i>
-                Respondidas
-            </button>
-            <button class="tab" data-tab="todas">
-                <i class="fas fa-list"></i>
-                Todas
-            </button>
-        </div>
-
         <!-- Loader -->
         <div class="loader active" id="loader">
             <div class="spinner"></div>
@@ -898,7 +794,7 @@
 <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getDatabase, ref, get, update, onChildAdded, query, orderByChild, equalTo } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+    import { getDatabase, ref, get, update, onChildAdded, onChildChanged, query, orderByChild, equalTo } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
     const firebaseConfig = {
         apiKey: "AIzaSyBDRqsZI8EQaGn1lCc4Y5rIcfmLE7969zY",
@@ -954,7 +850,7 @@
 
         async obtenerReprogramaciones() {
             if (!this.db) {
-                console.warn('⚠️ IndexedDB no inicializado en obtenerReprogramaciones');
+                console.warn('⚠️ IndexedDB no inicializado');
                 return [];
             }
             try {
@@ -969,14 +865,14 @@
                     };
                 });
             } catch (error) {
-                console.error('❌ Error en obtenerReprogramaciones:', error);
+                console.error('❌ Error:', error);
                 return [];
             }
         }
 
         async guardarCambioPendiente(reprogId, mes, datos) {
             if (!this.db) {
-                console.warn('⚠️ IndexedDB no inicializado en guardarCambioPendiente');
+                console.warn('⚠️ IndexedDB no inicializado');
                 return null;
             }
             try {
@@ -986,14 +882,14 @@
                 await store.put(cambio);
                 return cambio;
             } catch (error) {
-                console.error('❌ Error en guardarCambioPendiente:', error);
+                console.error('❌ Error:', error);
                 return null;
             }
         }
 
         async obtenerCambiosPendientes() {
             if (!this.db) {
-                console.warn('⚠️ IndexedDB no inicializado en obtenerCambiosPendientes');
+                console.warn('⚠️ IndexedDB no inicializado');
                 return [];
             }
             try {
@@ -1006,19 +902,19 @@
                         resolve(todos.filter(c => !c.sincronizado));
                     };
                     request.onerror = () => {
-                        console.error('❌ Error al obtener cambios pendientes');
+                        console.error('❌ Error');
                         resolve([]);
                     };
                 });
             } catch (error) {
-                console.error('❌ Error en obtenerCambiosPendientes:', error);
+                console.error('❌ Error:', error);
                 return [];
             }
         }
 
         async marcarCambioSincronizado(timestamp) {
             if (!this.db) {
-                console.warn('⚠️ IndexedDB no inicializado en marcarCambioSincronizado');
+                console.warn('⚠️ IndexedDB no inicializado');
                 return;
             }
             try {
@@ -1026,13 +922,13 @@
                 const store = tx.objectStore('cambiosPendientes');
                 await store.delete(timestamp);
             } catch (error) {
-                console.error('❌ Error en marcarCambioSincronizado:', error);
+                console.error('❌ Error:', error);
             }
         }
 
         async guardarUsuario(userData) {
             if (!this.db) {
-                console.warn('⚠️ IndexedDB no inicializado en guardarUsuario');
+                console.warn('⚠️ IndexedDB no inicializado');
                 return;
             }
             try {
@@ -1040,13 +936,13 @@
                 const store = tx.objectStore('usuario');
                 await store.put(userData);
             } catch (error) {
-                console.error('❌ Error en guardarUsuario:', error);
+                console.error('❌ Error:', error);
             }
         }
 
         async obtenerUsuario(uid) {
             if (!this.db) {
-                console.warn('⚠️ IndexedDB no inicializado en obtenerUsuario');
+                console.warn('⚠️ IndexedDB no inicializado');
                 return null;
             }
             try {
@@ -1056,12 +952,12 @@
                     const request = store.get(uid);
                     request.onsuccess = () => resolve(request.result);
                     request.onerror = () => {
-                        console.error('❌ Error al obtener usuario');
+                        console.error('❌ Error');
                         resolve(null);
                     };
                 });
             } catch (error) {
-                console.error('❌ Error en obtenerUsuario:', error);
+                console.error('❌ Error:', error);
                 return null;
             }
         }
@@ -1070,13 +966,13 @@
     const offlineStorage = new OfflineStorage();
     let isOnline = navigator.onLine;
     let currentUser = null;
-    let userData = null; // Datos del usuario supervisor
+    let userData = null;
     let todasReprogramaciones = [];
     let tabActual = 'pendientes';
     let datosEditados = {};
-    let reprogramacionesIds = new Set(); // Para rastrear IDs ya cargadas
-    let primeraCargar = true; // Flag para evitar notificaciones en carga inicial
-    let dbReady = false; // Flag para indicar que IndexedDB está listo
+    let reprogramacionesIds = new Set();
+    let primeraCargar = true;
+    let dbReady = false;
 
     const connectionBanner = document.getElementById('connectionBanner');
     const connectionText = document.getElementById('connectionText');
@@ -1105,17 +1001,16 @@
             currentUser = user;
             try {
                 await offlineStorage.init();
-                dbReady = true; // Marcar que IndexedDB está listo
-                console.log('✅ IndexedDB inicializado correctamente');
-                await cargarDatosUsuario(); // Cargar datos del supervisor
+                dbReady = true;
+                console.log('✅ IndexedDB inicializado');
+                await cargarDatosUsuario();
                 await cargarReprogramaciones();
-                iniciarEscuchaNuevasReprogramaciones(); // Escuchar cambios en tiempo real
+                iniciarEscuchaNuevasReprogramaciones();
                 const pendientes = await offlineStorage.obtenerCambiosPendientes();
                 actualizarContadorOffline(pendientes.length);
-
-                console.log('✅ Aplicación inicializada correctamente');
+                console.log('✅ Aplicación inicializada');
             } catch (error) {
-                console.error('❌ Error en inicialización:', error);
+                console.error('❌ Error:', error);
                 mostrarAlerta('error', 'Error: ' + error.message);
             }
         } else {
@@ -1126,16 +1021,13 @@
     async function cargarDatosUsuario() {
         try {
             const supervisorNameEl = document.getElementById('supervisorName');
-            
-            // Intentar cargar desde caché
             const cached = await offlineStorage.obtenerUsuario(currentUser.uid);
             if (cached && cached.nombre) {
                 userData = cached;
                 supervisorNameEl.textContent = userData.nombre;
-                console.log('👤 Nombre del supervisor desde cache:', userData.nombre);
+                console.log('👤 Nombre desde cache');
             }
 
-            // Si hay conexión, actualizar desde Firebase
             if (isOnline) {
                 const userRef = ref(db, `usuarios/${currentUser.uid}`);
                 const snapshot = await get(userRef);
@@ -1144,16 +1036,14 @@
                     const nombreCompleto = userData.nombre || userData.displayName || currentUser.displayName || currentUser.email?.split('@')[0] || 'Supervisor';
                     supervisorNameEl.textContent = nombreCompleto;
                     await offlineStorage.guardarUsuario({ uid: currentUser.uid, ...userData });
-                    console.log('👤 Nombre del supervisor desde Firebase:', nombreCompleto);
+                    console.log('👤 Nombre desde Firebase');
                 } else {
-                    // Si no existe en Firebase, usar datos de autenticación
                     const fallbackName = currentUser.displayName || currentUser.email?.split('@')[0] || 'Supervisor';
                     supervisorNameEl.textContent = fallbackName;
-                    console.log('👤 Nombre del supervisor (fallback):', fallbackName);
                 }
             }
         } catch (error) {
-            console.error('❌ Error cargando datos usuario:', error);
+            console.error('❌ Error:', error);
             const fallbackName = currentUser.displayName || currentUser.email?.split('@')[0] || 'Supervisor';
             document.getElementById('supervisorName').textContent = fallbackName;
         }
@@ -1193,84 +1083,77 @@
                 actualizarEstadisticas();
                 mostrarReprogramaciones();
 
-                // Actualizar el Set de IDs después de la carga inicial
                 reprogramacionesIds.clear();
                 todasReprogramaciones.forEach(r => reprogramacionesIds.add(r.id));
-                primeraCargar = false; // Marcar que ya terminó la carga inicial
+                primeraCargar = false;
             }
         } catch (error) {
-            console.error('Error:', error);
+            console.error('❌ Error:', error);
             loader.classList.remove('active');
         }
     }
 
-    // Función para escuchar nuevas reprogramaciones en tiempo real
     function iniciarEscuchaNuevasReprogramaciones() {
-        console.log('👂 Iniciando escucha de nuevas reprogramaciones...');
+        console.log('👂 Escuchando nuevas reprogramaciones...');
         const meses = obtenerUltimosMeses(3);
 
         meses.forEach(mes => {
             const reprogRef = ref(db, `reprogramaciones/${mes}`);
             const q = query(reprogRef, orderByChild('supervisorId'), equalTo(currentUser.uid));
 
+            // Escuchar NUEVAS reprogramaciones
             onChildAdded(q, (snapshot) => {
-                // Ignorar si es la primera carga
                 if (primeraCargar) return;
 
                 const reprogId = snapshot.key;
                 const nuevaReprog = snapshot.val();
 
-                // Solo notificar si es realmente nueva (no estaba en el Set)
                 if (nuevaReprog && !reprogramacionesIds.has(reprogId)) {
-                    console.log('🔔 Nueva reprogramación detectada:', reprogId);
-
-                    // Agregar al Set
+                    console.log('🔔 Nueva reprogramación:', reprogId);
                     reprogramacionesIds.add(reprogId);
-
-                    // Agregar a la lista
                     const reprogConMes = { id: reprogId, mes, ...nuevaReprog };
-                    todasReprogramaciones.unshift(reprogConMes); // Agregar al inicio
-
-                    // Guardar en IndexedDB
+                    todasReprogramaciones.unshift(reprogConMes);
                     offlineStorage.guardarReprogramaciones(todasReprogramaciones);
-
-                    // Actualizar UI
                     actualizarEstadisticas();
                     if (tabActual === 'pendientes' || tabActual === 'todas') {
                         mostrarReprogramaciones();
                     }
-
-                    // Mostrar notificación
                     mostrarNotificacionNuevaReprogramacion(nuevaReprog);
+                }
+            });
+
+            // Escuchar CAMBIOS en reprogramaciones existentes
+            onChildChanged(q, (snapshot) => {
+                const reprogId = snapshot.key;
+                const reprogActualizada = snapshot.val();
+
+                const index = todasReprogramaciones.findIndex(r => r.id === reprogId);
+                if (index !== -1) {
+                    console.log('🔄 Reprogramación actualizada:', reprogId);
+                    todasReprogramaciones[index] = { id: reprogId, mes, ...reprogActualizada };
+                    offlineStorage.guardarReprogramaciones(todasReprogramaciones);
+                    actualizarEstadisticas();
+                    mostrarReprogramaciones();
+                    mostrarAlerta('warning', `⚠️ Cambio detectado en reprogramación de ${reprogActualizada.auxiliarNombre}`);
                 }
             });
         });
     }
 
-    // Función para mostrar notificación de nueva reprogramación
     function mostrarNotificacionNuevaReprogramacion(reprog) {
-        // Reproducir sonido
         reproducirSonidoNotificacion();
-
-        // Mostrar alerta visual
         mostrarAlerta('success', `🔔 Nueva reprogramación de ${reprog.auxiliarNombre} (${reprog.totalRegistros || 0} registros)`);
-
-        // Vibración si está disponible
         if (navigator.vibrate) {
             navigator.vibrate([200, 100, 200]);
         }
-
-        console.log('🔔 Notificación mostrada para nueva reprogramación');
+        console.log('🔔 Notificación mostrada');
     }
 
-    // Función para reproducir sonido de notificación
     function reproducirSonidoNotificacion() {
         try {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-            // Crear tres tonos para un sonido de notificación agradable
             const tiempos = [0, 0.15, 0.3];
-            const frecuencias = [587.33, 659.25, 783.99]; // Re, Mi, Sol
+            const frecuencias = [587.33, 659.25, 783.99];
 
             tiempos.forEach((tiempo, index) => {
                 const oscillator = audioContext.createOscillator();
@@ -1282,7 +1165,6 @@
                 oscillator.type = 'sine';
                 oscillator.frequency.value = frecuencias[index];
 
-                // Envelope ADSR para un sonido más suave
                 const now = audioContext.currentTime + tiempo;
                 gainNode.gain.setValueAtTime(0, now);
                 gainNode.gain.linearRampToValueAtTime(0.3, now + 0.02);
@@ -1292,9 +1174,9 @@
                 oscillator.stop(now + 0.15);
             });
 
-            console.log('🔊 Sonido de notificación reproducido');
+            console.log('🔊 Sonido reproducido');
         } catch (error) {
-            console.error('❌ Error al reproducir sonido:', error);
+            console.error('❌ Error:', error);
         }
     }
 
@@ -1318,7 +1200,7 @@
                 await offlineStorage.marcarCambioSincronizado(cambio.timestamp);
                 sincronizados++;
             } catch (error) {
-                console.error('Error sincronizando:', error);
+                console.error('❌ Error sincronizando:', error);
             }
         }
 
@@ -1372,25 +1254,6 @@
         } else {
             container.innerHTML = filtradas.map(reprog => crearCardReprog(reprog)).join('');
         }
-
-        // Asegurar que los tabs permanezcan visibles (crítico para webview)
-        setTimeout(() => {
-            const tabsContainer = document.querySelector('.tabs-container');
-            if (tabsContainer) {
-                tabsContainer.style.display = 'flex';
-                tabsContainer.style.visibility = 'visible';
-            }
-            
-            // Forzar visibilidad de botones en WebView
-            const buttons = document.querySelectorAll('.btn');
-            buttons.forEach(btn => {
-                btn.style.display = 'inline-flex';
-                btn.style.visibility = 'visible';
-                btn.style.opacity = '1';
-                btn.style.pointerEvents = 'auto';
-                console.log('✓ Botón forzado visible:', btn.dataset.reprogId);
-            });
-        }, 10);
     }
 
     function crearCardReprog(reprog) {
@@ -1410,7 +1273,6 @@
 
         let tableHTML = '';
         if (reprog.estado === 'pendiente' && datosExcel.length > 0) {
-            // Obtener todas las columnas únicas del Excel
             const todasLasColumnas = new Set();
             datosExcel.forEach(row => {
                 Object.keys(row).forEach(col => todasLasColumnas.add(col));
@@ -1427,9 +1289,9 @@
             tableHTML = `
                 <div class="info-box">
                     <i class="fas fa-info-circle"></i>
-                    <div>Completa la FECHA REPROGRAMACION y OBSERVACION para cada fila</div>
+                    <div>Completa FECHA REPROGRAMACION y OBSERVACION</div>
                 </div>
-                <div class="table-wrapper" id="table-${reprog.id}">
+                <div class="table-wrapper">
                     <table class="data-table">
                         <thead>
                             <tr>
@@ -1458,22 +1320,17 @@
                                 `;
                                             }
                                         } else {
-                                            return `<td><span title="${row[col] || ''}">${row[col] || '-'}</span></td>`;
+                                            return `<td>${row[col] || '-'}</td>`;
                                         }
                                     }).join('')}
                                 </tr>
                             `).join('')}
                         </tbody>
                     </table>
-                    <div class="table-scroll-hint">← Desliza para ver más →</div>
                 </div>
                 <div class="actions-bar">
                     <button class="btn ${isOnline ? 'btn-success' : 'btn-warning'}" 
-                            onclick="guardarRespuestas('${reprog.mes}', '${reprog.id}')"
-                            ontouchstart="this.style.opacity='0.8'"
-                            ontouchend="this.style.opacity='1'"
-                            data-reprog-id="${reprog.id}"
-                            data-mes="${reprog.mes}">
+                            onclick="guardarRespuestas('${reprog.mes}', '${reprog.id}')">
                         <i class="fas ${isOnline ? 'fa-save' : 'fa-cloud-upload-alt'}"></i>
                         ${isOnline ? 'Guardar' : 'Guardar Offline'}
                     </button>
@@ -1520,7 +1377,7 @@
         const incompletas = datos.some(row => !row['FECHA REPROGRAMACION'] || !row['OBSERVACION']);
         if (incompletas && !confirm('⚠️ Algunas filas no están completas.\n\n¿Continuar?')) return;
 
-        const btn = event.target;
+        const btn = event.target.closest('.btn');
         const original = btn.innerHTML;
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
@@ -1542,7 +1399,6 @@
                 const resta = await offlineStorage.obtenerCambiosPendientes();
                 actualizarContadorOffline(resta.length);
 
-                // Enviar notificación a la auxiliar
                 const reprogActual = todasReprogramaciones.find(r => r.id === id);
                 if (reprogActual && reprogActual.auxiliarEmail) {
                     await notificarAuxiliarReprogramacionCompletada({
@@ -1562,7 +1418,6 @@
 
             delete datosEditados[id];
 
-            // Actualizar el estado de la reprogramación en la lista local
             const index = todasReprogramaciones.findIndex(r => r.id === id);
             if (index !== -1) {
                 todasReprogramaciones[index].estado = 'respondida';
@@ -1570,7 +1425,6 @@
                 todasReprogramaciones[index].fechaRespuesta = new Date().toISOString();
             }
 
-            // Actualizar estadísticas y cambiar a pestaña respondidas
             actualizarEstadisticas();
             cambiarTab('respondidas');
         } catch (error) {
@@ -1580,11 +1434,9 @@
         }
     };
 
-    // Función para cambiar de tab (más robusta para webview)
-    function cambiarTab(nuevoTab) {
+    window.cambiarTab = function(nuevoTab) {
         tabActual = nuevoTab;
 
-        // Actualizar clases de los tabs
         const tabs = document.querySelectorAll('.tab');
         tabs.forEach(t => {
             t.classList.remove('active');
@@ -1593,24 +1445,8 @@
             }
         });
 
-        // Mostrar reprogramaciones
         mostrarReprogramaciones();
-
-        // Forzar re-render en webview
-        const tabsContainer = document.querySelector('.tabs-container');
-        if (tabsContainer) {
-            tabsContainer.style.display = 'flex';
-        }
-    }
-
-    // Agregar event listeners a los tabs
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            cambiarTab(this.dataset.tab);
-        });
-    });
+    };
 
     window.cerrarSesion = async function() {
         const pendientes = await offlineStorage.obtenerCambiosPendientes();
@@ -1621,7 +1457,7 @@
             await signOut(auth);
             window.location.href = 'login.html';
         } catch (error) {
-            console.error('Error:', error);
+            console.error('❌ Error:', error);
         }
     };
 
