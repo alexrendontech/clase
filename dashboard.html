@@ -540,6 +540,424 @@
                 padding: 10px 8px;
             }
         }
+
+        /* Modal Gestión Usuarios */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-usuarios {
+            background: white;
+            border-radius: 12px;
+            max-width: 1000px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-overlay.show .modal-usuarios {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            background: #f3f4f6;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .modal-content {
+            padding: 24px;
+        }
+
+        .modal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .modal-card {
+            background: #f9fafb;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .modal-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group-modal {
+            margin-bottom: 16px;
+        }
+
+        .form-group-modal label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .form-group-modal input,
+        .form-group-modal select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #1f2937;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .form-group-modal input:focus,
+        .form-group-modal select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-box-wrapper {
+            margin-bottom: 16px;
+        }
+
+        .search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box i.fa-search {
+            position: absolute;
+            left: 12px;
+            color: #9ca3af;
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 40px 10px 38px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1f2937;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-box input::placeholder {
+            color: #9ca3af;
+        }
+
+        .clear-search {
+            position: absolute;
+            right: 10px;
+            background: transparent;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .clear-search:hover {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 32px 20px;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .no-results i {
+            font-size: 40px;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+
+        .highlight {
+            background: #fef3c7;
+            font-weight: 600;
+            padding: 2px 0;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        .alert-modal {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-modal.show {
+            display: flex;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .btn-modal {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        .btn-modal.primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-modal.primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-modal.primary:disabled {
+            background: #93c5fd;
+            cursor: not-allowed;
+        }
+
+        .users-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .user-item {
+            background: white;
+            padding: 14px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            border: 1px solid #e5e7eb;
+        }
+
+        .user-item:hover {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .user-details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 2px;
+        }
+
+        .user-details p {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-icon-modal {
+            padding: 6px 10px;
+            font-size: 12px;
+            background: transparent;
+            color: #6b7280;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-icon-modal:hover {
+            background: #f9fafb;
+            color: #374151;
+        }
+
+        .btn-icon-modal.edit {
+            color: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .btn-icon-modal.edit:hover {
+            background: #eff6ff;
+        }
+
+        .role-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .role-badge.admin {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .role-badge.supervisor {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .role-badge.auxiliar {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .empty-state-modal {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-state-modal i {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+
+        .loader-modal {
+            display: none;
+            text-align: center;
+            padding: 16px;
+        }
+
+        .loader-modal.active {
+            display: block;
+        }
+
+        .spinner-modal {
+            border: 2px solid #e5e7eb;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 0.6s linear infinite;
+            margin: 0 auto 8px;
+        }
+
+        @media (max-width: 768px) {
+            .modal-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -557,6 +975,10 @@
             <div class="user-info">
                 <span class="user-name" id="userName">Admin</span>
             </div>
+            <button class="logout-btn" onclick="abrirGestionUsuarios()" style="background: #3b82f6; color: white; margin-right: 10px;">
+                <i class="fas fa-users-cog"></i>
+                Gestionar Usuarios
+            </button>
             <button class="logout-btn" onclick="cerrarSesion()">
                 <i class="fas fa-sign-out-alt"></i>
                 Salir
@@ -699,6 +1121,142 @@
                             <tbody id="historyTableBody"></tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Gestión de Usuarios -->
+    <div class="modal-overlay" id="modalUsuarios">
+        <div class="modal-usuarios">
+            <div class="modal-header">
+                <h2><i class="fas fa-users-cog"></i> Gestión de Usuarios</h2>
+                <button class="modal-close" onclick="cerrarModalUsuarios()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="modal-grid">
+                    <!-- Crear Usuario -->
+                    <div class="modal-card">
+                        <h3 class="modal-card-title">
+                            <i class="fas fa-user-plus"></i>
+                            Crear Nuevo Usuario
+                        </h3>
+                        <div class="alert-modal alert-success" id="successAlertCreate">
+                            <i class="fas fa-check-circle"></i>
+                            <span id="successMsgCreate"></span>
+                        </div>
+                        <div class="alert-modal alert-error" id="errorAlertCreate">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span id="errorMsgCreate"></span>
+                        </div>
+                        <form id="createUserForm">
+                            <div class="form-group-modal">
+                                <label>Nombre Completo <span class="required">*</span></label>
+                                <input type="text" id="createNombre" required placeholder="Ej: Juan Pérez">
+                            </div>
+                            <div class="form-group-modal">
+                                <label>Correo Electrónico <span class="required">*</span></label>
+                                <input type="email" id="createEmail" required placeholder="usuario@ejemplo.com">
+                                <div class="help-text">Se usará para iniciar sesión</div>
+                            </div>
+                            <div class="form-group-modal">
+                                <label>Contraseña <span class="required">*</span></label>
+                                <input type="password" id="createPassword" required placeholder="Mínimo 6 caracteres">
+                                <div class="help-text">Debe tener al menos 6 caracteres</div>
+                            </div>
+                            <div class="form-group-modal">
+                                <label>Rol <span class="required">*</span></label>
+                                <select id="createRol" required>
+                                    <option value="">Seleccionar rol...</option>
+                                    <option value="admin">Administrador</option>
+                                    <option value="supervisor">Supervisor</option>
+                                    <option value="auxiliar">Auxiliar</option>
+                                </select>
+                            </div>
+                            <div class="loader-modal" id="createLoader">
+                                <div class="spinner-modal"></div>
+                                <div style="color: #9ca3af; font-size: 13px;">Creando usuario...</div>
+                            </div>
+                            <button type="submit" class="btn-modal primary" id="createSubmitBtn">
+                                <i class="fas fa-plus"></i>
+                                Crear Usuario
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Lista de Usuarios -->
+                    <div class="modal-card">
+                        <h3 class="modal-card-title">
+                            <i class="fas fa-users"></i>
+                            Usuarios Registrados
+                        </h3>
+                        <div class="search-box-wrapper">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="searchUsers" placeholder="Buscar por nombre o rol...">
+                                <button class="clear-search" id="clearSearch" style="display: none;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="loader-modal active" id="usersLoader">
+                            <div class="spinner-modal"></div>
+                            <div style="color: #9ca3af; font-size: 13px;">Cargando usuarios...</div>
+                        </div>
+                        <div class="users-list" id="usersList"></div>
+                    </div>
+                </div>
+
+                <!-- Modal Editar Usuario (Dentro del modal principal) -->
+                <div class="modal-card" id="editUserSection" style="display: none; margin-top: 24px;">
+                    <h3 class="modal-card-title">
+                        <i class="fas fa-user-edit"></i>
+                        Editar Usuario
+                    </h3>
+                    <div class="alert-modal alert-success" id="successAlertEdit">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="successMsgEdit"></span>
+                    </div>
+                    <div class="alert-modal alert-error" id="errorAlertEdit">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="errorMsgEdit"></span>
+                    </div>
+                    <form id="editUserForm">
+                        <div class="modal-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                            <div class="form-group-modal">
+                                <label>Nombre Completo <span class="required">*</span></label>
+                                <input type="text" id="editNombre" required>
+                            </div>
+                            <div class="form-group-modal">
+                                <label>Rol <span class="required">*</span></label>
+                                <select id="editRol" required>
+                                    <option value="admin">Administrador</option>
+                                    <option value="supervisor">Supervisor</option>
+                                    <option value="auxiliar">Auxiliar</option>
+                                </select>
+                            </div>
+                            <div class="form-group-modal">
+                                <label>Correo (solo lectura)</label>
+                                <input type="email" id="editEmail" disabled>
+                            </div>
+                        </div>
+                        <div class="loader-modal" id="editLoader">
+                            <div class="spinner-modal"></div>
+                            <div style="color: #9ca3af; font-size: 13px;">Actualizando...</div>
+                        </div>
+                        <div style="display: flex; gap: 12px; margin-top: 16px;">
+                            <button type="button" class="btn-modal" onclick="cancelarEdicion()" style="background: #6b7280; color: white;">
+                                <i class="fas fa-times"></i>
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn-modal primary" id="editSubmitBtn">
+                                <i class="fas fa-save"></i>
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -1174,6 +1732,269 @@
         document.getElementById('filterSupervisor').addEventListener('change', renderizarHistorial);
         document.getElementById('filterAuxiliar').addEventListener('change', renderizarHistorial);
         document.getElementById('filterEstado').addEventListener('change', renderizarHistorial);
+
+        // ========== GESTIÓN DE USUARIOS ==========
+        let usuarioEditando = null;
+        let todosLosUsuarios = []; // Array global para filtrado
+
+        window.abrirGestionUsuarios = function() {
+            document.getElementById('modalUsuarios').classList.add('show');
+            cargarUsuariosModal();
+        };
+
+        window.cerrarModalUsuarios = function() {
+            document.getElementById('modalUsuarios').classList.remove('show');
+            cancelarEdicion();
+        };
+
+        window.cancelarEdicion = function() {
+            document.getElementById('editUserSection').style.display = 'none';
+            document.getElementById('editUserForm').reset();
+            usuarioEditando = null;
+        };
+
+        // Crear Usuario
+        document.getElementById('createUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const nombre = document.getElementById('createNombre').value.trim();
+            const email = document.getElementById('createEmail').value.trim();
+            const password = document.getElementById('createPassword').value;
+            const rol = document.getElementById('createRol').value;
+            
+            if (!nombre || !email || !password || !rol) {
+                mostrarAlertaModal('error', 'Por favor completa todos los campos', 'create');
+                return;
+            }
+            
+            const loader = document.getElementById('createLoader');
+            const submitBtn = document.getElementById('createSubmitBtn');
+            loader.classList.add('active');
+            submitBtn.disabled = true;
+            
+            try {
+                // Importar las funciones necesarias
+                const { createUserWithEmailAndPassword } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
+                const { ref: refDB, set } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js');
+                
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                await set(refDB(db, `usuarios/${user.uid}`), {
+                    nombre: nombre,
+                    email: email,
+                    rol: rol,
+                    fechaCreacion: new Date().toISOString(),
+                    ultimaActualizacion: new Date().toISOString()
+                });
+                
+                mostrarAlertaModal('success', `✓ Usuario ${nombre} creado correctamente`, 'create');
+                document.getElementById('createUserForm').reset();
+                await signOut(auth); // Cerrar sesión del nuevo usuario
+                cargarUsuariosModal(); // Recargar lista
+                
+            } catch (error) {
+                console.error('Error:', error);
+                let mensajeError = 'Error al crear usuario';
+                
+                switch(error.code) {
+                    case 'auth/email-already-in-use':
+                        mensajeError = 'Este correo ya está registrado';
+                        break;
+                    case 'auth/invalid-email':
+                        mensajeError = 'Correo electrónico inválido';
+                        break;
+                    case 'auth/weak-password':
+                        mensajeError = 'La contraseña debe tener al menos 6 caracteres';
+                        break;
+                    default:
+                        mensajeError = `Error: ${error.message}`;
+                }
+                
+                mostrarAlertaModal('error', mensajeError, 'create');
+            } finally {
+                loader.classList.remove('active');
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Editar Usuario
+        document.getElementById('editUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!usuarioEditando) return;
+            
+            const nombre = document.getElementById('editNombre').value.trim();
+            const rol = document.getElementById('editRol').value;
+            
+            if (!nombre || !rol) {
+                mostrarAlertaModal('error', 'Por favor completa todos los campos', 'edit');
+                return;
+            }
+            
+            const loader = document.getElementById('editLoader');
+            const submitBtn = document.getElementById('editSubmitBtn');
+            loader.classList.add('active');
+            submitBtn.disabled = true;
+            
+            try {
+                const { ref: refDB, update } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js');
+                
+                await update(refDB(db, `usuarios/${usuarioEditando.uid}`), {
+                    nombre: nombre,
+                    rol: rol,
+                    ultimaActualizacion: new Date().toISOString()
+                });
+                
+                mostrarAlertaModal('success', '✓ Usuario actualizado correctamente', 'edit');
+                cargarUsuariosModal();
+                
+                setTimeout(() => {
+                    cancelarEdicion();
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarAlertaModal('error', `Error: ${error.message}`, 'edit');
+            } finally {
+                loader.classList.remove('active');
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Cargar Lista de Usuarios en el Modal
+        async function cargarUsuariosModal() {
+            const usersList = document.getElementById('usersList');
+            const loader = document.getElementById('usersLoader');
+            
+            loader.classList.add('active');
+            
+            try {
+                const usuariosRef = ref(db, 'usuarios');
+                const snapshot = await get(usuariosRef);
+                
+                if (!snapshot.exists()) {
+                    usersList.innerHTML = `
+                        <div class="empty-state-modal">
+                            <i class="fas fa-users"></i>
+                            <div>No hay usuarios registrados</div>
+                        </div>
+                    `;
+                    todosLosUsuarios = [];
+                    return;
+                }
+                
+                todosLosUsuarios = [];
+                snapshot.forEach((childSnapshot) => {
+                    const uid = childSnapshot.key;
+                    const userData = childSnapshot.val();
+                    todosLosUsuarios.push({ uid, ...userData });
+                });
+                
+                // Ordenar por nombre
+                todosLosUsuarios.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+                
+                renderizarUsuarios(todosLosUsuarios);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                usersList.innerHTML = `
+                    <div class="empty-state-modal">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>Error al cargar usuarios</div>
+                    </div>
+                `;
+            } finally {
+                loader.classList.remove('active');
+            }
+        }
+
+        // Renderizar lista de usuarios
+        function renderizarUsuarios(usuariosLista) {
+            const usersList = document.getElementById('usersList');
+            
+            if (usuariosLista.length === 0) {
+                usersList.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <div>No se encontraron usuarios</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            usersList.innerHTML = usuariosLista.map(user => `
+                <div class="user-item" data-user-name="${(user.nombre || '').toLowerCase()}" data-user-rol="${(user.rol || '').toLowerCase()}">
+                    <div class="user-details">
+                        <h4>${user.nombre || 'Sin nombre'}</h4>
+                        <p>${user.email || 'Sin correo'}</p>
+                    </div>
+                    <div class="user-actions">
+                        <span class="role-badge ${user.rol}">${user.rol || 'Sin rol'}</span>
+                        <button class="btn-icon-modal edit" onclick='editarUsuario(${JSON.stringify(user).replace(/'/g, "&apos;")})'>
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Búsqueda de usuarios
+        document.getElementById('searchUsers').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            const clearBtn = document.getElementById('clearSearch');
+            
+            // Mostrar/ocultar botón de limpiar
+            clearBtn.style.display = searchTerm ? 'flex' : 'none';
+            
+            if (!searchTerm) {
+                renderizarUsuarios(todosLosUsuarios);
+                return;
+            }
+            
+            // Filtrar usuarios
+            const usuariosFiltrados = todosLosUsuarios.filter(user => {
+                const nombre = (user.nombre || '').toLowerCase();
+                const rol = (user.rol || '').toLowerCase();
+                const email = (user.email || '').toLowerCase();
+                
+                return nombre.includes(searchTerm) || 
+                       rol.includes(searchTerm) || 
+                       email.includes(searchTerm);
+            });
+            
+            renderizarUsuarios(usuariosFiltrados);
+        });
+
+        // Botón limpiar búsqueda
+        document.getElementById('clearSearch').addEventListener('click', function() {
+            document.getElementById('searchUsers').value = '';
+            this.style.display = 'none';
+            renderizarUsuarios(todosLosUsuarios);
+        });
+
+        window.editarUsuario = function(user) {
+            usuarioEditando = user;
+            document.getElementById('editNombre').value = user.nombre || '';
+            document.getElementById('editRol').value = user.rol || '';
+            document.getElementById('editEmail').value = user.email || '';
+            document.getElementById('editUserSection').style.display = 'block';
+            document.getElementById('editUserSection').scrollIntoView({ behavior: 'smooth' });
+        };
+
+        function mostrarAlertaModal(tipo, mensaje, contexto) {
+            const alertId = tipo === 'success' ? `successAlert${contexto === 'create' ? 'Create' : 'Edit'}` : `errorAlert${contexto === 'create' ? 'Create' : 'Edit'}`;
+            const msgId = tipo === 'success' ? `successMsg${contexto === 'create' ? 'Create' : 'Edit'}` : `errorMsg${contexto === 'create' ? 'Create' : 'Edit'}`;
+            
+            const alert = document.getElementById(alertId);
+            const msgElement = document.getElementById(msgId);
+            
+            if (alert && msgElement) {
+                msgElement.textContent = mensaje;
+                alert.classList.add('show');
+                setTimeout(() => alert.classList.remove('show'), 4000);
+            }
+        }
 
         window.cerrarSesion = async function() {
             try {
