@@ -756,6 +756,28 @@
             padding: 2px 0;
         }
 
+        .user-counter {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #eff6ff;
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid #bfdbfe;
+        }
+
+        .user-counter span:first-child {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e40af;
+        }
+
+        .user-counter-label {
+            font-size: 12px;
+            color: #3b82f6;
+            font-weight: 500;
+        }
+
         .required {
             color: #ef4444;
         }
@@ -1188,10 +1210,16 @@
 
                     <!-- Lista de Usuarios -->
                     <div class="modal-card">
-                        <h3 class="modal-card-title">
-                            <i class="fas fa-users"></i>
-                            Usuarios Registrados
-                        </h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 class="modal-card-title" style="margin-bottom: 0;">
+                                <i class="fas fa-users"></i>
+                                Usuarios Registrados
+                            </h3>
+                            <div class="user-counter">
+                                <span id="userCountDisplay">0</span>
+                                <span class="user-counter-label">usuarios</span>
+                            </div>
+                        </div>
                         <div class="search-box-wrapper">
                             <div class="search-box">
                                 <i class="fas fa-search"></i>
@@ -1910,8 +1938,27 @@
         }
 
         // Renderizar lista de usuarios
-        function renderizarUsuarios(usuariosLista) {
+        function renderizarUsuarios(usuariosLista, esFiltrado = false) {
             const usersList = document.getElementById('usersList');
+            const counterDisplay = document.getElementById('userCountDisplay');
+            const counterLabel = document.querySelector('.user-counter-label');
+            
+            // Actualizar contador
+            if (esFiltrado && usuariosLista.length !== todosLosUsuarios.length) {
+                counterDisplay.textContent = usuariosLista.length;
+                counterLabel.textContent = `de ${todosLosUsuarios.length} usuarios`;
+                counterDisplay.parentElement.style.background = '#fef3c7';
+                counterDisplay.parentElement.style.borderColor = '#fcd34d';
+                counterDisplay.style.color = '#92400e';
+                counterLabel.style.color = '#d97706';
+            } else {
+                counterDisplay.textContent = todosLosUsuarios.length;
+                counterLabel.textContent = todosLosUsuarios.length === 1 ? 'usuario' : 'usuarios';
+                counterDisplay.parentElement.style.background = '#eff6ff';
+                counterDisplay.parentElement.style.borderColor = '#bfdbfe';
+                counterDisplay.style.color = '#1e40af';
+                counterLabel.style.color = '#3b82f6';
+            }
             
             if (usuariosLista.length === 0) {
                 usersList.innerHTML = `
@@ -1948,7 +1995,7 @@
             clearBtn.style.display = searchTerm ? 'flex' : 'none';
             
             if (!searchTerm) {
-                renderizarUsuarios(todosLosUsuarios);
+                renderizarUsuarios(todosLosUsuarios, false);
                 return;
             }
             
@@ -1963,14 +2010,14 @@
                        email.includes(searchTerm);
             });
             
-            renderizarUsuarios(usuariosFiltrados);
+            renderizarUsuarios(usuariosFiltrados, true);
         });
 
         // Botón limpiar búsqueda
         document.getElementById('clearSearch').addEventListener('click', function() {
             document.getElementById('searchUsers').value = '';
             this.style.display = 'none';
-            renderizarUsuarios(todosLosUsuarios);
+            renderizarUsuarios(todosLosUsuarios, false);
         });
 
         window.editarUsuario = function(user) {
