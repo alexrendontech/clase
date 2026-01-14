@@ -1109,6 +1109,7 @@
                 console.log('✅ IndexedDB inicializado correctamente');
                 await cargarDatosUsuario(); // Cargar datos del supervisor
                 await cargarReprogramaciones();
+                iniciarEscuchaNuevasReprogramaciones(); // Escuchar cambios en tiempo real
                 const pendientes = await offlineStorage.obtenerCambiosPendientes();
                 actualizarContadorOffline(pendientes.length);
 
