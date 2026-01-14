@@ -6,24 +6,31 @@
 
 const CLOUDFLARE_WORKER_URL = 'https://spring-field-4fe9.mifestereo.workers.dev';
 
-async function enviarCorreo({ to, toName, subject, htmlContent }) {
+async function enviarCorreo({ to, toName, subject, htmlContent, textContent }) {
     try {
         console.log('📧 Intentando enviar correo a:', to);
+        
+        const payload = {
+            sender: {
+                name: "Sistema Reprogramaciones",
+                email: "equipomenacional7@gmail.com"
+            },
+            to: [{ email: to, name: toName }],
+            subject: subject,
+            htmlContent: htmlContent
+        };
+        
+        // Agregar versión texto plano si existe (mejora deliverability)
+        if (textContent) {
+            payload.textContent = textContent;
+        }
         
         const response = await fetch(CLOUDFLARE_WORKER_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                sender: {
-                    name: "Sistema Reprogramaciones",
-                    email: "equipomenacional7@gmail.com"
-                },
-                to: [{ email: to, name: toName }],
-                subject: subject,
-                htmlContent: htmlContent
-            })
+            body: JSON.stringify(payload)
         });
 
         const data = await response.json();
@@ -53,39 +60,55 @@ async function notificarSupervisorNuevaReprogramacion(data) {
     });
 
     const htmlContent = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="x-apple-disable-message-reformatting" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="format-detection" content="telephone=no"/>
     <meta name="format-detection" content="date=no"/>
     <meta name="format-detection" content="address=no"/>
     <meta name="format-detection" content="email=no"/>
-    <title>Nueva Reprogramacion Pendiente</title>
+    <meta name="color-scheme" content="light"/>
+    <meta name="supported-color-schemes" content="light"/>
+    <title>Nueva Reprogramacion Pendiente - Sistema de Gestion</title>
     <!--[if mso]>
     <style type="text/css">
-        body, table, td {font-family: Arial, Helvetica, sans-serif !important;}
+        body, table, td, p, a, li {font-family: Arial, Helvetica, sans-serif !important;}
     </style>
     <![endif]-->
 </head>
-<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+    <!-- Preheader oculto para mejor preview -->
+    <div style="display: none; max-height: 0px; overflow: hidden; font-size: 1px; line-height: 1px; color: #f4f4f4;">
+        ${auxiliarNombre} ha enviado una nueva reprogramación con ${totalRegistros} registros para tu revisión.
+    </div>
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4; min-width: 100%;">
         <tr>
             <td align="center" style="padding: 40px 20px;">
                 <!-- Contenedor principal -->
-                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <!-- Header con gradiente -->
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <!-- Header profesional -->
                     <tr>
-                        <td align="center" style="background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%); padding: 40px 30px; border-radius: 8px 8px 0 0;">
+                        <td align="center" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); padding: 40px 30px; border-radius: 8px 8px 0 0;">
                             <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                                 <tr>
-                                    <td align="center" style="font-size: 48px; line-height: 1; padding-bottom: 12px;">📋</td>
+                                    <td align="center" style="padding-bottom: 16px;">
+                                        <div style="width: 56px; height: 56px; background-color: rgba(255,255,255,0.2); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
+                                            <span style="font-size: 28px; line-height: 1;">📋</span>
+                                        </div>
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td align="center" style="color: #ffffff; font-size: 26px; font-weight: 700; line-height: 1.3;">Nueva Reprogramación Pendiente</td>
+                                    <td align="center" style="color: #ffffff; font-size: 24px; font-weight: 700; line-height: 1.3; padding-bottom: 8px;">
+                                        Nueva Reprogramación Pendiente
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td align="center" style="color: rgba(255,255,255,0.9); font-size: 14px; padding-top: 8px;">Sistema de Gestión de Reprogramaciones</td>
+                                    <td align="center" style="color: rgba(255,255,255,0.95); font-size: 14px; line-height: 1.5;">
+                                        Sistema de Gestión de Reprogramaciones
+                                    </td>
                                 </tr>
                             </table>
                         </td>
@@ -97,67 +120,83 @@ async function notificarSupervisorNuevaReprogramacion(data) {
                                 <!-- Saludo -->
                                 <tr>
                                     <td style="color: #1f2937; font-size: 16px; line-height: 1.5; padding-bottom: 20px;">
-                                        Hola <strong style="color: #111827;">${supervisorNombre}</strong>,
+                                        Estimado/a <strong style="color: #111827;">${supervisorNombre}</strong>,
                                     </td>
                                 </tr>
-                                <!-- Alerta -->
+                                <!-- Alerta importante -->
                                 <tr>
-                                    <td style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px 20px; border-radius: 4px; margin-bottom: 24px;">
-                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <td style="padding-bottom: 24px;">
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 6px;">
                                             <tr>
-                                                <td style="color: #92400e; font-size: 15px; font-weight: 600; line-height: 1.5;">
-                                                    Tienes una nueva reprogramación que requiere tu atención
+                                                <td style="padding: 16px 20px;">
+                                                    <p style="margin: 0; color: #92400e; font-size: 15px; font-weight: 600; line-height: 1.5;">
+                                                        Se ha recibido una nueva reprogramación que requiere su atención
+                                                    </p>
                                                 </td>
                                             </tr>
                                         </table>
                                     </td>
                                 </tr>
-                                <!-- Texto -->
+                                <!-- Descripción -->
                                 <tr>
-                                    <td style="color: #4b5563; font-size: 15px; line-height: 1.6; padding: 20px 0;">
-                                        <strong style="color: #1f2937;">${auxiliarNombre}</strong> ha enviado una reprogramación para su revisión y aprobación.
+                                    <td style="color: #4b5563; font-size: 15px; line-height: 1.6; padding-bottom: 24px;">
+                                        <strong style="color: #1f2937;">${auxiliarNombre}</strong> ha enviado una reprogramación para su revisión y aprobación. Los detalles se encuentran a continuación:
                                     </td>
                                 </tr>
                                 <!-- Tarjeta de información -->
                                 <tr>
-                                    <td style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 24px; margin: 24px 0;">
-                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <td style="padding-bottom: 24px;">
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px;">
                                             <tr>
-                                                <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                                                <td style="padding: 24px;">
                                                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                                                         <tr>
-                                                            <td style="color: #6b7280; font-size: 13px; font-weight: 500;">📄 Archivo</td>
-                                                            <td align="right" style="color: #1f2937; font-size: 14px; font-weight: 600;">${archivoNombre}</td>
+                                                            <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                                                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                                                    <tr>
+                                                                        <td style="color: #6b7280; font-size: 13px; font-weight: 500; padding-bottom: 4px;">Archivo</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style="color: #1f2937; font-size: 14px; font-weight: 600;">${archivoNombre}</td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
                                                         </tr>
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
-                                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                                                         <tr>
-                                                            <td style="color: #6b7280; font-size: 13px; font-weight: 500;">📊 Total de registros</td>
-                                                            <td align="right" style="color: #1f2937; font-size: 14px; font-weight: 600;">${totalRegistros} registros</td>
+                                                            <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                                                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                                                    <tr>
+                                                                        <td style="color: #6b7280; font-size: 13px; font-weight: 500; padding-bottom: 4px;">Total de registros</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style="color: #1f2937; font-size: 14px; font-weight: 600;">${totalRegistros} registros</td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
                                                         </tr>
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
-                                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                                                         <tr>
-                                                            <td style="color: #6b7280; font-size: 13px; font-weight: 500;">👤 Enviado por</td>
-                                                            <td align="right" style="color: #1f2937; font-size: 14px; font-weight: 600;">${auxiliarNombre}</td>
+                                                            <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                                                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                                                    <tr>
+                                                                        <td style="color: #6b7280; font-size: 13px; font-weight: 500; padding-bottom: 4px;">Enviado por</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style="color: #1f2937; font-size: 14px; font-weight: 600;">${auxiliarNombre}</td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
                                                         </tr>
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 12px 0;">
-                                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                                                         <tr>
-                                                            <td style="color: #6b7280; font-size: 13px; font-weight: 500;">📅 Fecha de envío</td>
-                                                            <td align="right" style="color: #1f2937; font-size: 14px; font-weight: 600;">${fecha}</td>
+                                                            <td style="padding: 12px 0;">
+                                                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                                                    <tr>
+                                                                        <td style="color: #6b7280; font-size: 13px; font-weight: 500; padding-bottom: 4px;">Fecha de envío</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style="color: #1f2937; font-size: 14px; font-weight: 600;">${fecha}</td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
                                                         </tr>
                                                     </table>
                                                 </td>
@@ -165,35 +204,63 @@ async function notificarSupervisorNuevaReprogramacion(data) {
                                         </table>
                                     </td>
                                 </tr>
-                                <!-- Mensaje final -->
+                                <!-- Acción requerida -->
                                 <tr>
-                                    <td style="color: #4b5563; font-size: 15px; line-height: 1.6; padding: 20px 0;">
-                                        Por favor, ingresa al sistema para revisar y completar esta reprogramación a la brevedad posible.
+                                    <td style="color: #4b5563; font-size: 15px; line-height: 1.6; padding-bottom: 12px;">
+                                        Por favor, acceda al sistema para revisar y completar esta reprogramación a la brevedad posible.
+                                    </td>
+                                </tr>
+                                <!-- Nota de cortesía -->
+                                <tr>
+                                    <td style="color: #6b7280; font-size: 14px; line-height: 1.5; font-style: italic;">
+                                        Gracias por su colaboración en el proceso.
                                     </td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
-                    <!-- Footer -->
+                    <!-- Separador -->
                     <tr>
-                        <td style="background-color: #f9fafb; padding: 24px 30px; border-top: 1px solid #e5e7eb; border-radius: 0 0 8px 8px;">
+                        <td style="padding: 0 30px;">
+                            <div style="border-top: 1px solid #e5e7eb;"></div>
+                        </td>
+                    </tr>
+                    <!-- Footer profesional -->
+                    <tr>
+                        <td style="background-color: #fafafa; padding: 30px; border-radius: 0 0 8px 8px;">
                             <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                                 <tr>
-                                    <td align="center" style="color: #9ca3af; font-size: 12px; line-height: 1.5; padding-bottom: 8px;">
-                                        Este es un mensaje automático del Sistema de Reprogramaciones
+                                    <td align="center" style="padding-bottom: 12px;">
+                                        <p style="margin: 0; color: #9ca3af; font-size: 13px; line-height: 1.5;">
+                                            Sistema de Gestión de Reprogramaciones
+                                        </p>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td align="center" style="color: #9ca3af; font-size: 12px; line-height: 1.5;">
-                                        Por favor no responder a este correo electrónico
+                                    <td align="center" style="padding-bottom: 8px;">
+                                        <p style="margin: 0; color: #9ca3af; font-size: 12px; line-height: 1.5;">
+                                            Este es un mensaje automático, por favor no responder directamente a este correo.
+                                        </p>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td align="center" style="color: #d1d5db; font-size: 11px; padding-top: 16px;">
-                                        © 2026 Sistema de Reprogramaciones. Todos los derechos reservados.
+                                    <td align="center">
+                                        <p style="margin: 0; color: #d1d5db; font-size: 11px; line-height: 1.5;">
+                                            © ${new Date().getFullYear()} Sistema de Reprogramaciones. Todos los derechos reservados.
+                                        </p>
                                     </td>
                                 </tr>
                             </table>
+                        </td>
+                    </tr>
+                </table>
+                <!-- Espaciador final -->
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+                    <tr>
+                        <td style="padding-top: 20px;">
+                            <p style="margin: 0; text-align: center; color: #9ca3af; font-size: 11px; line-height: 1.5;">
+                                Si tiene problemas para visualizar este correo, contacte al administrador del sistema.
+                            </p>
                         </td>
                     </tr>
                 </table>
@@ -203,11 +270,35 @@ async function notificarSupervisorNuevaReprogramacion(data) {
 </body>
 </html>`;
 
+    const textContent = `NUEVA REPROGRAMACIÓN PENDIENTE
+
+Estimado/a ${supervisorNombre},
+
+Se ha recibido una nueva reprogramación que requiere su atención.
+
+${auxiliarNombre} ha enviado una reprogramación para su revisión y aprobación.
+
+DETALLES:
+- Archivo: ${archivoNombre}
+- Total de registros: ${totalRegistros}
+- Enviado por: ${auxiliarNombre}
+- Fecha de envío: ${fecha}
+
+Por favor, acceda al sistema para revisar y completar esta reprogramación a la brevedad posible.
+
+Gracias por su colaboración en el proceso.
+
+---
+Sistema de Gestión de Reprogramaciones
+Este es un mensaje automático, por favor no responder directamente a este correo.
+© ${new Date().getFullYear()} Sistema de Reprogramaciones. Todos los derechos reservados.`;
+
     return await enviarCorreo({
         to: supervisorEmail,
         toName: supervisorNombre,
-        subject: `📋 Nueva Reprogramación de ${auxiliarNombre}`,
-        htmlContent: htmlContent
+        subject: `Nueva Reprogramación de ${auxiliarNombre} - ${totalRegistros} registros`,
+        htmlContent: htmlContent,
+        textContent: textContent
     });
 }
 
@@ -219,39 +310,55 @@ async function notificarAuxiliarReprogramacionCompletada(data) {
     });
 
     const htmlContent = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="x-apple-disable-message-reformatting" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="format-detection" content="telephone=no"/>
     <meta name="format-detection" content="date=no"/>
     <meta name="format-detection" content="address=no"/>
     <meta name="format-detection" content="email=no"/>
-    <title>Reprogramacion Completada</title>
+    <meta name="color-scheme" content="light"/>
+    <meta name="supported-color-schemes" content="light"/>
+    <title>Reprogramacion Completada - Sistema de Gestion</title>
     <!--[if mso]>
     <style type="text/css">
-        body, table, td {font-family: Arial, Helvetica, sans-serif !important;}
+        body, table, td, p, a, li {font-family: Arial, Helvetica, sans-serif !important;}
     </style>
     <![endif]-->
 </head>
-<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+    <!-- Preheader oculto para mejor preview -->
+    <div style="display: none; max-height: 0px; overflow: hidden; font-size: 1px; line-height: 1px; color: #f4f4f4;">
+        ${supervisorNombre} ha completado tu reprogramación de ${archivoNombre}. Ya puedes descargar el archivo actualizado.
+    </div>
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4; min-width: 100%;">
         <tr>
             <td align="center" style="padding: 40px 20px;">
                 <!-- Contenedor principal -->
-                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <!-- Header con gradiente verde -->
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <!-- Header profesional verde -->
                     <tr>
                         <td align="center" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px 30px; border-radius: 8px 8px 0 0;">
                             <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                                 <tr>
-                                    <td align="center" style="font-size: 48px; line-height: 1; padding-bottom: 12px;">✅</td>
+                                    <td align="center" style="padding-bottom: 16px;">
+                                        <div style="width: 56px; height: 56px; background-color: rgba(255,255,255,0.2); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
+                                            <span style="font-size: 28px; line-height: 1;">✓</span>
+                                        </div>
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td align="center" style="color: #ffffff; font-size: 26px; font-weight: 700; line-height: 1.3;">Reprogramación Completada</td>
+                                    <td align="center" style="color: #ffffff; font-size: 24px; font-weight: 700; line-height: 1.3; padding-bottom: 8px;">
+                                        Reprogramación Completada
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td align="center" style="color: rgba(255,255,255,0.9); font-size: 14px; padding-top: 8px;">Sistema de Gestión de Reprogramaciones</td>
+                                    <td align="center" style="color: rgba(255,255,255,0.95); font-size: 14px; line-height: 1.5;">
+                                        Sistema de Gestión de Reprogramaciones
+                                    </td>
                                 </tr>
                             </table>
                         </td>
@@ -263,67 +370,83 @@ async function notificarAuxiliarReprogramacionCompletada(data) {
                                 <!-- Saludo -->
                                 <tr>
                                     <td style="color: #1f2937; font-size: 16px; line-height: 1.5; padding-bottom: 20px;">
-                                        Hola <strong style="color: #111827;">${auxiliarNombre}</strong>,
+                                        Estimado/a <strong style="color: #111827;">${auxiliarNombre}</strong>,
                                     </td>
                                 </tr>
                                 <!-- Alerta de éxito -->
                                 <tr>
-                                    <td style="background-color: #d1fae5; border-left: 4px solid #10b981; padding: 16px 20px; border-radius: 4px; margin-bottom: 24px;">
-                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <td style="padding-bottom: 24px;">
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #d1fae5; border-left: 4px solid #10b981; border-radius: 6px;">
                                             <tr>
-                                                <td style="color: #065f46; font-size: 15px; font-weight: 600; line-height: 1.5;">
-                                                    Tu reprogramación ha sido revisada y completada exitosamente
+                                                <td style="padding: 16px 20px;">
+                                                    <p style="margin: 0; color: #065f46; font-size: 15px; font-weight: 600; line-height: 1.5;">
+                                                        Su reprogramación ha sido revisada y completada exitosamente
+                                                    </p>
                                                 </td>
                                             </tr>
                                         </table>
                                     </td>
                                 </tr>
-                                <!-- Texto -->
+                                <!-- Descripción -->
                                 <tr>
-                                    <td style="color: #4b5563; font-size: 15px; line-height: 1.6; padding: 20px 0;">
-                                        <strong style="color: #1f2937;">${supervisorNombre}</strong> ha revisado y completado tu reprogramación. Ya puedes descargar el archivo actualizado desde el sistema.
+                                    <td style="color: #4b5563; font-size: 15px; line-height: 1.6; padding-bottom: 24px;">
+                                        <strong style="color: #1f2937;">${supervisorNombre}</strong> ha revisado y completado su reprogramación. El archivo actualizado ya está disponible en el sistema para su descarga.
                                     </td>
                                 </tr>
                                 <!-- Tarjeta de información -->
                                 <tr>
-                                    <td style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 24px; margin: 24px 0;">
-                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <td style="padding-bottom: 24px;">
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px;">
                                             <tr>
-                                                <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                                                <td style="padding: 24px;">
                                                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                                                         <tr>
-                                                            <td style="color: #6b7280; font-size: 13px; font-weight: 500;">📄 Archivo</td>
-                                                            <td align="right" style="color: #1f2937; font-size: 14px; font-weight: 600;">${archivoNombre}</td>
+                                                            <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                                                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                                                    <tr>
+                                                                        <td style="color: #6b7280; font-size: 13px; font-weight: 500; padding-bottom: 4px;">Archivo</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style="color: #1f2937; font-size: 14px; font-weight: 600;">${archivoNombre}</td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
                                                         </tr>
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
-                                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                                                         <tr>
-                                                            <td style="color: #6b7280; font-size: 13px; font-weight: 500;">📊 Total de registros</td>
-                                                            <td align="right" style="color: #1f2937; font-size: 14px; font-weight: 600;">${totalRegistros} registros</td>
+                                                            <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                                                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                                                    <tr>
+                                                                        <td style="color: #6b7280; font-size: 13px; font-weight: 500; padding-bottom: 4px;">Total de registros procesados</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style="color: #1f2937; font-size: 14px; font-weight: 600;">${totalRegistros} registros</td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
                                                         </tr>
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
-                                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                                                         <tr>
-                                                            <td style="color: #6b7280; font-size: 13px; font-weight: 500;">👤 Revisado por</td>
-                                                            <td align="right" style="color: #1f2937; font-size: 14px; font-weight: 600;">${supervisorNombre}</td>
+                                                            <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                                                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                                                    <tr>
+                                                                        <td style="color: #6b7280; font-size: 13px; font-weight: 500; padding-bottom: 4px;">Revisado por</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style="color: #1f2937; font-size: 14px; font-weight: 600;">${supervisorNombre}</td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
                                                         </tr>
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 12px 0;">
-                                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                                                         <tr>
-                                                            <td style="color: #6b7280; font-size: 13px; font-weight: 500;">📅 Fecha de respuesta</td>
-                                                            <td align="right" style="color: #1f2937; font-size: 14px; font-weight: 600;">${fecha}</td>
+                                                            <td style="padding: 12px 0;">
+                                                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                                                    <tr>
+                                                                        <td style="color: #6b7280; font-size: 13px; font-weight: 500; padding-bottom: 4px;">Fecha de respuesta</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style="color: #1f2937; font-size: 14px; font-weight: 600;">${fecha}</td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
                                                         </tr>
                                                     </table>
                                                 </td>
@@ -331,35 +454,63 @@ async function notificarAuxiliarReprogramacionCompletada(data) {
                                         </table>
                                     </td>
                                 </tr>
-                                <!-- Mensaje final -->
+                                <!-- Próximos pasos -->
                                 <tr>
-                                    <td style="color: #4b5563; font-size: 15px; line-height: 1.6; padding: 20px 0;">
-                                        Gracias por tu colaboración en el proceso de reprogramación.
+                                    <td style="color: #4b5563; font-size: 15px; line-height: 1.6; padding-bottom: 12px;">
+                                        Puede acceder al sistema para descargar el archivo actualizado con los resultados procesados.
+                                    </td>
+                                </tr>
+                                <!-- Nota de cortesía -->
+                                <tr>
+                                    <td style="color: #6b7280; font-size: 14px; line-height: 1.5; font-style: italic;">
+                                        Gracias por su colaboración en el proceso de reprogramación.
                                     </td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
-                    <!-- Footer -->
+                    <!-- Separador -->
                     <tr>
-                        <td style="background-color: #f9fafb; padding: 24px 30px; border-top: 1px solid #e5e7eb; border-radius: 0 0 8px 8px;">
+                        <td style="padding: 0 30px;">
+                            <div style="border-top: 1px solid #e5e7eb;"></div>
+                        </td>
+                    </tr>
+                    <!-- Footer profesional -->
+                    <tr>
+                        <td style="background-color: #fafafa; padding: 30px; border-radius: 0 0 8px 8px;">
                             <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                                 <tr>
-                                    <td align="center" style="color: #9ca3af; font-size: 12px; line-height: 1.5; padding-bottom: 8px;">
-                                        Este es un mensaje automático del Sistema de Reprogramaciones
+                                    <td align="center" style="padding-bottom: 12px;">
+                                        <p style="margin: 0; color: #9ca3af; font-size: 13px; line-height: 1.5;">
+                                            Sistema de Gestión de Reprogramaciones
+                                        </p>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td align="center" style="color: #9ca3af; font-size: 12px; line-height: 1.5;">
-                                        Por favor no responder a este correo electrónico
+                                    <td align="center" style="padding-bottom: 8px;">
+                                        <p style="margin: 0; color: #9ca3af; font-size: 12px; line-height: 1.5;">
+                                            Este es un mensaje automático, por favor no responder directamente a este correo.
+                                        </p>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td align="center" style="color: #d1d5db; font-size: 11px; padding-top: 16px;">
-                                        © 2026 Sistema de Reprogramaciones. Todos los derechos reservados.
+                                    <td align="center">
+                                        <p style="margin: 0; color: #d1d5db; font-size: 11px; line-height: 1.5;">
+                                            © ${new Date().getFullYear()} Sistema de Reprogramaciones. Todos los derechos reservados.
+                                        </p>
                                     </td>
                                 </tr>
                             </table>
+                        </td>
+                    </tr>
+                </table>
+                <!-- Espaciador final -->
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+                    <tr>
+                        <td style="padding-top: 20px;">
+                            <p style="margin: 0; text-align: center; color: #9ca3af; font-size: 11px; line-height: 1.5;">
+                                Si tiene problemas para visualizar este correo, contacte al administrador del sistema.
+                            </p>
                         </td>
                     </tr>
                 </table>
@@ -369,11 +520,35 @@ async function notificarAuxiliarReprogramacionCompletada(data) {
 </body>
 </html>`;
 
+    const textContent = `REPROGRAMACIÓN COMPLETADA
+
+Estimado/a ${auxiliarNombre},
+
+Su reprogramación ha sido revisada y completada exitosamente.
+
+${supervisorNombre} ha revisado y completado su reprogramación. El archivo actualizado ya está disponible en el sistema para su descarga.
+
+DETALLES:
+- Archivo: ${archivoNombre}
+- Total de registros procesados: ${totalRegistros}
+- Revisado por: ${supervisorNombre}
+- Fecha de respuesta: ${fecha}
+
+Puede acceder al sistema para descargar el archivo actualizado con los resultados procesados.
+
+Gracias por su colaboración en el proceso de reprogramación.
+
+---
+Sistema de Gestión de Reprogramaciones
+Este es un mensaje automático, por favor no responder directamente a este correo.
+© ${new Date().getFullYear()} Sistema de Reprogramaciones. Todos los derechos reservados.`;
+
     return await enviarCorreo({
         to: auxiliarEmail,
         toName: auxiliarNombre,
-        subject: `✅ ${supervisorNombre} completó tu reprogramación`,
-        htmlContent: htmlContent
+        subject: `Reprogramación completada por ${supervisorNombre} - ${archivoNombre}`,
+        htmlContent: htmlContent,
+        textContent: textContent
     });
 }
 
