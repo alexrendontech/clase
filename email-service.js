@@ -376,3 +376,7 @@ async function notificarAuxiliarReprogramacionCompletada(data) {
         htmlContent: htmlContent
     });
 }
+
+// Exportar funciones globalmente
+window.notificarSupervisorNuevaReprogramacion = notificarSupervisorNuevaReprogramacion;
+window.notificarAuxiliarReprogramacionCompletada = notificarAuxiliarReprogramacionCompletada;
