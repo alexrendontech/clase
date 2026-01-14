@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Reprogramaciones</title>
+    <title>Dashboard - Reprogramaciones</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="email-service.js"></script>
     <style>
         * {
             margin: 0;
@@ -15,7 +14,7 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #fafafa;
+            background: #f5f5f5;
             color: #2d3748;
             line-height: 1.5;
         }
@@ -23,14 +22,14 @@
         .topbar {
             background: white;
             border-bottom: 1px solid #e5e7eb;
-            padding: 15px 25px;
+            padding: 16px 28px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .brand {
@@ -40,35 +39,62 @@
         }
 
         .brand i {
-            color: #3b82f6;
-            font-size: 22px;
+            color: #f59e0b;
+            font-size: 24px;
         }
 
         .brand h1 {
-            font-size: 19px;
+            font-size: 20px;
             font-weight: 600;
             color: #1f2937;
         }
 
-        .user-section {
+        .top-actions {
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 16px;
+        }
+
+        .period-selector {
+            display: flex;
+            gap: 6px;
+            background: #f3f4f6;
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .period-btn {
+            padding: 6px 14px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .period-btn:hover {
+            color: #374151;
+        }
+
+        .period-btn.active {
+            background: white;
+            color: #f59e0b;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
         .user-info {
-            text-align: right;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .user-name {
             font-size: 14px;
             font-weight: 500;
             color: #374151;
-        }
-
-        .user-role {
-            font-size: 12px;
-            color: #9ca3af;
         }
 
         .logout-btn {
@@ -87,13 +113,12 @@
 
         .logout-btn:hover {
             background: #e5e7eb;
-            color: #374151;
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 28px 20px;
+            padding: 32px 24px;
         }
 
         .page-header {
@@ -101,279 +126,342 @@
         }
 
         .page-header h2 {
-            font-size: 26px;
+            font-size: 28px;
             color: #111827;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-weight: 600;
         }
 
         .page-header p {
             color: #6b7280;
-            font-size: 14px;
-        }
-
-        .section {
-            background: white;
-            border-radius: 8px;
-            padding: 24px;
-            margin-bottom: 24px;
-            border: 1px solid #e5e7eb;
-        }
-
-        .section-title {
-            font-size: 17px;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-title i {
-            color: #3b82f6;
-            font-size: 19px;
-        }
-
-        .form-row {
-            margin-bottom: 18px;
-        }
-
-        label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: #374151;
-            margin-bottom: 6px;
-        }
-
-        select, input[type="text"] {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 14px;
-            color: #1f2937;
-            background: white;
-            transition: border 0.2s;
-        }
-
-        select:focus, input[type="text"]:focus {
-            outline: none;
-            border-color: #3b82f6;
-        }
-
-        .upload-area {
-            border: 2px dashed #d1d5db;
-            border-radius: 8px;
-            padding: 35px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: #fafafa;
-        }
-
-        .upload-area:hover {
-            border-color: #3b82f6;
-            background: #f0f9ff;
-        }
-
-        .upload-area.drag-over {
-            border-color: #3b82f6;
-            background: #eff6ff;
-        }
-
-        .upload-icon {
-            font-size: 38px;
-            color: #9ca3af;
-            margin-bottom: 12px;
-        }
-
-        .upload-area:hover .upload-icon {
-            color: #3b82f6;
-        }
-
-        .upload-text {
             font-size: 15px;
-            color: #6b7280;
-            margin-bottom: 5px;
         }
 
-        .upload-subtext {
-            font-size: 13px;
-            color: #9ca3af;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
         }
 
-        .file-name {
-            display: none;
-            margin-top: 15px;
-            padding: 10px 14px;
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            border-radius: 6px;
-            font-size: 13px;
-            color: #166534;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .file-name.show {
-            display: flex;
-        }
-
-        .file-name i {
-            color: #16a34a;
-        }
-
-        .btn {
-            padding: 11px 20px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #2563eb;
-        }
-
-        .btn-primary:disabled {
-            background: #93c5fd;
-            cursor: not-allowed;
-        }
-
-        .alert {
-            padding: 12px 16px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            display: none;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .alert.show {
-            display: flex;
-        }
-
-        .alert-success {
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            color: #166534;
-        }
-
-        .alert-error {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #991b1b;
-        }
-
-        .reprog-item {
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 18px;
-            margin-bottom: 14px;
-            transition: all 0.2s;
-            background: #fafafa;
-        }
-
-        .reprog-item:hover {
-            border-color: #cbd5e1;
+        .stat-card {
             background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 22px;
+            transition: all 0.2s;
         }
 
-        .reprog-header {
+        .stat-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .stat-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
 
-        .reprog-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 4px;
-        }
-
-        .reprog-date {
-            font-size: 12px;
-            color: #9ca3af;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .status-badge {
-            padding: 5px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .badge-pending {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .badge-answered {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .reprog-body {
-            padding-top: 12px;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .data-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 0;
+        .stat-label {
             font-size: 13px;
-        }
-
-        .data-label {
             color: #6b7280;
             font-weight: 500;
-        }
-
-        .data-value {
-            color: #1f2937;
-            font-weight: 500;
-        }
-
-        .answer-box {
-            margin-top: 14px;
-            padding: 14px;
-            background: #eff6ff;
-            border-radius: 6px;
-            border-left: 3px solid #3b82f6;
-        }
-
-        .answer-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #1e40af;
-            margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .answer-content {
-            font-size: 14px;
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .icon-blue {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .icon-green {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .icon-yellow {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .icon-purple {
+            background: #f3e8ff;
+            color: #9333ea;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
             color: #1f2937;
-            line-height: 1.6;
+            margin-bottom: 4px;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .change-positive {
+            color: #16a34a;
+        }
+
+        .change-negative {
+            color: #dc2626;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .panel {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 24px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .panel-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title i {
+            color: #f59e0b;
+        }
+
+        .ranking-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px;
+            background: #fafafa;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .ranking-item:hover {
+            background: #f3f4f6;
+        }
+
+        .rank-position {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .rank-1 {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+        }
+
+        .rank-2 {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+
+        .rank-3 {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .rank-other {
+            background: #f3f4f6;
+            color: #9ca3af;
+        }
+
+        .rank-info {
+            flex: 1;
+        }
+
+        .rank-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 2px;
+        }
+
+        .rank-stats {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .rank-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .rank-unit {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-left: 2px;
+        }
+
+        .chart-container {
+            height: 280px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            gap: 12px;
+            padding: 20px 10px;
+            background: #fafafa;
+            border-radius: 8px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 6px 6px 0 0;
+            position: relative;
+            transition: all 0.3s;
+            cursor: pointer;
+            min-width: 40px;
+        }
+
+        .chart-bar:hover {
+            opacity: 0.8;
+            transform: translateY(-4px);
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: #6b7280;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            font-weight: 600;
+            color: #1f2937;
+            background: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .full-width-panel {
+            grid-column: 1 / -1;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table thead {
+            background: #f9fafb;
+        }
+
+        .history-table th {
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .history-table td {
+            padding: 14px 12px;
+            font-size: 13px;
+            color: #1f2937;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .history-table tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .dot-pending {
+            background: #fbbf24;
+        }
+
+        .dot-answered {
+            background: #10b981;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #374151;
+            background: white;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #f59e0b;
         }
 
         .empty-state {
@@ -383,35 +471,15 @@
         }
 
         .empty-icon {
-            font-size: 50px;
-            margin-bottom: 16px;
+            font-size: 48px;
+            margin-bottom: 12px;
             opacity: 0.5;
-        }
-
-        .empty-text {
-            font-size: 15px;
-            color: #6b7280;
         }
 
         .loader {
             display: none;
             text-align: center;
-            padding: 30px;
-        }
-
-        .footer {
-            background: white;
-            border-top: 1px solid #e5e7eb;
-            padding: 20px;
-            text-align: center;
-            margin-top: 40px;
-            color: #6b7280;
-            font-size: 13px;
-        }
-
-        .footer i {
-            color: #ef4444;
-            margin: 0 4px;
+            padding: 40px;
         }
 
         .loader.active {
@@ -420,10 +488,10 @@
 
         .spinner {
             border: 3px solid #f3f4f6;
-            border-top: 3px solid #3b82f6;
+            border-top: 3px solid #f59e0b;
             border-radius: 50%;
-            width: 35px;
-            height: 35px;
+            width: 40px;
+            height: 40px;
             animation: spin 0.8s linear infinite;
             margin: 0 auto 12px;
         }
@@ -433,43 +501,483 @@
             100% { transform: rotate(360deg); }
         }
 
-        .download-btn {
-            background: #f3f4f6;
-            border: 1px solid #d1d5db;
-            color: #374151;
-            padding: 7px 14px;
-            font-size: 12px;
-            margin-top: 10px;
-        }
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
 
-        .download-btn:hover {
-            background: #e5e7eb;
+            .chart-container {
+                height: 240px;
+            }
         }
 
         @media (max-width: 768px) {
             .topbar {
-                padding: 12px 16px;
-            }
-
-            .user-section {
+                flex-direction: column;
                 gap: 12px;
+                padding: 16px;
             }
 
-            .user-info {
-                display: none;
+            .top-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
 
             .container {
                 padding: 20px 16px;
             }
 
-            .section {
-                padding: 18px;
+            .history-table {
+                font-size: 12px;
             }
 
-            .reprog-header {
-                flex-direction: column;
-                gap: 10px;
+            .history-table th,
+            .history-table td {
+                padding: 10px 8px;
+            }
+        }
+
+        /* Modal Gestión Usuarios */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-usuarios {
+            background: white;
+            border-radius: 12px;
+            max-width: 1000px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-overlay.show .modal-usuarios {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            background: #f3f4f6;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .modal-content {
+            padding: 24px;
+        }
+
+        .modal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .modal-card {
+            background: #f9fafb;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .modal-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group-modal {
+            margin-bottom: 16px;
+        }
+
+        .form-group-modal label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .form-group-modal input,
+        .form-group-modal select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #1f2937;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .form-group-modal input:focus,
+        .form-group-modal select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-box-wrapper {
+            margin-bottom: 16px;
+        }
+
+        .search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box i.fa-search {
+            position: absolute;
+            left: 12px;
+            color: #9ca3af;
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 40px 10px 38px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1f2937;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-box input::placeholder {
+            color: #9ca3af;
+        }
+
+        .clear-search {
+            position: absolute;
+            right: 10px;
+            background: transparent;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .clear-search:hover {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 32px 20px;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .no-results i {
+            font-size: 40px;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+
+        .highlight {
+            background: #fef3c7;
+            font-weight: 600;
+            padding: 2px 0;
+        }
+
+        .user-counter {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #eff6ff;
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid #bfdbfe;
+        }
+
+        .user-counter span:first-child {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e40af;
+        }
+
+        .user-counter-label {
+            font-size: 12px;
+            color: #3b82f6;
+            font-weight: 500;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        .alert-modal {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-modal.show {
+            display: flex;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .btn-modal {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        .btn-modal.primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-modal.primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-modal.primary:disabled {
+            background: #93c5fd;
+            cursor: not-allowed;
+        }
+
+        .users-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .user-item {
+            background: white;
+            padding: 14px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            border: 1px solid #e5e7eb;
+        }
+
+        .user-item:hover {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .user-details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 2px;
+        }
+
+        .user-details p {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-icon-modal {
+            padding: 6px 10px;
+            font-size: 12px;
+            background: transparent;
+            color: #6b7280;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-icon-modal:hover {
+            background: #f9fafb;
+            color: #374151;
+        }
+
+        .btn-icon-modal.edit {
+            color: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .btn-icon-modal.edit:hover {
+            background: #eff6ff;
+        }
+
+        .role-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .role-badge.admin {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .role-badge.supervisor {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .role-badge.auxiliar {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .empty-state-modal {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-state-modal i {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+
+        .loader-modal {
+            display: none;
+            text-align: center;
+            padding: 16px;
+        }
+
+        .loader-modal.active {
+            display: block;
+        }
+
+        .spinner-modal {
+            border: 2px solid #e5e7eb;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 0.6s linear infinite;
+            margin: 0 auto 8px;
+        }
+
+        @media (max-width: 768px) {
+            .modal-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -477,14 +985,22 @@
 <body>
     <div class="topbar">
         <div class="brand">
-            <i class="fas fa-calendar-alt"></i>
-            <h1>Reprogramaciones</h1>
+            <i class="fas fa-chart-line"></i>
+            <h1>Dashboard de Reprogramaciones</h1>
         </div>
-        <div class="user-section">
-            <div class="user-info">
-                <div class="user-name" id="userName">Cargando...</div>
-                <div class="user-role">Auxiliar de Seguimiento</div>
+        <div class="top-actions">
+            <div class="period-selector">
+                <button class="period-btn active" data-period="month">Este Mes</button>
+                <button class="period-btn" data-period="3months">3 Meses</button>
+                <button class="period-btn" data-period="all">Todo</button>
             </div>
+            <div class="user-info">
+                <span class="user-name" id="userName">Admin</span>
+            </div>
+            <button class="logout-btn" onclick="abrirGestionUsuarios()" style="background: #3b82f6; color: white; margin-right: 10px;">
+                <i class="fas fa-users-cog"></i>
+                Gestionar Usuarios
+            </button>
             <button class="logout-btn" onclick="cerrarSesion()">
                 <i class="fas fa-sign-out-alt"></i>
                 Salir
@@ -494,77 +1010,290 @@
 
     <div class="container">
         <div class="page-header">
-            <h2>Enviar Reprogramación</h2>
-            <p>Sube el archivo Excel con los datos para el supervisor</p>
+            <h2>Resumen General</h2>
+            <p>Análisis de rendimiento y métricas del equipo</p>
         </div>
 
-        <div class="alert alert-success" id="successAlert">
-            <i class="fas fa-check-circle"></i>
-            <span id="successMsg"></span>
+        <div class="loader active" id="mainLoader">
+            <div class="spinner"></div>
+            <div style="color: #9ca3af; font-size: 14px;">Cargando estadísticas...</div>
         </div>
 
-        <div class="alert alert-error" id="errorAlert">
-            <i class="fas fa-exclamation-circle"></i>
-            <span id="errorMsg"></span>
-        </div>
-
-        <div class="section">
-            <div class="section-title">
-                <i class="fas fa-cloud-upload-alt"></i>
-                Nueva Reprogramación
-            </div>
-
-            <form id="uploadForm">
-                <div class="form-row">
-                    <label for="supervisorSelect">Supervisor a quien enviar</label>
-                    <select id="supervisorSelect" required>
-                        <option value="">Selecciona un supervisor...</option>
-                    </select>
-                </div>
-
-                <div class="form-row">
-                    <label>Archivo Excel</label>
-                    <div class="upload-area" id="uploadArea">
-                        <div class="upload-icon">
-                            <i class="fas fa-file-excel"></i>
+        <div id="mainContent" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-label">Total Reprogramaciones</div>
+                        <div class="stat-icon icon-blue">
+                            <i class="fas fa-file-alt"></i>
                         </div>
-                        <div class="upload-text">Arrastra tu archivo aquí o haz clic</div>
-                        <div class="upload-subtext">Formatos: .xlsx, .xls (máx 5MB)</div>
-                        <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;" required>
                     </div>
-                    <div class="file-name" id="fileName">
-                        <i class="fas fa-file-check"></i>
-                        <span id="fileNameText"></span>
+                    <div class="stat-value" id="totalReprogs">0</div>
+                    <div class="stat-change change-positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="totalChange">0%</span> vs mes anterior
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary" id="submitBtn">
-                    <i class="fas fa-paper-plane"></i>
-                    Enviar Reprogramación
-                </button>
-            </form>
-        </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-label">Pendientes</div>
+                        <div class="stat-icon icon-yellow">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="pendingReprogs">0</div>
+                    <div class="stat-change">
+                        <span id="pendingPercent">0%</span> del total
+                    </div>
+                </div>
 
-        <div class="section">
-            <div class="section-title">
-                <i class="fas fa-history"></i>
-                Mis Reprogramaciones Enviadas
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-label">Respondidas</div>
+                        <div class="stat-icon icon-green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="answeredReprogs">0</div>
+                    <div class="stat-change change-positive">
+                        <span id="answeredPercent">0%</span> del total
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-label">Tiempo Promedio</div>
+                        <div class="stat-icon icon-purple">
+                            <i class="fas fa-stopwatch"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="avgTime">0h</div>
+                    <div class="stat-change">
+                        Tiempo de respuesta
+                    </div>
+                </div>
             </div>
 
-            <div class="loader active" id="listLoader">
-                <div class="spinner"></div>
-                <div style="color: #9ca3af; font-size: 13px;">Cargando reprogramaciones...</div>
-            </div>
+            <div class="content-grid">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="fas fa-trophy"></i>
+                            Supervisores Más Rápidos
+                        </div>
+                    </div>
+                    <div class="ranking-list" id="supervisorRanking"></div>
+                </div>
 
-            <div id="reprogList"></div>
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="fas fa-users"></i>
+                            Auxiliares Más Activos
+                        </div>
+                    </div>
+                    <div class="ranking-list" id="auxiliarRanking"></div>
+                </div>
+
+                <div class="panel full-width-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Reprogramaciones por Mes
+                        </div>
+                    </div>
+                    <div class="chart-container" id="monthlyChart"></div>
+                </div>
+
+                <div class="panel full-width-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="fas fa-history"></i>
+                            Historial Completo
+                        </div>
+                    </div>
+                    
+                    <div class="filter-bar">
+                        <select class="filter-select" id="filterSupervisor">
+                            <option value="">Todos los supervisores</option>
+                        </select>
+                        <select class="filter-select" id="filterAuxiliar">
+                            <option value="">Todas las auxiliares</option>
+                        </select>
+                        <select class="filter-select" id="filterEstado">
+                            <option value="">Todos los estados</option>
+                            <option value="pendiente">Pendientes</option>
+                            <option value="respondida">Respondidas</option>
+                        </select>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Auxiliar</th>
+                                    <th>Supervisor</th>
+                                    <th>Estado</th>
+                                    <th>Registros</th>
+                                    <th>Tiempo Respuesta</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Modal Gestión de Usuarios -->
+    <div class="modal-overlay" id="modalUsuarios">
+        <div class="modal-usuarios">
+            <div class="modal-header">
+                <h2><i class="fas fa-users-cog"></i> Gestión de Usuarios</h2>
+                <button class="modal-close" onclick="cerrarModalUsuarios()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="modal-grid">
+                    <!-- Crear Usuario -->
+                    <div class="modal-card">
+                        <h3 class="modal-card-title">
+                            <i class="fas fa-user-plus"></i>
+                            Crear Nuevo Usuario
+                        </h3>
+                        <div class="alert-modal alert-success" id="successAlertCreate">
+                            <i class="fas fa-check-circle"></i>
+                            <span id="successMsgCreate"></span>
+                        </div>
+                        <div class="alert-modal alert-error" id="errorAlertCreate">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span id="errorMsgCreate"></span>
+                        </div>
+                        <form id="createUserForm">
+                            <div class="form-group-modal">
+                                <label>Nombre Completo <span class="required">*</span></label>
+                                <input type="text" id="createNombre" required placeholder="Ej: Juan Pérez">
+                            </div>
+                            <div class="form-group-modal">
+                                <label>Correo Electrónico <span class="required">*</span></label>
+                                <input type="email" id="createEmail" required placeholder="usuario@ejemplo.com">
+                                <div class="help-text">Se usará para iniciar sesión</div>
+                            </div>
+                            <div class="form-group-modal">
+                                <label>Contraseña <span class="required">*</span></label>
+                                <input type="password" id="createPassword" required placeholder="Mínimo 6 caracteres">
+                                <div class="help-text">Debe tener al menos 6 caracteres</div>
+                            </div>
+                            <div class="form-group-modal">
+                                <label>Rol <span class="required">*</span></label>
+                                <select id="createRol" required>
+                                    <option value="">Seleccionar rol...</option>
+                                    <option value="admin">Administrador</option>
+                                    <option value="supervisor">Supervisor</option>
+                                    <option value="auxiliar">Auxiliar</option>
+                                </select>
+                            </div>
+                            <div class="loader-modal" id="createLoader">
+                                <div class="spinner-modal"></div>
+                                <div style="color: #9ca3af; font-size: 13px;">Creando usuario...</div>
+                            </div>
+                            <button type="submit" class="btn-modal primary" id="createSubmitBtn">
+                                <i class="fas fa-plus"></i>
+                                Crear Usuario
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Lista de Usuarios -->
+                    <div class="modal-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 class="modal-card-title" style="margin-bottom: 0;">
+                                <i class="fas fa-users"></i>
+                                Usuarios Registrados
+                            </h3>
+                            <div class="user-counter">
+                                <span id="userCountDisplay">0</span>
+                                <span class="user-counter-label">usuarios</span>
+                            </div>
+                        </div>
+                        <div class="search-box-wrapper">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="searchUsers" placeholder="Buscar por nombre o rol...">
+                                <button class="clear-search" id="clearSearch" style="display: none;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="loader-modal active" id="usersLoader">
+                            <div class="spinner-modal"></div>
+                            <div style="color: #9ca3af; font-size: 13px;">Cargando usuarios...</div>
+                        </div>
+                        <div class="users-list" id="usersList"></div>
+                    </div>
+                </div>
+
+                <!-- Modal Editar Usuario (Dentro del modal principal) -->
+                <div class="modal-card" id="editUserSection" style="display: none; margin-top: 24px;">
+                    <h3 class="modal-card-title">
+                        <i class="fas fa-user-edit"></i>
+                        Editar Usuario
+                    </h3>
+                    <div class="alert-modal alert-success" id="successAlertEdit">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="successMsgEdit"></span>
+                    </div>
+                    <div class="alert-modal alert-error" id="errorAlertEdit">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="errorMsgEdit"></span>
+                    </div>
+                    <form id="editUserForm">
+                        <div class="modal-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                            <div class="form-group-modal">
+                                <label>Nombre Completo <span class="required">*</span></label>
+                                <input type="text" id="editNombre" required>
+                            </div>
+                            <div class="form-group-modal">
+                                <label>Rol <span class="required">*</span></label>
+                                <select id="editRol" required>
+                                    <option value="admin">Administrador</option>
+                                    <option value="supervisor">Supervisor</option>
+                                    <option value="auxiliar">Auxiliar</option>
+                                </select>
+                            </div>
+                            <div class="form-group-modal">
+                                <label>Correo (solo lectura)</label>
+                                <input type="email" id="editEmail" disabled>
+                            </div>
+                        </div>
+                        <div class="loader-modal" id="editLoader">
+                            <div class="spinner-modal"></div>
+                            <div style="color: #9ca3af; font-size: 13px;">Actualizando...</div>
+                        </div>
+                        <div style="display: flex; gap: 12px; margin-top: 16px;">
+                            <button type="button" class="btn-modal" onclick="cancelarEdicion()" style="background: #6b7280; color: white;">
+                                <i class="fas fa-times"></i>
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn-modal primary" id="editSubmitBtn">
+                                <i class="fas fa-save"></i>
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getDatabase, ref, push, set, onValue, onChildChanged, query, orderByChild, equalTo, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyBDRqsZI8EQaGn1lCc4Y5rIcfmLE7969zY",
@@ -582,26 +1311,16 @@
         const db = getDatabase(app);
 
         let currentUser = null;
-        let userData = null;
-        let selectedFile = null;
-        let reprogramacionesActuales = new Map(); // Para rastrear cambios
-
-        // Solicitar permiso para notificaciones
-        if ('Notification' in window) {
-            Notification.requestPermission().then(permission => {
-                if (permission === 'granted') {
-                    console.log('✅ Permiso de notificaciones concedido');
-                }
-            });
-        }
+        let todasReprogramaciones = [];
+        let usuarios = {};
+        let periodoActual = 'month';
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
                 await cargarDatosUsuario();
-                await cargarSupervisores();
-                cargarReprogramaciones();
-                iniciarEscuchaCambios(); // Iniciar escucha de cambios en tiempo real
+                await cargarUsuarios();
+                await cargarDatos();
             } else {
                 window.location.href = 'login.html';
             }
@@ -611,305 +1330,71 @@
             const userRef = ref(db, `usuarios/${currentUser.uid}`);
             const snapshot = await get(userRef);
             if (snapshot.exists()) {
-                userData = snapshot.val();
+                const userData = snapshot.val();
                 document.getElementById('userName').textContent = userData.nombre;
             }
         }
 
-        async function cargarSupervisores() {
+        async function cargarUsuarios() {
             try {
-                console.log('📥 Cargando supervisores...');
-                
-                // Intentar cargar desde caché primero
-                const cacheKey = 'supervisores_cache';
+                // Intentar caché primero
+                const cacheKey = 'usuarios_dashboard';
                 const cached = localStorage.getItem(cacheKey);
                 const cacheTime = localStorage.getItem(cacheKey + '_time');
                 
-                let supervisores = null;
-                
-                // Usar caché si tiene menos de 5 minutos
                 if (cached && cacheTime && (Date.now() - parseInt(cacheTime)) < 300000) {
-                    console.log('✅ Usando caché de supervisores');
-                    supervisores = JSON.parse(cached);
+                    console.log('✅ Usando caché de usuarios');
+                    usuarios = JSON.parse(cached);
                 } else {
-                    console.log('🔄 Consultando Firebase...');
+                    console.log('🔄 Cargando usuarios desde Firebase...');
                     const usuariosRef = ref(db, 'usuarios');
                     const snapshot = await get(usuariosRef);
                     
                     if (snapshot.exists()) {
-                        const usuarios = snapshot.val();
-                        supervisores = Object.entries(usuarios)
-                            .filter(([uid, data]) => data.rol === 'supervisor')
-                            .map(([uid, data]) => ({ uid, nombre: data.nombre }));
-                        
-                        // Guardar en caché
-                        localStorage.setItem(cacheKey, JSON.stringify(supervisores));
+                        usuarios = snapshot.val();
+                        localStorage.setItem(cacheKey, JSON.stringify(usuarios));
                         localStorage.setItem(cacheKey + '_time', Date.now().toString());
-                        console.log('💾 Supervisores guardados en caché');
                     }
                 }
                 
-                const select = document.getElementById('supervisorSelect');
-                select.innerHTML = '<option value="">Selecciona un supervisor...</option>';
+                // Poblar filtros
+                const filterSupervisor = document.getElementById('filterSupervisor');
+                const filterAuxiliar = document.getElementById('filterAuxiliar');
                 
-                if (supervisores && supervisores.length > 0) {
-                    supervisores.forEach(sup => {
+                filterSupervisor.innerHTML = '<option value="">Todos los supervisores</option>';
+                filterAuxiliar.innerHTML = '<option value="">Todas las auxiliares</option>';
+                
+                Object.entries(usuarios).forEach(([uid, user]) => {
+                    if (user.rol === 'supervisor') {
                         const option = document.createElement('option');
-                        option.value = sup.uid;
-                        option.textContent = sup.nombre;
-                        select.appendChild(option);
-                    });
-                    console.log(`✅ ${supervisores.length} supervisores cargados`);
-                } else {
-                    console.warn('⚠️ No hay supervisores disponibles');
-                    mostrarAlerta('error', 'No hay supervisores disponibles');
-                }
-            } catch (error) {
-                console.error('❌ Error al cargar supervisores:', error);
-                mostrarAlerta('error', 'Error al cargar supervisores: ' + error.message);
-            }
-        }
-
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
-        const fileName = document.getElementById('fileName');
-        const fileNameText = document.getElementById('fileNameText');
-
-        uploadArea.addEventListener('click', () => fileInput.click());
-
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('drag-over');
-        });
-
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('drag-over');
-        });
-
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('drag-over');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                fileInput.files = files;
-                handleFileSelect(files[0]);
-            }
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                handleFileSelect(e.target.files[0]);
-            }
-        });
-
-        function handleFileSelect(file) {
-            if (file.size > 5 * 1024 * 1024) {
-                mostrarAlerta('error', 'El archivo es muy grande (máx 5MB)');
-                return;
-            }
-            selectedFile = file;
-            fileNameText.textContent = file.name;
-            fileName.classList.add('show');
-        }
-
-        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const supervisorId = document.getElementById('supervisorSelect').value;
-            if (!supervisorId || !selectedFile) {
-                mostrarAlerta('error', 'Completa todos los campos');
-                return;
-            }
-
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-
-            try {
-                console.log('📤 Procesando archivo Excel...');
-                const excelData = await leerExcel(selectedFile);
-                
-                if (excelData.length > 1000) {
-                    if (!confirm(`El archivo tiene ${excelData.length} filas. ¿Deseas continuar? (Puede tardar un poco)`)) {
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Reprogramación';
-                        return;
+                        option.value = uid;
+                        option.textContent = user.nombre;
+                        filterSupervisor.appendChild(option);
+                    } else if (user.rol === 'auxiliar') {
+                        const option = document.createElement('option');
+                        option.value = uid;
+                        option.textContent = user.nombre;
+                        filterAuxiliar.appendChild(option);
                     }
-                }
-                
-                console.log('👤 Obteniendo datos del supervisor...');
-                const supervisorSnapshot = await get(ref(db, `usuarios/${supervisorId}`));
-                
-                if (!supervisorSnapshot.exists()) {
-                    throw new Error('Supervisor no encontrado');
-                }
-                
-                const supervisorData = supervisorSnapshot.val();
-                const mes = new Date().toISOString().slice(0, 7).replace('-', '');
-                const timestamp = new Date().toISOString();
-                
-                console.log('💾 Guardando en Firebase...');
-                const reprogRef = push(ref(db, `reprogramaciones/${mes}`));
-
-                // Estructura optimizada: metadata + datos
-                await set(reprogRef, {
-                    // Metadata (pequeña)
-                    auxiliarId: currentUser.uid,
-                    auxiliarNombre: userData.nombre,
-                    auxiliarEmail: userData.email || currentUser.email,
-                    supervisorId: supervisorId,
-                    supervisorNombre: supervisorData.nombre,
-                    supervisorEmail: supervisorData.email,
-                    fechaSubida: timestamp,
-                    estado: 'pendiente',
-                    archivoNombre: selectedFile.name,
-                    totalRegistros: excelData.length,
-                    
-                    // Datos Excel (grande)
-                    datosExcel: excelData
                 });
-
-                console.log('✅ Reprogramación guardada exitosamente');
-                mostrarAlerta('success', `✓ ¡Reprogramación enviada! (${excelData.length} registros)`);
-                
-                // 📧 Enviar correo al supervisor
-                try {
-                    await notificarSupervisorNuevaReprogramacion({
-                        supervisorEmail: supervisorData.email,
-                        supervisorNombre: supervisorData.nombre,
-                        auxiliarNombre: userData.nombre,
-                        archivoNombre: selectedFile.name,
-                        totalRegistros: excelData.length,
-                        fechaSubida: timestamp
-                    });
-                } catch (e) { console.warn('⚠️ Error email:', e); }
-                
-                // Limpiar caché de reprogramaciones para forzar recarga
-                localStorage.removeItem('reprogramaciones_' + currentUser.uid);
-                
-                document.getElementById('uploadForm').reset();
-                fileName.classList.remove('show');
-                selectedFile = null;
-                
-                // Recargar lista
-                setTimeout(() => cargarReprogramaciones(), 500);
-
             } catch (error) {
-                console.error('❌ Error al enviar:', error);
-                let mensajeError = 'Error al enviar la reprogramación';
-                
-                if (error.message.includes('Faltan columnas')) {
-                    mensajeError = error.message + '. Verifica que el Excel tenga la estructura correcta.';
-                } else if (error.message.includes('vacío')) {
-                    mensajeError = 'El archivo Excel está vacío. Agrega datos e intenta de nuevo.';
-                } else if (error.code === 'PERMISSION_DENIED') {
-                    mensajeError = 'No tienes permisos para enviar reprogramaciones.';
-                } else {
-                    mensajeError += ': ' + error.message;
-                }
-                
-                mostrarAlerta('error', mensajeError);
+                console.error('❌ Error al cargar usuarios:', error);
             }
-
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Reprogramación';
-        });
-
-        async function leerExcel(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    try {
-                        const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, { type: 'array', cellDates: false });
-                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
-                        
-                        // Validar que el archivo tenga datos
-                        if (!jsonData || jsonData.length === 0) {
-                            reject(new Error('El archivo Excel está vacío'));
-                            return;
-                        }
-                        
-                        // Columnas que vienen en el Excel original (13 columnas)
-                        const columnasRequeridas = [
-                            'AID PROMOTOR', 'ID PV', 'ID EMPRESA', 'N_DIA', 'FECHA', 
-                            'MINUTOS', 'HORAS', 'NOMBRE PROMOTOR', 'NOMBRE PUNTO DE VENTA', 
-                            'NOMBRE EMPRESA', 'CIUDAD PV', 'DEPARTAMENTO PV', 'ZONA'
-                        ];
-                        
-                        // Validar estructura (verificar primera fila)
-                        const primeraFila = jsonData[0];
-                        const columnasEncontradas = Object.keys(primeraFila);
-                        const columnasFaltantes = columnasRequeridas.filter(
-                            col => !columnasEncontradas.includes(col)
-                        );
-                        
-                        if (columnasFaltantes.length > 0) {
-                            const mensaje = `Faltan columnas requeridas: ${columnasFaltantes.join(', ')}`;
-                            console.error('❌ Validación fallida:', mensaje);
-                            reject(new Error(mensaje));
-                            return;
-                        }
-                        
-                        console.log('✅ Validación Excel: Estructura correcta');
-                        console.log(`📊 Total de filas: ${jsonData.length}`);
-                        
-                        // Agregar columnas que el supervisor llenará + convertir fechas
-                        const datosConvertidos = jsonData.map((row, index) => {
-                            const nuevaFila = {};
-                            
-                            // Copiar todas las columnas originales
-                            columnasRequeridas.forEach(col => {
-                                nuevaFila[col] = row[col] ?? '';
-                            });
-                            
-                            // Agregar columnas vacías para que el supervisor las complete
-                            nuevaFila['FECHA REPROGRAMACION'] = '';
-                            nuevaFila['OBSERVACION'] = '';
-                            
-                            // Convertir FECHA si es un número serial
-                            if (nuevaFila['FECHA'] && typeof nuevaFila['FECHA'] === 'number') {
-                                const fechaBase = new Date(1900, 0, 1);
-                                const dias = nuevaFila['FECHA'] - 2;
-                                const fecha = new Date(fechaBase.getTime() + dias * 24 * 60 * 60 * 1000);
-                                nuevaFila['FECHA'] = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`;
-                            }
-                            
-                            return nuevaFila;
-                        });
-                        
-                        console.log('✅ Excel procesado:', datosConvertidos.length, 'filas');
-                        console.log('📝 Primera fila:', datosConvertidos[0]);
-                        resolve(datosConvertidos);
-                    } catch (error) {
-                        console.error('❌ Error al procesar Excel:', error);
-                        reject(error);
-                    }
-                };
-                reader.onerror = (error) => {
-                    console.error('❌ Error al leer archivo:', error);
-                    reject(error);
-                };
-                reader.readAsArrayBuffer(file);
-            });
         }
 
-        async function cargarReprogramaciones() {
-            const reprogList = document.getElementById('reprogList');
-            const loader = document.getElementById('listLoader');
+        async function cargarDatos() {
+            todasReprogramaciones = [];
+            const meses = obtenerMesesSegunPeriodo(periodoActual);
             
-            try {
-                console.log('📥 Cargando reprogramaciones del auxiliar...');
-                const meses = obtenerUltimosMeses(3);
-                const todasLasReprogs = [];
+            console.log(`📥 Cargando datos para ${meses.length} meses...`);
+            const inicio = performance.now();
 
-                // Cargar todos los meses en paralelo (más rápido)
+            try {
+                // Cargar todos los meses en PARALELO (mucho más rápido)
                 const promesas = meses.map(async mes => {
                     const reprogRef = ref(db, `reprogramaciones/${mes}`);
-                    const q = query(reprogRef, orderByChild('auxiliarId'), equalTo(currentUser.uid));
-                    const snapshot = await get(q);
-
+                    const snapshot = await get(reprogRef);
+                    
                     if (snapshot.exists()) {
                         const data = snapshot.val();
                         return Object.entries(data).map(([id, reprog]) => ({ id, mes, ...reprog }));
@@ -918,242 +1403,339 @@
                 });
 
                 const resultados = await Promise.all(promesas);
-                resultados.forEach(reprogs => todasLasReprogs.push(...reprogs));
+                resultados.forEach(reprogs => todasReprogramaciones.push(...reprogs));
                 
-                loader.classList.remove('active');
+                const fin = performance.now();
+                console.log(`✅ ${todasReprogramaciones.length} reprogramaciones cargadas en ${Math.round(fin - inicio)}ms`);
+
+                // Ordenar por fecha
+                todasReprogramaciones.sort((a, b) => new Date(b.fechaSubida) - new Date(a.fechaSubida));
                 
-                // Ordenar por fecha más reciente
-                todasLasReprogs.sort((a, b) => new Date(b.fechaSubida) - new Date(a.fechaSubida));
+                calcularEstadisticas();
+                renderizarRankings();
+                renderizarGrafico();
+                renderizarHistorial();
                 
-                // Actualizar mapa de reprogramaciones actuales
-                reprogramacionesActuales.clear();
-                todasLasReprogs.forEach(reprog => {
-                    reprogramacionesActuales.set(reprog.id, reprog.estado);
-                });
-                
-                console.log(`✅ ${todasLasReprogs.length} reprogramaciones cargadas`);
-                
-                if (todasLasReprogs.length === 0) {
-                    reprogList.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon"><i class="fas fa-inbox"></i></div>
-                            <div class="empty-text">No has enviado reprogramaciones todavía</div>
-                        </div>
-                    `;
-                } else {
-                    // Renderizar solo las primeras 20 (paginación)
-                    const reprogsMostrar = todasLasReprogs.slice(0, 20);
-                    reprogList.innerHTML = reprogsMostrar.map(reprog => crearItemReprog(reprog)).join('');
-                    
-                    // Agregar botón "Ver más" si hay más
-                    if (todasLasReprogs.length > 20) {
-                        reprogList.innerHTML += `
-                            <div style="text-align: center; padding: 20px;">
-                                <button class="btn btn-primary" onclick="cargarMasReprogramaciones()">
-                                    <i class="fas fa-chevron-down"></i>
-                                    Ver más (${todasLasReprogs.length - 20} restantes)
-                                </button>
-                            </div>
-                        `;
-                        
-                        // Guardar las restantes en una variable global
-                        window.reprogramacionesRestantes = todasLasReprogs.slice(20);
-                    }
-                }
             } catch (error) {
-                console.error('❌ Error al cargar reprogramaciones:', error);
-                loader.classList.remove('active');
-                reprogList.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon"><i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i></div>
-                        <div class="empty-text" style="color: #ef4444;">Error al cargar: ${error.message}</div>
+                console.error('❌ Error al cargar datos:', error);
+                mostrarError('Error al cargar datos del dashboard');
+            }
+            
+            document.getElementById('mainLoader').classList.remove('active');
+            document.getElementById('mainContent').style.display = 'block';
+        }
+        
+        function mostrarError(mensaje) {
+            document.getElementById('mainContent').innerHTML = `
+                <div style="text-align: center; padding: 60px; background: white; border-radius: 8px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #ef4444; margin-bottom: 16px;"></i>
+                    <p style="color: #6b7280; font-size: 16px;">${mensaje}</p>
+                </div>
+            `;
+            document.getElementById('mainContent').style.display = 'block';
+        }
+
+        function calcularEstadisticas() {
+            const total = todasReprogramaciones.length;
+            const pendientes = todasReprogramaciones.filter(r => r.estado === 'pendiente').length;
+            const respondidas = todasReprogramaciones.filter(r => r.estado === 'respondida').length;
+
+            document.getElementById('totalReprogs').textContent = total;
+            document.getElementById('pendingReprogs').textContent = pendientes;
+            document.getElementById('answeredReprogs').textContent = respondidas;
+
+            const pendingPercent = total > 0 ? Math.round((pendientes / total) * 100) : 0;
+            const answeredPercent = total > 0 ? Math.round((respondidas / total) * 100) : 0;
+            
+            document.getElementById('pendingPercent').textContent = pendingPercent + '%';
+            document.getElementById('answeredPercent').textContent = answeredPercent + '%';
+
+            const tiemposRespuesta = todasReprogramaciones
+                .filter(r => r.respuesta && r.respuesta.fechaRespuesta)
+                .map(r => {
+                    const inicio = new Date(r.fechaSubida);
+                    const fin = new Date(r.respuesta.fechaRespuesta);
+                    return (fin - inicio) / (1000 * 60 * 60);
+                });
+
+            const avgHoras = tiemposRespuesta.length > 0
+                ? tiemposRespuesta.reduce((a, b) => a + b, 0) / tiemposRespuesta.length
+                : 0;
+
+            document.getElementById('avgTime').textContent = avgHoras < 24
+                ? Math.round(avgHoras) + 'h'
+                : Math.round(avgHoras / 24) + 'd';
+        }
+
+        function renderizarRankings() {
+            const supervisores = {};
+            const auxiliares = {};
+
+            todasReprogramaciones.forEach(reprog => {
+                if (!supervisores[reprog.supervisorId]) {
+                    supervisores[reprog.supervisorId] = {
+                        nombre: reprog.supervisorNombre,
+                        total: 0,
+                        respondidas: 0,
+                        tiempos: []
+                    };
+                }
+                supervisores[reprog.supervisorId].total++;
+                
+                if (reprog.estado === 'respondida' && reprog.respuesta) {
+                    supervisores[reprog.supervisorId].respondidas++;
+                    const inicio = new Date(reprog.fechaSubida);
+                    const fin = new Date(reprog.respuesta.fechaRespuesta);
+                    const horas = (fin - inicio) / (1000 * 60 * 60);
+                    supervisores[reprog.supervisorId].tiempos.push(horas);
+                }
+
+                if (!auxiliares[reprog.auxiliarId]) {
+                    auxiliares[reprog.auxiliarId] = {
+                        nombre: reprog.auxiliarNombre,
+                        total: 0
+                    };
+                }
+                auxiliares[reprog.auxiliarId].total++;
+            });
+
+            const rankingSupervisores = Object.values(supervisores)
+                .map(s => ({
+                    ...s,
+                    avgTiempo: s.tiempos.length > 0
+                        ? s.tiempos.reduce((a, b) => a + b, 0) / s.tiempos.length
+                        : 999999
+                }))
+                .sort((a, b) => a.avgTiempo - b.avgTiempo)
+                .slice(0, 5);
+
+            const rankingAuxiliares = Object.values(auxiliares)
+                .sort((a, b) => b.total - a.total)
+                .slice(0, 5);
+
+            const supervisorHTML = rankingSupervisores.map((sup, index) => {
+                const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : 'rank-other';
+                const tiempo = sup.avgTiempo < 24 
+                    ? Math.round(sup.avgTiempo) + 'h' 
+                    : Math.round(sup.avgTiempo / 24) + 'd';
+                
+                return `
+                    <div class="ranking-item">
+                        <div class="rank-position ${rankClass}">${index + 1}</div>
+                        <div class="rank-info">
+                            <div class="rank-name">${sup.nombre}</div>
+                            <div class="rank-stats">${sup.respondidas} de ${sup.total} respondidas</div>
+                        </div>
+                        <div class="rank-value">${tiempo}<span class="rank-unit">promedio</span></div>
                     </div>
                 `;
-            }
+            }).join('');
+
+            const auxiliarHTML = rankingAuxiliares.map((aux, index) => {
+                const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : 'rank-other';
+                
+                return `
+                    <div class="ranking-item">
+                        <div class="rank-position ${rankClass}">${index + 1}</div>
+                        <div class="rank-info">
+                            <div class="rank-name">${aux.nombre}</div>
+                            <div class="rank-stats">Reprogramaciones enviadas</div>
+                        </div>
+                        <div class="rank-value">${aux.total}<span class="rank-unit">envíos</span></div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('supervisorRanking').innerHTML = supervisorHTML || '<div class="empty-state"><div class="empty-icon"><i class="fas fa-inbox"></i></div><div>Sin datos</div></div>';
+            document.getElementById('auxiliarRanking').innerHTML = auxiliarHTML || '<div class="empty-state"><div class="empty-icon"><i class="fas fa-inbox"></i></div><div>Sin datos</div></div>';
         }
 
-        // Función para iniciar escucha de cambios en tiempo real
-        function iniciarEscuchaCambios() {
-            console.log('👂 Iniciando escucha de cambios en reprogramaciones...');
-            const meses = obtenerUltimosMeses(3);
+        function renderizarGrafico() {
+            const mesesData = {};
             
-            meses.forEach(mes => {
-                const reprogRef = ref(db, `reprogramaciones/${mes}`);
-                const q = query(reprogRef, orderByChild('auxiliarId'), equalTo(currentUser.uid));
-                
-                onChildChanged(q, (snapshot) => {
-                    const reprogId = snapshot.key;
-                    const nuevaReprog = snapshot.val();
-                    
-                    if (nuevaReprog) {
-                        const estadoAnterior = reprogramacionesActuales.get(reprogId);
-                        const estadoNuevo = nuevaReprog.estado;
-                        
-                        // Si cambió de pendiente a respondida, notificar
-                        if (estadoAnterior === 'pendiente' && estadoNuevo === 'respondida') {
-                            mostrarNotificacionReprogramacion(nuevaReprog);
-                            // Actualizar el mapa
-                            reprogramacionesActuales.set(reprogId, estadoNuevo);
-                            // Recargar la lista para mostrar el cambio
-                            cargarReprogramaciones();
-                        }
-                    }
-                });
+            todasReprogramaciones.forEach(reprog => {
+                if (!mesesData[reprog.mes]) {
+                    mesesData[reprog.mes] = 0;
+                }
+                mesesData[reprog.mes]++;
             });
+
+            const mesesOrdenados = Object.keys(mesesData).sort();
+            const maxValue = Math.max(...Object.values(mesesData), 1);
+
+            const chartHTML = mesesOrdenados.map(mes => {
+                const valor = mesesData[mes];
+                const altura = (valor / maxValue) * 100;
+                const mesTexto = formatearMes(mes);
+                
+                return `
+                    <div class="chart-bar" style="height: ${altura}%">
+                        <div class="bar-value">${valor}</div>
+                        <div class="bar-label">${mesTexto}</div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('monthlyChart').innerHTML = chartHTML || '<div class="empty-state"><div class="empty-icon"><i class="fas fa-chart-bar"></i></div><div>Sin datos</div></div>';
         }
 
-        // Función para mostrar notificación de reprogramación completada
-        function mostrarNotificacionReprogramacion(reprog) {
-            // Reproducir sonido de notificación
-            reproducirSonidoNotificacion();
-            
-            if ('Notification' in window && Notification.permission === 'granted') {
-                const notification = new Notification('Reprogramación Completada', {
-                    body: `El supervisor ${reprog.supervisorNombre} ha completado la reprogramación "${reprog.archivoNombre}". Haz clic para ver los detalles.`,
-                    icon: '/favicon.ico', // Opcional: ícono de la notificación
-                    tag: `reprog-${reprog.id}`, // Evita notificaciones duplicadas
-                    requireInteraction: true // La notificación permanece hasta que el usuario interactúe
-                });
-                
-                // Al hacer clic en la notificación, enfocar la ventana
-                notification.onclick = function() {
-                    window.focus();
-                    notification.close();
-                };
-                
-                // Auto-cerrar después de 10 segundos si no se interactúa
-                setTimeout(() => {
-                    notification.close();
-                }, 10000);
-                
-                console.log('🔔 Notificación mostrada para reprogramación completada');
-            } else {
-                console.log('⚠️ Notificaciones no permitidas o no soportadas');
+        let historialPaginaActual = 1;
+        const HISTORIAL_POR_PAGINA = 100;
+        
+        function renderizarHistorial() {
+            let filtradas = [...todasReprogramaciones];
+
+            const filterSupervisor = document.getElementById('filterSupervisor').value;
+            const filterAuxiliar = document.getElementById('filterAuxiliar').value;
+            const filterEstado = document.getElementById('filterEstado').value;
+
+            if (filterSupervisor) {
+                filtradas = filtradas.filter(r => r.supervisorId === filterSupervisor);
             }
-        }
+            if (filterAuxiliar) {
+                filtradas = filtradas.filter(r => r.auxiliarId === filterAuxiliar);
+            }
+            if (filterEstado) {
+                filtradas = filtradas.filter(r => r.estado === filterEstado);
+            }
 
-        // Función para reproducir sonido de notificación
-        function reproducirSonidoNotificacion() {
-            try {
-                // Crear un audio context para generar un tono de notificación
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                
-                // Crear tres tonos para un sonido de notificación agradable
-                const tiempos = [0, 0.15, 0.3];
-                const frecuencias = [587.33, 659.25, 783.99]; // Re, Mi, Sol
-                
-                tiempos.forEach((tiempo, index) => {
-                    const oscillator = audioContext.createOscillator();
-                    const gainNode = audioContext.createGain();
-                    
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioContext.destination);
-                    
-                    oscillator.type = 'sine';
-                    oscillator.frequency.value = frecuencias[index];
-                    
-                    // Envelope ADSR para un sonido más suave
-                    const now = audioContext.currentTime + tiempo;
-                    gainNode.gain.setValueAtTime(0, now);
-                    gainNode.gain.linearRampToValueAtTime(0.3, now + 0.02);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                    
-                    oscillator.start(now);
-                    oscillator.stop(now + 0.15);
-                });
-                
-                console.log('🔊 Sonido de notificación reproducido');
-            } catch (error) {
-                console.error('❌ Error al reproducir sonido:', error);
+            const tbody = document.getElementById('historyTableBody');
+            
+            if (filtradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #9ca3af;">No hay reprogramaciones</td></tr>';
+                return;
+            }
+
+            // Mostrar solo las primeras HISTORIAL_POR_PAGINA (optimización)
+            const inicio = 0;
+            const fin = Math.min(HISTORIAL_POR_PAGINA, filtradas.length);
+            const filasMostrar = filtradas.slice(inicio, fin);
+            
+            console.log(`📄 Renderizando ${filasMostrar.length} de ${filtradas.length} filas en historial`);
+
+            const rows = filasMostrar.map(reprog => {
+                const fecha = new Date(reprog.fechaSubida).toLocaleDateString('es-CO');
+                const dotClass = reprog.estado === 'pendiente' ? 'dot-pending' : 'dot-answered';
+                const estadoTexto = reprog.estado === 'pendiente' ? 'Pendiente' : 'Respondida';
+                const numRegistros = reprog.totalRegistros || reprog.datosExcel?.length || 0;
+
+                let tiempoRespuesta = '-';
+                if (reprog.estado === 'respondida' && reprog.fechaRespuesta) {
+                    const inicio = new Date(reprog.fechaSubida);
+                    const fin = new Date(reprog.fechaRespuesta);
+                    const horas = (fin - inicio) / (1000 * 60 * 60);
+                    tiempoRespuesta = horas < 24 ? Math.round(horas) + 'h' : Math.round(horas / 24) + 'd';
+                }
+
+                return `
+                    <tr>
+                        <td>${fecha}</td>
+                        <td>${reprog.auxiliarNombre}</td>
+                        <td>${reprog.supervisorNombre}</td>
+                        <td>
+                            <span class="status-dot ${dotClass}"></span>
+                            ${estadoTexto}
+                        </td>
+                        <td>${numRegistros}</td>
+                        <td>${tiempoRespuesta}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            tbody.innerHTML = rows;
+            
+            // Agregar indicador si hay más filas
+            if (filtradas.length > HISTORIAL_POR_PAGINA) {
+                tbody.innerHTML += `
+                    <tr style="background: #fafbfc;">
+                        <td colspan="6" style="text-align: center; padding: 20px;">
+                            <button class="btn btn-primary" onclick="cargarMasHistorial()" style="font-size: 13px; padding: 8px 16px;">
+                                <i class="fas fa-chevron-down"></i>
+                                Cargar más (${filtradas.length - HISTORIAL_POR_PAGINA} restantes)
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                window.historialFiltrado = filtradas;
+                historialPaginaActual = 1;
             }
         }
         
-        window.cargarMasReprogramaciones = function() {
-            if (window.reprogramacionesRestantes && window.reprogramacionesRestantes.length > 0) {
-                const reprogList = document.getElementById('reprogList');
-                const siguiente20 = window.reprogramacionesRestantes.slice(0, 20);
-                
-                // Remover botón anterior
-                const ultimoElemento = reprogList.lastElementChild;
-                if (ultimoElemento && ultimoElemento.querySelector('button')) {
-                    ultimoElemento.remove();
+        window.cargarMasHistorial = function() {
+            if (!window.historialFiltrado) return;
+            
+            historialPaginaActual++;
+            const inicio = historialPaginaActual * HISTORIAL_POR_PAGINA;
+            const fin = Math.min(inicio + HISTORIAL_POR_PAGINA, window.historialFiltrado.length);
+            const siguientes = window.historialFiltrado.slice(inicio, fin);
+            
+            if (siguientes.length === 0) return;
+            
+            const tbody = document.getElementById('historyTableBody');
+            const btnRow = tbody.querySelector('tr[style*="background: #fafbfc"]');
+            if (btnRow) btnRow.remove();
+            
+            const nuevasFilas = siguientes.map(reprog => {
+                const fecha = new Date(reprog.fechaSubida).toLocaleDateString('es-CO');
+                const dotClass = reprog.estado === 'pendiente' ? 'dot-pending' : 'dot-answered';
+                const estadoTexto = reprog.estado === 'pendiente' ? 'Pendiente' : 'Respondida';
+                const numRegistros = reprog.totalRegistros || reprog.datosExcel?.length || 0;
+
+                let tiempoRespuesta = '-';
+                if (reprog.estado === 'respondida' && reprog.fechaRespuesta) {
+                    const inicio = new Date(reprog.fechaSubida);
+                    const fin = new Date(reprog.fechaRespuesta);
+                    const horas = (fin - inicio) / (1000 * 60 * 60);
+                    tiempoRespuesta = horas < 24 ? Math.round(horas) + 'h' : Math.round(horas / 24) + 'd';
                 }
-                
-                // Agregar siguientes 20
-                reprogList.innerHTML += siguiente20.map(reprog => crearItemReprog(reprog)).join('');
-                
-                // Actualizar restantes
-                window.reprogramacionesRestantes = window.reprogramacionesRestantes.slice(20);
-                
-                // Agregar botón si aún hay más
-                if (window.reprogramacionesRestantes.length > 0) {
-                    reprogList.innerHTML += `
-                        <div style="text-align: center; padding: 20px;">
-                            <button class="btn btn-primary" onclick="cargarMasReprogramaciones()">
+
+                return `
+                    <tr>
+                        <td>${fecha}</td>
+                        <td>${reprog.auxiliarNombre}</td>
+                        <td>${reprog.supervisorNombre}</td>
+                        <td>
+                            <span class="status-dot ${dotClass}"></span>
+                            ${estadoTexto}
+                        </td>
+                        <td>${numRegistros}</td>
+                        <td>${tiempoRespuesta}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            tbody.innerHTML += nuevasFilas;
+            
+            const totalMostradas = (historialPaginaActual + 1) * HISTORIAL_POR_PAGINA;
+            if (totalMostradas < window.historialFiltrado.length) {
+                tbody.innerHTML += `
+                    <tr style="background: #fafbfc;">
+                        <td colspan="6" style="text-align: center; padding: 20px;">
+                            <button class="btn btn-primary" onclick="cargarMasHistorial()" style="font-size: 13px; padding: 8px 16px;">
                                 <i class="fas fa-chevron-down"></i>
-                                Ver más (${window.reprogramacionesRestantes.length} restantes)
+                                Cargar más (${window.historialFiltrado.length - totalMostradas} restantes)
                             </button>
-                        </div>
-                    `;
-                }
-            }
-        }
-
-        function crearItemReprog(reprog) {
-            const fecha = new Date(reprog.fechaSubida).toLocaleString('es-CO');
-            const estadoClass = reprog.estado === 'respondida' ? 'badge-answered' : 'badge-pending';
-            const estadoTexto = reprog.estado === 'respondida' ? 'Respondida' : 'Pendiente';
-            const estadoIcon = reprog.estado === 'respondida' ? 'fa-check-circle' : 'fa-clock';
-
-            let respuestaHTML = '';
-            if (reprog.estado === 'respondida') {
-                respuestaHTML = `
-                    <div class="answer-box">
-                        <div class="answer-label"><i class="fas fa-check-circle"></i> Reprogramación Completada</div>
-                        <div class="answer-content">
-                            <p style="margin-bottom: 10px; color: #065f46; font-weight: 500;">
-                                El supervisor ha completado todas las fechas y observaciones
-                            </p>
-                        </div>
-                        <button class="btn download-btn" onclick="descargarExcel('${reprog.id}')">
-                            <i class="fas fa-download"></i> Descargar Excel Completo
-                        </button>
-                    </div>
+                        </td>
+                    </tr>
                 `;
             }
-
-            return `
-                <div class="reprog-item">
-                    <div class="reprog-header">
-                        <div>
-                            <div class="reprog-title">Para: ${reprog.supervisorNombre}</div>
-                            <div class="reprog-date">
-                                <i class="far fa-calendar"></i>
-                                ${fecha}
-                            </div>
-                        </div>
-                        <span class="status-badge ${estadoClass}">
-                            <i class="fas ${estadoIcon}"></i> ${estadoTexto}
-                        </span>
-                    </div>
-                    <div class="reprog-body">
-                        <div class="data-row">
-                            <span class="data-label">Archivo:</span>
-                            <span class="data-value">${reprog.archivoNombre || 'archivo.xlsx'}</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-label">Registros:</span>
-                            <span class="data-value">${reprog.datosExcel?.length || 0} filas</span>
-                        </div>
-                        ${respuestaHTML}
-                    </div>
-                </div>
-            `;
         }
 
-        function obtenerUltimosMeses(cantidad) {
+        function formatearMes(mes) {
+            const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            const year = mes.substring(0, 4);
+            const month = parseInt(mes.substring(4, 6)) - 1;
+            return `${meses[month]} ${year}`;
+        }
+
+        function obtenerMesesSegunPeriodo(periodo) {
             const meses = [];
             const ahora = new Date();
+            let cantidad = 1;
+
+            if (periodo === '3months') cantidad = 3;
+            else if (periodo === 'all') cantidad = 12;
+
             for (let i = 0; i < cantidad; i++) {
                 const fecha = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1);
                 const mes = fecha.toISOString().slice(0, 7).replace('-', '');
@@ -1162,93 +1744,304 @@
             return meses;
         }
 
-        window.descargarExcel = async function(reprogId) {
+        document.querySelectorAll('.period-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                periodoActual = this.dataset.period;
+                
+                document.getElementById('mainContent').style.display = 'none';
+                document.getElementById('mainLoader').classList.add('active');
+                
+                setTimeout(() => cargarDatos(), 300);
+            });
+        });
+
+        document.getElementById('filterSupervisor').addEventListener('change', renderizarHistorial);
+        document.getElementById('filterAuxiliar').addEventListener('change', renderizarHistorial);
+        document.getElementById('filterEstado').addEventListener('change', renderizarHistorial);
+
+        // ========== GESTIÓN DE USUARIOS ==========
+        let usuarioEditando = null;
+        let todosLosUsuarios = []; // Array global para filtrado
+
+        window.abrirGestionUsuarios = function() {
+            document.getElementById('modalUsuarios').classList.add('show');
+            cargarUsuariosModal();
+        };
+
+        window.cerrarModalUsuarios = function() {
+            document.getElementById('modalUsuarios').classList.remove('show');
+            cancelarEdicion();
+        };
+
+        window.cancelarEdicion = function() {
+            document.getElementById('editUserSection').style.display = 'none';
+            document.getElementById('editUserForm').reset();
+            usuarioEditando = null;
+        };
+
+        // Crear Usuario
+        document.getElementById('createUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const nombre = document.getElementById('createNombre').value.trim();
+            const email = document.getElementById('createEmail').value.trim();
+            const password = document.getElementById('createPassword').value;
+            const rol = document.getElementById('createRol').value;
+            
+            if (!nombre || !email || !password || !rol) {
+                mostrarAlertaModal('error', 'Por favor completa todos los campos', 'create');
+                return;
+            }
+            
+            const loader = document.getElementById('createLoader');
+            const submitBtn = document.getElementById('createSubmitBtn');
+            loader.classList.add('active');
+            submitBtn.disabled = true;
+            
             try {
-                const meses = obtenerUltimosMeses(3);
-                let reprogData = null;
-
-                for (const mes of meses) {
-                    const snapshot = await get(ref(db, `reprogramaciones/${mes}/${reprogId}`));
-                    if (snapshot.exists()) {
-                        reprogData = snapshot.val();
-                        break;
-                    }
-                }
-
-                if (!reprogData || !reprogData.datosExcel) {
-                    mostrarAlerta('error', 'No se encontraron datos');
-                    return;
-                }
-
-                // Crear workbook manualmente para mantener el formato exacto
-                const wb = XLSX.utils.book_new();
+                // Importar las funciones necesarias
+                const { createUserWithEmailAndPassword } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
+                const { ref: refDB, set } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js');
                 
-                // Definir el orden exacto de las columnas
-                const columnas = [
-                    'FECHA REPROGRAMACION',
-                    'OBSERVACION',
-                    'AID PROMOTOR',
-                    'ID PV',
-                    'ID EMPRESA',
-                    'N_DIA',
-                    'FECHA',
-                    'MINUTOS',
-                    'HORAS',
-                    'NOMBRE PROMOTOR',
-                    'NOMBRE PUNTO DE VENTA',
-                    'NOMBRE EMPRESA',
-                    'CIUDAD PV',
-                    'DEPARTAMENTO PV',
-                    'ZONA'
-                ];
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
                 
-                // Crear array de arrays (no objetos) para mantener el orden y formato
-                const datos = [columnas]; // Primera fila: encabezados
-                
-                reprogData.datosExcel.forEach(row => {
-                    const fila = columnas.map(col => {
-                        const valor = row[col];
-                        // Si es undefined o null, retornar string vacío
-                        if (valor === undefined || valor === null) return '';
-                        // Retornar el valor tal cual
-                        return valor;
-                    });
-                    datos.push(fila);
+                await set(refDB(db, `usuarios/${user.uid}`), {
+                    nombre: nombre,
+                    email: email,
+                    rol: rol,
+                    fechaCreacion: new Date().toISOString(),
+                    ultimaActualizacion: new Date().toISOString()
                 });
                 
-                const ws = XLSX.utils.aoa_to_sheet(datos);
+                mostrarAlertaModal('success', `✓ Usuario ${nombre} creado correctamente`, 'create');
+                document.getElementById('createUserForm').reset();
+                await signOut(auth); // Cerrar sesión del nuevo usuario
+                cargarUsuariosModal(); // Recargar lista
                 
-                // Ajustar anchos de columnas
-                const colWidths = [
-                    { wch: 18 }, // FECHA REPROGRAMACION
-                    { wch: 30 }, // OBSERVACION
-                    { wch: 12 }, // AID PROMOTOR
-                    { wch: 10 }, // ID PV
-                    { wch: 12 }, // ID EMPRESA
-                    { wch: 8 },  // N_DIA
-                    { wch: 12 }, // FECHA
-                    { wch: 10 }, // MINUTOS
-                    { wch: 8 },  // HORAS
-                    { wch: 30 }, // NOMBRE PROMOTOR
-                    { wch: 35 }, // NOMBRE PUNTO DE VENTA
-                    { wch: 35 }, // NOMBRE EMPRESA
-                    { wch: 15 }, // CIUDAD PV
-                    { wch: 15 }, // DEPARTAMENTO PV
-                    { wch: 12 }  // ZONA
-                ];
-                ws['!cols'] = colWidths;
-                
-                XLSX.utils.book_append_sheet(wb, ws, 'Reprogramación');
-                
-                const nombreArchivo = `reprogramacion_${reprogData.supervisorNombre.replace(/ /g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`;
-                XLSX.writeFile(wb, nombreArchivo);
-
-                mostrarAlerta('success', 'Excel descargado correctamente');
             } catch (error) {
                 console.error('Error:', error);
-                mostrarAlerta('error', 'Error al descargar: ' + error.message);
+                let mensajeError = 'Error al crear usuario';
+                
+                switch(error.code) {
+                    case 'auth/email-already-in-use':
+                        mensajeError = 'Este correo ya está registrado';
+                        break;
+                    case 'auth/invalid-email':
+                        mensajeError = 'Correo electrónico inválido';
+                        break;
+                    case 'auth/weak-password':
+                        mensajeError = 'La contraseña debe tener al menos 6 caracteres';
+                        break;
+                    default:
+                        mensajeError = `Error: ${error.message}`;
+                }
+                
+                mostrarAlertaModal('error', mensajeError, 'create');
+            } finally {
+                loader.classList.remove('active');
+                submitBtn.disabled = false;
             }
+        });
+
+        // Editar Usuario
+        document.getElementById('editUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!usuarioEditando) return;
+            
+            const nombre = document.getElementById('editNombre').value.trim();
+            const rol = document.getElementById('editRol').value;
+            
+            if (!nombre || !rol) {
+                mostrarAlertaModal('error', 'Por favor completa todos los campos', 'edit');
+                return;
+            }
+            
+            const loader = document.getElementById('editLoader');
+            const submitBtn = document.getElementById('editSubmitBtn');
+            loader.classList.add('active');
+            submitBtn.disabled = true;
+            
+            try {
+                const { ref: refDB, update } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js');
+                
+                await update(refDB(db, `usuarios/${usuarioEditando.uid}`), {
+                    nombre: nombre,
+                    rol: rol,
+                    ultimaActualizacion: new Date().toISOString()
+                });
+                
+                mostrarAlertaModal('success', '✓ Usuario actualizado correctamente', 'edit');
+                cargarUsuariosModal();
+                
+                setTimeout(() => {
+                    cancelarEdicion();
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarAlertaModal('error', `Error: ${error.message}`, 'edit');
+            } finally {
+                loader.classList.remove('active');
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Cargar Lista de Usuarios en el Modal
+        async function cargarUsuariosModal() {
+            const usersList = document.getElementById('usersList');
+            const loader = document.getElementById('usersLoader');
+            
+            loader.classList.add('active');
+            
+            try {
+                const usuariosRef = ref(db, 'usuarios');
+                const snapshot = await get(usuariosRef);
+                
+                if (!snapshot.exists()) {
+                    usersList.innerHTML = `
+                        <div class="empty-state-modal">
+                            <i class="fas fa-users"></i>
+                            <div>No hay usuarios registrados</div>
+                        </div>
+                    `;
+                    todosLosUsuarios = [];
+                    return;
+                }
+                
+                todosLosUsuarios = [];
+                snapshot.forEach((childSnapshot) => {
+                    const uid = childSnapshot.key;
+                    const userData = childSnapshot.val();
+                    todosLosUsuarios.push({ uid, ...userData });
+                });
+                
+                // Ordenar por nombre
+                todosLosUsuarios.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+                
+                renderizarUsuarios(todosLosUsuarios);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                usersList.innerHTML = `
+                    <div class="empty-state-modal">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>Error al cargar usuarios</div>
+                    </div>
+                `;
+            } finally {
+                loader.classList.remove('active');
+            }
+        }
+
+        // Renderizar lista de usuarios
+        function renderizarUsuarios(usuariosLista, esFiltrado = false) {
+            const usersList = document.getElementById('usersList');
+            const counterDisplay = document.getElementById('userCountDisplay');
+            const counterLabel = document.querySelector('.user-counter-label');
+            
+            // Actualizar contador
+            if (esFiltrado && usuariosLista.length !== todosLosUsuarios.length) {
+                counterDisplay.textContent = usuariosLista.length;
+                counterLabel.textContent = `de ${todosLosUsuarios.length} usuarios`;
+                counterDisplay.parentElement.style.background = '#fef3c7';
+                counterDisplay.parentElement.style.borderColor = '#fcd34d';
+                counterDisplay.style.color = '#92400e';
+                counterLabel.style.color = '#d97706';
+            } else {
+                counterDisplay.textContent = todosLosUsuarios.length;
+                counterLabel.textContent = todosLosUsuarios.length === 1 ? 'usuario' : 'usuarios';
+                counterDisplay.parentElement.style.background = '#eff6ff';
+                counterDisplay.parentElement.style.borderColor = '#bfdbfe';
+                counterDisplay.style.color = '#1e40af';
+                counterLabel.style.color = '#3b82f6';
+            }
+            
+            if (usuariosLista.length === 0) {
+                usersList.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <div>No se encontraron usuarios</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            usersList.innerHTML = usuariosLista.map(user => `
+                <div class="user-item" data-user-name="${(user.nombre || '').toLowerCase()}" data-user-rol="${(user.rol || '').toLowerCase()}">
+                    <div class="user-details">
+                        <h4>${user.nombre || 'Sin nombre'}</h4>
+                        <p>${user.email || 'Sin correo'}</p>
+                    </div>
+                    <div class="user-actions">
+                        <span class="role-badge ${user.rol}">${user.rol || 'Sin rol'}</span>
+                        <button class="btn-icon-modal edit" onclick='editarUsuario(${JSON.stringify(user).replace(/'/g, "&apos;")})'>
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Búsqueda de usuarios
+        document.getElementById('searchUsers').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            const clearBtn = document.getElementById('clearSearch');
+            
+            // Mostrar/ocultar botón de limpiar
+            clearBtn.style.display = searchTerm ? 'flex' : 'none';
+            
+            if (!searchTerm) {
+                renderizarUsuarios(todosLosUsuarios, false);
+                return;
+            }
+            
+            // Filtrar usuarios
+            const usuariosFiltrados = todosLosUsuarios.filter(user => {
+                const nombre = (user.nombre || '').toLowerCase();
+                const rol = (user.rol || '').toLowerCase();
+                const email = (user.email || '').toLowerCase();
+                
+                return nombre.includes(searchTerm) || 
+                       rol.includes(searchTerm) || 
+                       email.includes(searchTerm);
+            });
+            
+            renderizarUsuarios(usuariosFiltrados, true);
+        });
+
+        // Botón limpiar búsqueda
+        document.getElementById('clearSearch').addEventListener('click', function() {
+            document.getElementById('searchUsers').value = '';
+            this.style.display = 'none';
+            renderizarUsuarios(todosLosUsuarios, false);
+        });
+
+        window.editarUsuario = function(user) {
+            usuarioEditando = user;
+            document.getElementById('editNombre').value = user.nombre || '';
+            document.getElementById('editRol').value = user.rol || '';
+            document.getElementById('editEmail').value = user.email || '';
+            document.getElementById('editUserSection').style.display = 'block';
+            document.getElementById('editUserSection').scrollIntoView({ behavior: 'smooth' });
         };
+
+        function mostrarAlertaModal(tipo, mensaje, contexto) {
+            const alertId = tipo === 'success' ? `successAlert${contexto === 'create' ? 'Create' : 'Edit'}` : `errorAlert${contexto === 'create' ? 'Create' : 'Edit'}`;
+            const msgId = tipo === 'success' ? `successMsg${contexto === 'create' ? 'Create' : 'Edit'}` : `errorMsg${contexto === 'create' ? 'Create' : 'Edit'}`;
+            
+            const alert = document.getElementById(alertId);
+            const msgElement = document.getElementById(msgId);
+            
+            if (alert && msgElement) {
+                msgElement.textContent = mensaje;
+                alert.classList.add('show');
+                setTimeout(() => alert.classList.remove('show'), 4000);
+            }
+        }
 
         window.cerrarSesion = async function() {
             try {
@@ -1258,25 +2051,6 @@
                 console.error('Error:', error);
             }
         };
-
-        function mostrarAlerta(tipo, mensaje) {
-            const successAlert = document.getElementById('successAlert');
-            const errorAlert = document.getElementById('errorAlert');
-            
-            if (tipo === 'success') {
-                document.getElementById('successMsg').textContent = mensaje;
-                successAlert.classList.add('show');
-                setTimeout(() => successAlert.classList.remove('show'), 4000);
-            } else {
-                document.getElementById('errorMsg').textContent = mensaje;
-                errorAlert.classList.add('show');
-                setTimeout(() => errorAlert.classList.remove('show'), 4000);
-            }
-        }
     </script>
-    
-    <footer class="footer">
-        <p>© 2026 Desarrollado con <i class="fas fa-heart"></i> por <strong>Alex Rendon</strong>. Todos los derechos reservados.</p>
-    </footer>
 </body>
 </html>
