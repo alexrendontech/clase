@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Reprogramaciones</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="email-service.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #fafafa;
+            color: #2d3748;
+            line-height: 1.5;
+        }
+
+        .topbar {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand i {
+            color: #3b82f6;
+            font-size: 22px;
+        }
+
+        .brand h1 {
+            font-size: 19px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .logout-btn {
+            background: #f3f4f6;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #6b7280;
+            font-size: 13px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .logout-btn:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 28px 20px;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-header h2 {
+            font-size: 26px;
+            color: #111827;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .section-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: #3b82f6;
+            font-size: 19px;
+        }
+
+        .form-row {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #1f2937;
+            background: white;
+            transition: border 0.2s;
+        }
+
+        select:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 35px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+
+        .upload-area:hover {
+            border-color: #3b82f6;
+            background: #f0f9ff;
+        }
+
+        .upload-area.drag-over {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .upload-icon {
+            font-size: 38px;
+            color: #9ca3af;
+            margin-bottom: 12px;
+        }
+
+        .upload-area:hover .upload-icon {
+            color: #3b82f6;
+        }
+
+        .upload-text {
+            font-size: 15px;
+            color: #6b7280;
+            margin-bottom: 5px;
+        }
+
+        .upload-subtext {
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        .file-name {
+            display: none;
+            margin-top: 15px;
+            padding: 10px 14px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #166534;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-name.show {
+            display: flex;
+        }
+
+        .file-name i {
+            color: #16a34a;
+        }
+
+        .btn {
+            padding: 11px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-primary:disabled {
+            background: #93c5fd;
+            cursor: not-allowed;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert.show {
+            display: flex;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+        .reprog-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 14px;
+            transition: all 0.2s;
+            background: #fafafa;
+        }
+
+        .reprog-item:hover {
+            border-color: #cbd5e1;
+            background: white;
+        }
+
+        .reprog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .reprog-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .reprog-date {
+            font-size: 12px;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-answered {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .reprog-body {
+            padding-top: 12px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 13px;
+        }
+
+        .data-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .data-value {
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        .answer-box {
+            margin-top: 14px;
+            padding: 14px;
+            background: #eff6ff;
+            border-radius: 6px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .answer-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .answer-content {
+            font-size: 14px;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-icon {
+            font-size: 50px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 15px;
+            color: #6b7280;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .loader.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .download-btn {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            color: #374151;
+            padding: 7px 14px;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .download-btn:hover {
+            background: #e5e7eb;
+        }
+
+        @media (max-width: 768px) {
+            .topbar {
+                padding: 12px 16px;
+            }
+
+            .user-section {
+                gap: 12px;
+            }
+
+            .user-info {
+                display: none;
+            }
+
+            .container {
+                padding: 20px 16px;
+            }
+
+            .section {
+                padding: 18px;
+            }
+
+            .reprog-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="brand">
+            <i class="fas fa-calendar-alt"></i>
+            <h1>Reprogramaciones</h1>
+        </div>
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-name" id="userName">Cargando...</div>
+                <div class="user-role">Auxiliar de Seguimiento</div>
+            </div>
+            <button class="logout-btn" onclick="cerrarSesion()">
+                <i class="fas fa-sign-out-alt"></i>
+                Salir
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h2>Enviar Reprogramación</h2>
+            <p>Sube el archivo Excel con los datos para el supervisor</p>
+        </div>
+
+        <div class="alert alert-success" id="successAlert">
+            <i class="fas fa-check-circle"></i>
+            <span id="successMsg"></span>
+        </div>
+
+        <div class="alert alert-error" id="errorAlert">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="errorMsg"></span>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <i class="fas fa-cloud-upload-alt"></i>
+                Nueva Reprogramación
+            </div>
+
+            <form id="uploadForm">
+                <div class="form-row">
+                    <label for="supervisorSelect">Supervisor a quien enviar</label>
+                    <select id="supervisorSelect" required>
+                        <option value="">Selecciona un supervisor...</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label>Archivo Excel</label>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-file-excel"></i>
+                        </div>
+                        <div class="upload-text">Arrastra tu archivo aquí o haz clic</div>
+                        <div class="upload-subtext">Formatos: .xlsx, .xls (máx 5MB)</div>
+                        <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;" required>
+                    </div>
+                    <div class="file-name" id="fileName">
+                        <i class="fas fa-file-check"></i>
+                        <span id="fileNameText"></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <i class="fas fa-paper-plane"></i>
+                    Enviar Reprogramación
+                </button>
+            </form>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <i class="fas fa-history"></i>
+                Mis Reprogramaciones Enviadas
+            </div>
+
+            <div class="loader active" id="listLoader">
+                <div class="spinner"></div>
+                <div style="color: #9ca3af; font-size: 13px;">Cargando reprogramaciones...</div>
+            </div>
+
+            <div id="reprogList"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getDatabase, ref, push, set, onValue, onChildChanged, query, orderByChild, equalTo, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBDRqsZI8EQaGn1lCc4Y5rIcfmLE7969zY",
+            authDomain: "reprogramacionesme.firebaseapp.com",
+            databaseURL: "https://reprogramacionesme-default-rtdb.firebaseio.com",
+            projectId: "reprogramacionesme",
+            storageBucket: "reprogramacionesme.firebasestorage.app",
+            messagingSenderId: "674035461204",
+            appId: "1:674035461204:web:a70b7793f71ae1c5e311c1",
+            measurementId: "G-T4VJ4EQKNT"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let currentUser = null;
+        let userData = null;
+        let selectedFile = null;
+        let reprogramacionesActuales = new Map(); // Para rastrear cambios
+
+        // Solicitar permiso para notificaciones
+        if ('Notification' in window) {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    console.log('✅ Permiso de notificaciones concedido');
+                }
+            });
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                await cargarDatosUsuario();
+                await cargarSupervisores();
+                cargarReprogramaciones();
+                iniciarEscuchaCambios(); // Iniciar escucha de cambios en tiempo real
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        async function cargarDatosUsuario() {
+            const userRef = ref(db, `usuarios/${currentUser.uid}`);
+            const snapshot = await get(userRef);
+            if (snapshot.exists()) {
+                userData = snapshot.val();
+                document.getElementById('userName').textContent = userData.nombre;
+            }
+        }
+
+        async function cargarSupervisores() {
+            try {
+                console.log('📥 Cargando supervisores...');
+                
+                // Intentar cargar desde caché primero
+                const cacheKey = 'supervisores_cache';
+                const cached = localStorage.getItem(cacheKey);
+                const cacheTime = localStorage.getItem(cacheKey + '_time');
+                
+                let supervisores = null;
+                
+                // Usar caché si tiene menos de 5 minutos
+                if (cached && cacheTime && (Date.now() - parseInt(cacheTime)) < 300000) {
+                    console.log('✅ Usando caché de supervisores');
+                    supervisores = JSON.parse(cached);
+                } else {
+                    console.log('🔄 Consultando Firebase...');
+                    const usuariosRef = ref(db, 'usuarios');
+                    const snapshot = await get(usuariosRef);
+                    
+                    if (snapshot.exists()) {
+                        const usuarios = snapshot.val();
+                        supervisores = Object.entries(usuarios)
+                            .filter(([uid, data]) => data.rol === 'supervisor')
+                            .map(([uid, data]) => ({ uid, nombre: data.nombre }));
+                        
+                        // Guardar en caché
+                        localStorage.setItem(cacheKey, JSON.stringify(supervisores));
+                        localStorage.setItem(cacheKey + '_time', Date.now().toString());
+                        console.log('💾 Supervisores guardados en caché');
+                    }
+                }
+                
+                const select = document.getElementById('supervisorSelect');
+                select.innerHTML = '<option value="">Selecciona un supervisor...</option>';
+                
+                if (supervisores && supervisores.length > 0) {
+                    supervisores.forEach(sup => {
+                        const option = document.createElement('option');
+                        option.value = sup.uid;
+                        option.textContent = sup.nombre;
+                        select.appendChild(option);
+                    });
+                    console.log(`✅ ${supervisores.length} supervisores cargados`);
+                } else {
+                    console.warn('⚠️ No hay supervisores disponibles');
+                    mostrarAlerta('error', 'No hay supervisores disponibles');
+                }
+            } catch (error) {
+                console.error('❌ Error al cargar supervisores:', error);
+                mostrarAlerta('error', 'Error al cargar supervisores: ' + error.message);
+            }
+        }
+
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const fileNameText = document.getElementById('fileNameText');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelect(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        function handleFileSelect(file) {
+            if (file.size > 5 * 1024 * 1024) {
+                mostrarAlerta('error', 'El archivo es muy grande (máx 5MB)');
+                return;
+            }
+            selectedFile = file;
+            fileNameText.textContent = file.name;
+            fileName.classList.add('show');
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const supervisorId = document.getElementById('supervisorSelect').value;
+            if (!supervisorId || !selectedFile) {
+                mostrarAlerta('error', 'Completa todos los campos');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+            try {
+                console.log('📤 Procesando archivo Excel...');
+                const excelData = await leerExcel(selectedFile);
+                
+                if (excelData.length > 1000) {
+                    if (!confirm(`El archivo tiene ${excelData.length} filas. ¿Deseas continuar? (Puede tardar un poco)`)) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Reprogramación';
+                        return;
+                    }
+                }
+                
+                console.log('👤 Obteniendo datos del supervisor...');
+                const supervisorSnapshot = await get(ref(db, `usuarios/${supervisorId}`));
+                
+                if (!supervisorSnapshot.exists()) {
+                    throw new Error('Supervisor no encontrado');
+                }
+                
+                const supervisorData = supervisorSnapshot.val();
+                const mes = new Date().toISOString().slice(0, 7).replace('-', '');
+                const timestamp = new Date().toISOString();
+                
+                console.log('💾 Guardando en Firebase...');
+                const reprogRef = push(ref(db, `reprogramaciones/${mes}`));
+
+                // Estructura optimizada: metadata + datos
+                await set(reprogRef, {
+                    // Metadata (pequeña)
+                    auxiliarId: currentUser.uid,
+                    auxiliarNombre: userData.nombre,
+                    auxiliarEmail: userData.email || currentUser.email,
+                    supervisorId: supervisorId,
+                    supervisorNombre: supervisorData.nombre,
+                    supervisorEmail: supervisorData.email,
+                    fechaSubida: timestamp,
+                    estado: 'pendiente',
+                    archivoNombre: selectedFile.name,
+                    totalRegistros: excelData.length,
+                    
+                    // Datos Excel (grande)
+                    datosExcel: excelData
+                });
+
+                console.log('✅ Reprogramación guardada exitosamente');
+                mostrarAlerta('success', `✓ ¡Reprogramación enviada! (${excelData.length} registros)`);
+                
+                // 📧 Enviar correo al supervisor
+                try {
+                    await notificarSupervisorNuevaReprogramacion({
+                        supervisorEmail: supervisorData.email,
+                        supervisorNombre: supervisorData.nombre,
+                        auxiliarNombre: userData.nombre,
+                        archivoNombre: selectedFile.name,
+                        totalRegistros: excelData.length,
+                        fechaSubida: timestamp
+                    });
+                } catch (e) { console.warn('⚠️ Error email:', e); }
+                
+                // Limpiar caché de reprogramaciones para forzar recarga
+                localStorage.removeItem('reprogramaciones_' + currentUser.uid);
+                
+                document.getElementById('uploadForm').reset();
+                fileName.classList.remove('show');
+                selectedFile = null;
+                
+                // Recargar lista
+                setTimeout(() => cargarReprogramaciones(), 500);
+
+            } catch (error) {
+                console.error('❌ Error al enviar:', error);
+                let mensajeError = 'Error al enviar la reprogramación';
+                
+                if (error.message.includes('Faltan columnas')) {
+                    mensajeError = error.message + '. Verifica que el Excel tenga la estructura correcta.';
+                } else if (error.message.includes('vacío')) {
+                    mensajeError = 'El archivo Excel está vacío. Agrega datos e intenta de nuevo.';
+                } else if (error.code === 'PERMISSION_DENIED') {
+                    mensajeError = 'No tienes permisos para enviar reprogramaciones.';
+                } else {
+                    mensajeError += ': ' + error.message;
+                }
+                
+                mostrarAlerta('error', mensajeError);
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Reprogramación';
+        });
+
+        async function leerExcel(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array', cellDates: false });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                        
+                        // Validar que el archivo tenga datos
+                        if (!jsonData || jsonData.length === 0) {
+                            reject(new Error('El archivo Excel está vacío'));
+                            return;
+                        }
+                        
+                        // Columnas que vienen en el Excel original (13 columnas)
+                        const columnasRequeridas = [
+                            'AID PROMOTOR', 'ID PV', 'ID EMPRESA', 'N_DIA', 'FECHA', 
+                            'MINUTOS', 'HORAS', 'NOMBRE PROMOTOR', 'NOMBRE PUNTO DE VENTA', 
+                            'NOMBRE EMPRESA', 'CIUDAD PV', 'DEPARTAMENTO PV', 'ZONA'
+                        ];
+                        
+                        // Validar estructura (verificar primera fila)
+                        const primeraFila = jsonData[0];
+                        const columnasEncontradas = Object.keys(primeraFila);
+                        const columnasFaltantes = columnasRequeridas.filter(
+                            col => !columnasEncontradas.includes(col)
+                        );
+                        
+                        if (columnasFaltantes.length > 0) {
+                            const mensaje = `Faltan columnas requeridas: ${columnasFaltantes.join(', ')}`;
+                            console.error('❌ Validación fallida:', mensaje);
+                            reject(new Error(mensaje));
+                            return;
+                        }
+                        
+                        console.log('✅ Validación Excel: Estructura correcta');
+                        console.log(`📊 Total de filas: ${jsonData.length}`);
+                        
+                        // Agregar columnas que el supervisor llenará + convertir fechas
+                        const datosConvertidos = jsonData.map((row, index) => {
+                            const nuevaFila = {};
+                            
+                            // Copiar todas las columnas originales
+                            columnasRequeridas.forEach(col => {
+                                nuevaFila[col] = row[col] ?? '';
+                            });
+                            
+                            // Agregar columnas vacías para que el supervisor las complete
+                            nuevaFila['FECHA REPROGRAMACION'] = '';
+                            nuevaFila['OBSERVACION'] = '';
+                            
+                            // Convertir FECHA si es un número serial
+                            if (nuevaFila['FECHA'] && typeof nuevaFila['FECHA'] === 'number') {
+                                const fechaBase = new Date(1900, 0, 1);
+                                const dias = nuevaFila['FECHA'] - 2;
+                                const fecha = new Date(fechaBase.getTime() + dias * 24 * 60 * 60 * 1000);
+                                nuevaFila['FECHA'] = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`;
+                            }
+                            
+                            return nuevaFila;
+                        });
+                        
+                        console.log('✅ Excel procesado:', datosConvertidos.length, 'filas');
+                        console.log('📝 Primera fila:', datosConvertidos[0]);
+                        resolve(datosConvertidos);
+                    } catch (error) {
+                        console.error('❌ Error al procesar Excel:', error);
+                        reject(error);
+                    }
+                };
+                reader.onerror = (error) => {
+                    console.error('❌ Error al leer archivo:', error);
+                    reject(error);
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        async function cargarReprogramaciones() {
+            const reprogList = document.getElementById('reprogList');
+            const loader = document.getElementById('listLoader');
+            
+            try {
+                console.log('📥 Cargando reprogramaciones del auxiliar...');
+                const meses = obtenerUltimosMeses(3);
+                const todasLasReprogs = [];
+
+                // Cargar todos los meses en paralelo (más rápido)
+                const promesas = meses.map(async mes => {
+                    const reprogRef = ref(db, `reprogramaciones/${mes}`);
+                    const q = query(reprogRef, orderByChild('auxiliarId'), equalTo(currentUser.uid));
+                    const snapshot = await get(q);
+
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        return Object.entries(data).map(([id, reprog]) => ({ id, mes, ...reprog }));
+                    }
+                    return [];
+                });
+
+                const resultados = await Promise.all(promesas);
+                resultados.forEach(reprogs => todasLasReprogs.push(...reprogs));
+                
+                loader.classList.remove('active');
+                
+                // Ordenar por fecha más reciente
+                todasLasReprogs.sort((a, b) => new Date(b.fechaSubida) - new Date(a.fechaSubida));
+                
+                // Actualizar mapa de reprogramaciones actuales
+                reprogramacionesActuales.clear();
+                todasLasReprogs.forEach(reprog => {
+                    reprogramacionesActuales.set(reprog.id, reprog.estado);
+                });
+                
+                console.log(`✅ ${todasLasReprogs.length} reprogramaciones cargadas`);
+                
+                if (todasLasReprogs.length === 0) {
+                    reprogList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+                            <div class="empty-text">No has enviado reprogramaciones todavía</div>
+                        </div>
+                    `;
+                } else {
+                    // Renderizar solo las primeras 20 (paginación)
+                    const reprogsMostrar = todasLasReprogs.slice(0, 20);
+                    reprogList.innerHTML = reprogsMostrar.map(reprog => crearItemReprog(reprog)).join('');
+                    
+                    // Agregar botón "Ver más" si hay más
+                    if (todasLasReprogs.length > 20) {
+                        reprogList.innerHTML += `
+                            <div style="text-align: center; padding: 20px;">
+                                <button class="btn btn-primary" onclick="cargarMasReprogramaciones()">
+                                    <i class="fas fa-chevron-down"></i>
+                                    Ver más (${todasLasReprogs.length - 20} restantes)
+                                </button>
+                            </div>
+                        `;
+                        
+                        // Guardar las restantes en una variable global
+                        window.reprogramacionesRestantes = todasLasReprogs.slice(20);
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error al cargar reprogramaciones:', error);
+                loader.classList.remove('active');
+                reprogList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i></div>
+                        <div class="empty-text" style="color: #ef4444;">Error al cargar: ${error.message}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Función para iniciar escucha de cambios en tiempo real
+        function iniciarEscuchaCambios() {
+            console.log('👂 Iniciando escucha de cambios en reprogramaciones...');
+            const meses = obtenerUltimosMeses(3);
+            
+            meses.forEach(mes => {
+                const reprogRef = ref(db, `reprogramaciones/${mes}`);
+                const q = query(reprogRef, orderByChild('auxiliarId'), equalTo(currentUser.uid));
+                
+                onChildChanged(q, (snapshot) => {
+                    const reprogId = snapshot.key;
+                    const nuevaReprog = snapshot.val();
+                    
+                    if (nuevaReprog) {
+                        const estadoAnterior = reprogramacionesActuales.get(reprogId);
+                        const estadoNuevo = nuevaReprog.estado;
+                        
+                        // Si cambió de pendiente a respondida, notificar
+                        if (estadoAnterior === 'pendiente' && estadoNuevo === 'respondida') {
+                            mostrarNotificacionReprogramacion(nuevaReprog);
+                            // Actualizar el mapa
+                            reprogramacionesActuales.set(reprogId, estadoNuevo);
+                            // Recargar la lista para mostrar el cambio
+                            cargarReprogramaciones();
+                        }
+                    }
+                });
+            });
+        }
+
+        // Función para mostrar notificación de reprogramación completada
+        function mostrarNotificacionReprogramacion(reprog) {
+            // Reproducir sonido de notificación
+            reproducirSonidoNotificacion();
+            
+            if ('Notification' in window && Notification.permission === 'granted') {
+                const notification = new Notification('Reprogramación Completada', {
+                    body: `El supervisor ${reprog.supervisorNombre} ha completado la reprogramación "${reprog.archivoNombre}". Haz clic para ver los detalles.`,
+                    icon: '/favicon.ico', // Opcional: ícono de la notificación
+                    tag: `reprog-${reprog.id}`, // Evita notificaciones duplicadas
+                    requireInteraction: true // La notificación permanece hasta que el usuario interactúe
+                });
+                
+                // Al hacer clic en la notificación, enfocar la ventana
+                notification.onclick = function() {
+                    window.focus();
+                    notification.close();
+                };
+                
+                // Auto-cerrar después de 10 segundos si no se interactúa
+                setTimeout(() => {
+                    notification.close();
+                }, 10000);
+                
+                console.log('🔔 Notificación mostrada para reprogramación completada');
+            } else {
+                console.log('⚠️ Notificaciones no permitidas o no soportadas');
+            }
+        }
+
+        // Función para reproducir sonido de notificación
+        function reproducirSonidoNotificacion() {
+            try {
+                // Crear un audio context para generar un tono de notificación
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Crear tres tonos para un sonido de notificación agradable
+                const tiempos = [0, 0.15, 0.3];
+                const frecuencias = [587.33, 659.25, 783.99]; // Re, Mi, Sol
+                
+                tiempos.forEach((tiempo, index) => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.type = 'sine';
+                    oscillator.frequency.value = frecuencias[index];
+                    
+                    // Envelope ADSR para un sonido más suave
+                    const now = audioContext.currentTime + tiempo;
+                    gainNode.gain.setValueAtTime(0, now);
+                    gainNode.gain.linearRampToValueAtTime(0.3, now + 0.02);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    
+                    oscillator.start(now);
+                    oscillator.stop(now + 0.15);
+                });
+                
+                console.log('🔊 Sonido de notificación reproducido');
+            } catch (error) {
+                console.error('❌ Error al reproducir sonido:', error);
+            }
+        }
+        
+        window.cargarMasReprogramaciones = function() {
+            if (window.reprogramacionesRestantes && window.reprogramacionesRestantes.length > 0) {
+                const reprogList = document.getElementById('reprogList');
+                const siguiente20 = window.reprogramacionesRestantes.slice(0, 20);
+                
+                // Remover botón anterior
+                const ultimoElemento = reprogList.lastElementChild;
+                if (ultimoElemento && ultimoElemento.querySelector('button')) {
+                    ultimoElemento.remove();
+                }
+                
+                // Agregar siguientes 20
+                reprogList.innerHTML += siguiente20.map(reprog => crearItemReprog(reprog)).join('');
+                
+                // Actualizar restantes
+                window.reprogramacionesRestantes = window.reprogramacionesRestantes.slice(20);
+                
+                // Agregar botón si aún hay más
+                if (window.reprogramacionesRestantes.length > 0) {
+                    reprogList.innerHTML += `
+                        <div style="text-align: center; padding: 20px;">
+                            <button class="btn btn-primary" onclick="cargarMasReprogramaciones()">
+                                <i class="fas fa-chevron-down"></i>
+                                Ver más (${window.reprogramacionesRestantes.length} restantes)
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function crearItemReprog(reprog) {
+            const fecha = new Date(reprog.fechaSubida).toLocaleString('es-CO');
+            const estadoClass = reprog.estado === 'respondida' ? 'badge-answered' : 'badge-pending';
+            const estadoTexto = reprog.estado === 'respondida' ? 'Respondida' : 'Pendiente';
+            const estadoIcon = reprog.estado === 'respondida' ? 'fa-check-circle' : 'fa-clock';
+
+            let respuestaHTML = '';
+            if (reprog.estado === 'respondida') {
+                respuestaHTML = `
+                    <div class="answer-box">
+                        <div class="answer-label"><i class="fas fa-check-circle"></i> Reprogramación Completada</div>
+                        <div class="answer-content">
+                            <p style="margin-bottom: 10px; color: #065f46; font-weight: 500;">
+                                El supervisor ha completado todas las fechas y observaciones
+                            </p>
+                        </div>
+                        <button class="btn download-btn" onclick="descargarExcel('${reprog.id}')">
+                            <i class="fas fa-download"></i> Descargar Excel Completo
+                        </button>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="reprog-item">
+                    <div class="reprog-header">
+                        <div>
+                            <div class="reprog-title">Para: ${reprog.supervisorNombre}</div>
+                            <div class="reprog-date">
+                                <i class="far fa-calendar"></i>
+                                ${fecha}
+                            </div>
+                        </div>
+                        <span class="status-badge ${estadoClass}">
+                            <i class="fas ${estadoIcon}"></i> ${estadoTexto}
+                        </span>
+                    </div>
+                    <div class="reprog-body">
+                        <div class="data-row">
+                            <span class="data-label">Archivo:</span>
+                            <span class="data-value">${reprog.archivoNombre || 'archivo.xlsx'}</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Registros:</span>
+                            <span class="data-value">${reprog.datosExcel?.length || 0} filas</span>
+                        </div>
+                        ${respuestaHTML}
+                    </div>
+                </div>
+            `;
+        }
+
+        function obtenerUltimosMeses(cantidad) {
+            const meses = [];
+            const ahora = new Date();
+            for (let i = 0; i < cantidad; i++) {
+                const fecha = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1);
+                const mes = fecha.toISOString().slice(0, 7).replace('-', '');
+                meses.push(mes);
+            }
+            return meses;
+        }
+
+        window.descargarExcel = async function(reprogId) {
+            try {
+                const meses = obtenerUltimosMeses(3);
+                let reprogData = null;
+
+                for (const mes of meses) {
+                    const snapshot = await get(ref(db, `reprogramaciones/${mes}/${reprogId}`));
+                    if (snapshot.exists()) {
+                        reprogData = snapshot.val();
+                        break;
+                    }
+                }
+
+                if (!reprogData || !reprogData.datosExcel) {
+                    mostrarAlerta('error', 'No se encontraron datos');
+                    return;
+                }
+
+                // Crear workbook manualmente para mantener el formato exacto
+                const wb = XLSX.utils.book_new();
+                
+                // Definir el orden exacto de las columnas
+                const columnas = [
+                    'FECHA REPROGRAMACION',
+                    'OBSERVACION',
+                    'AID PROMOTOR',
+                    'ID PV',
+                    'ID EMPRESA',
+                    'N_DIA',
+                    'FECHA',
+                    'MINUTOS',
+                    'HORAS',
+                    'NOMBRE PROMOTOR',
+                    'NOMBRE PUNTO DE VENTA',
+                    'NOMBRE EMPRESA',
+                    'CIUDAD PV',
+                    'DEPARTAMENTO PV',
+                    'ZONA'
+                ];
+                
+                // Crear array de arrays (no objetos) para mantener el orden y formato
+                const datos = [columnas]; // Primera fila: encabezados
+                
+                reprogData.datosExcel.forEach(row => {
+                    const fila = columnas.map(col => {
+                        const valor = row[col];
+                        // Si es undefined o null, retornar string vacío
+                        if (valor === undefined || valor === null) return '';
+                        // Retornar el valor tal cual
+                        return valor;
+                    });
+                    datos.push(fila);
+                });
+                
+                const ws = XLSX.utils.aoa_to_sheet(datos);
+                
+                // Ajustar anchos de columnas
+                const colWidths = [
+                    { wch: 18 }, // FECHA REPROGRAMACION
+                    { wch: 30 }, // OBSERVACION
+                    { wch: 12 }, // AID PROMOTOR
+                    { wch: 10 }, // ID PV
+                    { wch: 12 }, // ID EMPRESA
+                    { wch: 8 },  // N_DIA
+                    { wch: 12 }, // FECHA
+                    { wch: 10 }, // MINUTOS
+                    { wch: 8 },  // HORAS
+                    { wch: 30 }, // NOMBRE PROMOTOR
+                    { wch: 35 }, // NOMBRE PUNTO DE VENTA
+                    { wch: 35 }, // NOMBRE EMPRESA
+                    { wch: 15 }, // CIUDAD PV
+                    { wch: 15 }, // DEPARTAMENTO PV
+                    { wch: 12 }  // ZONA
+                ];
+                ws['!cols'] = colWidths;
+                
+                XLSX.utils.book_append_sheet(wb, ws, 'Reprogramación');
+                
+                const nombreArchivo = `reprogramacion_${reprogData.supervisorNombre.replace(/ /g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+                XLSX.writeFile(wb, nombreArchivo);
+
+                mostrarAlerta('success', 'Excel descargado correctamente');
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarAlerta('error', 'Error al descargar: ' + error.message);
+            }
+        };
+
+        window.cerrarSesion = async function() {
+            try {
+                await signOut(auth);
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        };
+
+        function mostrarAlerta(tipo, mensaje) {
+            const successAlert = document.getElementById('successAlert');
+            const errorAlert = document.getElementById('errorAlert');
+            
+            if (tipo === 'success') {
+                document.getElementById('successMsg').textContent = mensaje;
+                successAlert.classList.add('show');
+                setTimeout(() => successAlert.classList.remove('show'), 4000);
+            } else {
+                document.getElementById('errorMsg').textContent = mensaje;
+                errorAlert.classList.add('show');
+                setTimeout(() => errorAlert.classList.remove('show'), 4000);
+            }
+        }
+    </script>
+</body>
+</html>
