@@ -348,7 +348,7 @@
             background: var(--bg-secondary);
             border-radius: 12px;
             padding: 16px;
-            padding-bottom: 24px;
+            padding-bottom: 32px;
             margin-bottom: 24px;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border);
@@ -358,6 +358,7 @@
             z-index: 1;
             transform: translateZ(0);
             -webkit-transform: translateZ(0);
+            overflow: visible !important;
         }
 
         .reprog-card:active {
@@ -522,7 +523,7 @@
             gap: 10px;
             margin-top: 16px;
             padding-top: 16px;
-            padding-bottom: 0;
+            padding-bottom: 8px; /* Added padding to prevent bottom clipping */
             border-top: 1px solid var(--border);
             position: relative;
             z-index: 1000;
