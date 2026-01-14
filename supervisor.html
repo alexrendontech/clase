@@ -1400,7 +1400,15 @@
                 actualizarContadorOffline(resta.length);
 
                 const reprogActual = todasReprogramaciones.find(r => r.id === id);
+                console.log('📧 Verificando email auxiliar:', {
+                    tiene_reprogActual: !!reprogActual,
+                    tiene_auxiliarEmail: !!reprogActual?.auxiliarEmail,
+                    auxiliarEmail: reprogActual?.auxiliarEmail,
+                    auxiliarNombre: reprogActual?.auxiliarNombre
+                });
+                
                 if (reprogActual && reprogActual.auxiliarEmail) {
+                    console.log('📤 Enviando correo a auxiliar...');
                     await notificarAuxiliarReprogramacionCompletada({
                         auxiliarEmail: reprogActual.auxiliarEmail,
                         auxiliarNombre: reprogActual.auxiliarNombre,
@@ -1409,6 +1417,9 @@
                         totalRegistros: datos.length,
                         fechaRespuesta: fechaRespuesta
                     });
+                    console.log('✅ Correo enviado a auxiliar');
+                } else {
+                    console.warn('⚠️ No se puede enviar correo: auxiliarEmail no disponible');
                 }
 
                 mostrarAlerta('success', '✓ Guardado y sincronizado');
