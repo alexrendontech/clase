@@ -355,6 +355,51 @@
             z-index: 1;
         }
 
+        /* 📋 Estilos para REPROGRAMACIONES (azul) */
+        .reprog-card.tipo-reprogramaciones {
+            border-left: 5px solid #3b82f6;
+            background: linear-gradient(to right, #eff6ff 0%, var(--bg-secondary) 15%);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+        }
+
+        .reprog-card.tipo-reprogramaciones:hover {
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+            border-left-color: #2563eb;
+        }
+
+        .reprog-card.tipo-reprogramaciones .status-badge {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            color: #1e40af;
+        }
+
+        /* ⏰ Estilos para PENDIENTES (naranja) */
+        .reprog-card.tipo-pendientes {
+            border-left: 5px solid #f59e0b;
+            background: linear-gradient(to right, #fffbeb 0%, var(--bg-secondary) 15%);
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1);
+        }
+
+        .reprog-card.tipo-pendientes:hover {
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.2);
+            border-left-color: #d97706;
+        }
+
+        .reprog-card.tipo-pendientes .status-badge {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+        }
+
+        /* Encabezados de tabla según tipo */
+        .reprog-card.tipo-reprogramaciones .table-responsive th {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+
+        .reprog-card.tipo-pendientes .table-responsive th {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
         .reprog-card:active {
             box-shadow: var(--shadow-md);
         }
@@ -825,6 +870,109 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Tabs */
+        .tabs-container {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .tabs-header {
+            display: flex;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 16px 12px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+        }
+
+        /* Pestaña de REPROGRAMACIONES (azul) */
+        .tab-btn[data-tab="reprogramaciones"] {
+            color: #3b82f6;
+        }
+
+        .tab-btn[data-tab="reprogramaciones"].active {
+            color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .tab-btn[data-tab="reprogramaciones"].active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #3b82f6;
+        }
+
+        /* Pestaña de PENDIENTES (naranja) */
+        .tab-btn[data-tab="pendientes"] {
+            color: #f59e0b;
+        }
+
+        .tab-btn[data-tab="pendientes"].active {
+            color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .tab-btn[data-tab="pendientes"].active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #f59e0b;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            background: var(--bg-secondary);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: var(--text-primary);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .tabs-content {
+            padding: 20px;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -853,6 +1001,13 @@
 
     <div class="header-stats">
         <div class="stat-card pending">
+            <i class="fas fa-clipboard-list"></i>
+            <div class="stat-label">
+                <span class="stat-number" id="reprogCount">0</span>
+                <span>Reprogramaciones</span>
+            </div>
+        </div>
+        <div class="stat-card warning">
             <i class="fas fa-clock"></i>
             <div class="stat-label">
                 <span class="stat-number" id="pendingCount">0</span>
@@ -923,7 +1078,38 @@
         </div>
 
         <!-- Content -->
-        <div id="reprogContainer"></div>
+        <div class="tabs-container">
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="reprogramaciones">
+                    <i class="fas fa-clipboard-list"></i>
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1.3;">
+                        <span style="font-size: 14px; font-weight: 700;">
+                            📋 Reprogramaciones 
+                            <span id="reprogBadge" style="display:inline-block;background:#3b82f6;color:white;border-radius:12px;padding:2px 8px;font-size:11px;margin-left:6px;">0</span>
+                        </span>
+                        <span style="font-size: 11px; opacity: 0.8; font-weight: 500;">Visitas a reprogramar</span>
+                    </div>
+                </button>
+                <button class="tab-btn" data-tab="pendientes">
+                    <i class="fas fa-clock"></i>
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1.3;">
+                        <span style="font-size: 14px; font-weight: 700;">
+                            ⏰ Pendientes 
+                            <span id="pendientesBadge" style="display:inline-block;background:#f59e0b;color:white;border-radius:12px;padding:2px 8px;font-size:11px;margin-left:6px;">0</span>
+                        </span>
+                        <span style="font-size: 11px; opacity: 0.8; font-weight: 500;">Tareas pendientes</span>
+                    </div>
+                </button>
+            </div>
+            <div class="tabs-content">
+                <div class="tab-pane active" id="reprogramaciones-tab">
+                    <div id="reprogContainer"></div>
+                </div>
+                <div class="tab-pane" id="pendientes-tab">
+                    <div id="pendientesContainer"></div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -1123,6 +1309,67 @@
         }
     }
 
+    // Cache de zonas para evitar consultas repetidas
+    let zonasCache = null;
+    let zonasCacheTime = 0;
+    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
+
+    async function obtenerTodasLasAuxiliares() {
+        // Obtener todos los usuarios auxiliares
+        const usuariosRef = ref(db, 'usuarios');
+        const snapshot = await get(usuariosRef);
+
+        if (!snapshot.exists()) {
+            return [];
+        }
+
+        const usuarios = snapshot.val();
+        const auxiliares = [];
+
+        for (const [uid, data] of Object.entries(usuarios)) {
+            if (data.rol === 'auxiliar') {
+                auxiliares.push({
+                    uid: uid,
+                    nombre: data.nombre,
+                    email: data.email
+                });
+            }
+        }
+
+        return auxiliares;
+    }
+
+    async function obtenerSupervisoresZona(zona) {
+        try {
+            // Verificar si tenemos datos en cache válidos
+            const ahora = Date.now();
+            if (!zonasCache || (ahora - zonasCacheTime) > CACHE_DURATION) {
+                console.log('📥 Consultando configuración de zonas desde Firebase...');
+                const zonasRef = ref(db, 'zonas');
+                const snapshot = await get(zonasRef);
+
+                if (snapshot.exists()) {
+                    zonasCache = snapshot.val();
+                    zonasCacheTime = ahora;
+                    console.log('✅ Zonas cargadas desde Firebase');
+                } else {
+                    console.warn('⚠️ No se encontró configuración de zonas en Firebase');
+                    return [];
+                }
+            } else {
+                console.log('✅ Usando zonas desde cache');
+            }
+
+            // Retornar supervisores de la zona solicitada
+            const zonaData = zonasCache[zona];
+            return zonaData ? zonaData.supervisores || [] : [];
+
+        } catch (error) {
+            console.error('❌ Error al obtener supervisores de zona:', error);
+            return [];
+        }
+    }
+
     const offlineStorage = new OfflineStorage();
     let isOnline = navigator.onLine;
     let currentUser = null;
@@ -1209,9 +1456,28 @@
         }
     }
 
+    let tabActiva = 'reprogramaciones'; // Trackear pestaña activa
+
+    // Inicializar pestañas
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabName = btn.dataset.tab;
+            tabActiva = tabName; // Actualizar pestaña activa
+            
+            // Cambiar clase active
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            
+            btn.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        });
+    });
+
     async function cargarReprogramaciones() {
         const loader = document.getElementById('loader');
         try {
+            console.log('📥 Cargando reprogramaciones para supervisor:', currentUser.uid);
+            
             const cached = await offlineStorage.obtenerReprogramaciones();
             if (cached.length > 0) {
                 todasReprogramaciones = cached;
@@ -1222,21 +1488,48 @@
 
             if (isOnline) {
                 const meses = obtenerUltimosMeses(3);
+                console.log('📅 Buscando en meses:', meses);
+                console.log('📧 Email del supervisor actual:', currentUser.email);
+                
                 const promesas = meses.map(async mes => {
                     const reprogRef = ref(db, `reprogramaciones/${mes}`);
                     const snapshot = await get(reprogRef);
                     if (snapshot.exists()) {
                         const data = snapshot.val();
-                        return Object.entries(data)
-                            .filter(([, reprog]) => reprog.supervisorId === currentUser.uid)
+                        console.log(`📊 Datos encontrados en ${mes}:`, Object.keys(data).length, 'reprogramaciones');
+                        
+                        const filtradas = Object.entries(data)
+                            .filter(([id, reprog]) => {
+                                // Buscar por email en lugar de por UID
+                                const supervisoresEmails = reprog.supervisoresZona?.map(s => s.email) || [];
+                                const coincide = supervisoresEmails.includes(currentUser.email);
+                                
+                                console.log(`🔍 Reprog ${id}:`, {
+                                    zona: reprog.zona,
+                                    auxiliar: reprog.auxiliarNombre,
+                                    supervisoresEmails: JSON.stringify(supervisoresEmails),
+                                    supervisorActualEmail: currentUser.email,
+                                    coincide: coincide
+                                });
+                                
+                                return reprog.supervisoresZona && 
+                                       reprog.supervisoresZona.some(sup => sup.email === currentUser.email);
+                            })
                             .map(([id, reprog]) => ({ id, mes, ...reprog }));
+                        
+                        console.log(`✅ Reprogramaciones filtradas para este supervisor en ${mes}:`, filtradas.length);
+                        return filtradas;
                     }
+                    console.log(`⚠️ No hay datos en ${mes}`);
                     return [];
                 });
 
                 const resultados = await Promise.all(promesas);
                 todasReprogramaciones = resultados.flat()
                     .sort((a, b) => new Date(b.fechaSubida) - new Date(a.fechaSubida));
+
+                console.log('🎯 Total de reprogramaciones cargadas:', todasReprogramaciones.length);
+                console.log('📋 Reprogramaciones:', todasReprogramaciones);
 
                 await offlineStorage.guardarReprogramaciones(todasReprogramaciones);
                 loader.classList.remove('active');
@@ -1259,42 +1552,52 @@
 
         meses.forEach(mes => {
             const reprogRef = ref(db, `reprogramaciones/${mes}`);
-            const q = query(reprogRef, orderByChild('supervisorId'), equalTo(currentUser.uid));
-
-            // Escuchar NUEVAS reprogramaciones
-            onChildAdded(q, (snapshot) => {
+            
+            // NO usar query con supervisorId - ese campo no existe
+            // En su lugar, escuchar TODOS los cambios y filtrar localmente
+            onChildAdded(reprogRef, (snapshot) => {
                 if (primeraCargar) return;
 
                 const reprogId = snapshot.key;
                 const nuevaReprog = snapshot.val();
 
-                if (nuevaReprog && !reprogramacionesIds.has(reprogId)) {
-                    console.log('🔔 Nueva reprogramación:', reprogId);
-                    reprogramacionesIds.add(reprogId);
-                    const reprogConMes = { id: reprogId, mes, ...nuevaReprog };
-                    todasReprogramaciones.unshift(reprogConMes);
-                    offlineStorage.guardarReprogramaciones(todasReprogramaciones);
-                    actualizarEstadisticas();
-                    if (tabActual === 'pendientes' || tabActual === 'todas') {
+                // ✅ Validar que el email del supervisor actual esté en supervisoresZona
+                if (nuevaReprog && nuevaReprog.supervisoresZona) {
+                    const pertenece = nuevaReprog.supervisoresZona.some(sup => sup.email === currentUser.email);
+                    
+                    if (pertenece && !reprogramacionesIds.has(reprogId)) {
+                        console.log('🔔 Nueva reprogramación para este supervisor:', reprogId);
+                        reprogramacionesIds.add(reprogId);
+                        const reprogConMes = { id: reprogId, mes, ...nuevaReprog };
+                        todasReprogramaciones.unshift(reprogConMes);
+                        offlineStorage.guardarReprogramaciones(todasReprogramaciones);
+                        actualizarEstadisticas();
                         mostrarReprogramaciones();
+                        mostrarNotificacionNuevaReprogramacion(nuevaReprog);
                     }
-                    mostrarNotificacionNuevaReprogramacion(nuevaReprog);
                 }
             });
 
-            // Escuchar CAMBIOS en reprogramaciones existentes
-            onChildChanged(q, (snapshot) => {
+            // Escuchar cambios
+            onChildChanged(reprogRef, (snapshot) => {
                 const reprogId = snapshot.key;
                 const reprogActualizada = snapshot.val();
 
-                const index = todasReprogramaciones.findIndex(r => r.id === reprogId);
-                if (index !== -1) {
-                    console.log('🔄 Reprogramación actualizada:', reprogId);
-                    todasReprogramaciones[index] = { id: reprogId, mes, ...reprogActualizada };
-                    offlineStorage.guardarReprogramaciones(todasReprogramaciones);
-                    actualizarEstadisticas();
-                    mostrarReprogramaciones();
-                    mostrarAlerta('warning', `⚠️ Cambio detectado en reprogramación de ${reprogActualizada.auxiliarNombre}`);
+                // ✅ Validar que el email del supervisor actual esté en supervisoresZona
+                if (reprogActualizada && reprogActualizada.supervisoresZona) {
+                    const pertenece = reprogActualizada.supervisoresZona.some(sup => sup.email === currentUser.email);
+                    
+                    if (pertenece) {
+                        const index = todasReprogramaciones.findIndex(r => r.id === reprogId);
+                        if (index !== -1) {
+                            console.log('📄 Reprogramación actualizada:', reprogId);
+                            todasReprogramaciones[index] = { id: reprogId, mes, ...reprogActualizada };
+                            offlineStorage.guardarReprogramaciones(todasReprogramaciones);
+                            actualizarEstadisticas();
+                            mostrarReprogramaciones();
+                            mostrarAlerta('warning', `⚠️ Cambio detectado en reprogramación de ${reprogActualizada.auxiliarNombre}`);
+                        }
+                    }
                 }
             });
         });
@@ -1390,37 +1693,95 @@
     }
 
     function actualizarEstadisticas() {
-        const pendientes = todasReprogramaciones.filter(r => r.estado === 'pendiente').length;
+        const reprogramaciones = todasReprogramaciones.filter(r => r.datosReprogramacion && r.datosReprogramacion.length > 0).length;
+        const pendientes = todasReprogramaciones.filter(r => r.datosPendientes && r.datosPendientes.length > 0).length;
+        const totalPendientes = reprogramaciones + pendientes;
+        
+        document.getElementById('reprogCount').textContent = reprogramaciones;
         document.getElementById('pendingCount').textContent = pendientes;
-        document.getElementById('pendingBadge').textContent = pendientes;
+        
+        // Actualizar badges en las pestañas
+        if (document.getElementById('reprogBadge')) {
+            document.getElementById('reprogBadge').textContent = reprogramaciones;
+        }
+        if (document.getElementById('pendientesBadge')) {
+            document.getElementById('pendientesBadge').textContent = pendientes;
+        }
+        if (document.getElementById('pendingBadge')) {
+            document.getElementById('pendingBadge').textContent = totalPendientes;
+        }
     }
 
     function mostrarReprogramaciones() {
-        let filtradas = todasReprogramaciones;
-        if (tabActual === 'pendientes') {
-            filtradas = todasReprogramaciones.filter(r => r.estado === 'pendiente');
-        } else if (tabActual === 'respondidas') {
-            filtradas = todasReprogramaciones.filter(r => r.estado === 'respondida');
-        }
+        console.log('📋 Mostrando reprogramaciones. Tab actual:', tabActual);
+        console.log('📊 Total de reprogramaciones:', todasReprogramaciones.length);
+        
+        // Mostrar reprogramaciones en la primera pestaña
+        const reprogramaciones = todasReprogramaciones.filter(r => {
+            const tiene = r.datosReprogramacion && Array.isArray(r.datosReprogramacion) && r.datosReprogramacion.length > 0;
+            console.log(`  - ${r.id}: tiene datosReprogramacion = ${tiene}`);
+            return tiene;
+        });
 
-        const container = document.getElementById('reprogContainer');
-        if (filtradas.length === 0) {
-            container.innerHTML = `
+        console.log('✅ Reprogramaciones a mostrar:', reprogramaciones.length);
+
+        const containerReprog = document.getElementById('reprogContainer');
+        if (reprogramaciones.length === 0) {
+            containerReprog.innerHTML = `
                 <div class="empty-state fade-in">
-                    <div class="empty-icon"><i class="fas fa-inbox"></i></div>
-                    <div class="empty-text">No hay reprogramaciones</div>
+                    <div class="empty-icon" style="color:#3b82f6;"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="empty-text" style="color:#3b82f6;font-weight:600;">No hay reprogramaciones asignadas</div>
+                    <p style="font-size:13px;color:#64748b;margin-top:8px;">Las visitas que necesitan ser reprogramadas aparecerán aquí</p>
                 </div>
             `;
         } else {
-            container.innerHTML = filtradas.map(reprog => crearCardReprog(reprog)).join('');
+            containerReprog.innerHTML = reprogramaciones
+                .map(reprog => crearCardReprog(reprog, 'reprogramaciones'))
+                .join('');
+        }
+
+        // Mostrar pendientes en la segunda pestaña
+        const pendientes = todasReprogramaciones.filter(r => {
+            const tiene = r.datosPendientes && Array.isArray(r.datosPendientes) && r.datosPendientes.length > 0;
+            console.log(`  - ${r.id}: tiene datosPendientes = ${tiene}`);
+            return tiene;
+        });
+
+        console.log('✅ Pendientes a mostrar:', pendientes.length);
+
+        const containerPendientes = document.getElementById('pendientesContainer');
+        if (pendientes.length === 0) {
+            containerPendientes.innerHTML = `
+                <div class="empty-state fade-in">
+                    <div class="empty-icon" style="color:#f59e0b;"><i class="fas fa-clock"></i></div>
+                    <div class="empty-text" style="color:#f59e0b;font-weight:600;">No hay pendientes asignadas</div>
+                    <p style="font-size:13px;color:#64748b;margin-top:8px;">Las tareas pendientes por completar aparecerán aquí</p>
+                </div>
+            `;
+        } else {
+            containerPendientes.innerHTML = pendientes
+                .map(reprog => crearCardReprog(reprog, 'pendientes'))
+                .join('');
         }
     }
 
-    function crearCardReprog(reprog) {
+    function crearCardReprog(reprog, tipo) {
         const fecha = new Date(reprog.fechaSubida).toLocaleDateString('es-CO');
         const estadoClass = reprog.estado === 'respondida' ? 'badge-answered' : 'badge-pending';
         const estadoTexto = reprog.estado === 'respondida' ? 'Respondida' : 'Pendiente';
-        const datosExcel = reprog.datosExcel || [];
+        
+        // ✅ Validar que existan los datos antes de acceder
+        const datosExcel = tipo === 'reprogramaciones' ? 
+            (reprog.datosReprogramacion || []) : 
+            (reprog.datosPendientes || []);
+
+        console.log(`📊 Creando card para ${tipo}:`, {
+            reprogId: reprog.id,
+            tieneReprogramacion: !!reprog.datosReprogramacion,
+            tienePendientes: !!reprog.datosPendientes,
+            datosAMostrar: datosExcel.length,
+            estado: reprog.estado
+        });
 
         if (!datosEditados[reprog.id] && reprog.estado === 'pendiente') {
             datosEditados[reprog.id] = datosExcel.map(row => {
@@ -1433,18 +1794,22 @@
 
         let tableHTML = '';
         if (reprog.estado === 'pendiente' && datosExcel.length > 0) {
+            // ✅ Extraer todas las columnas del Excel (estructura dinámica)
             const todasLasColumnas = new Set();
             datosExcel.forEach(row => {
-                Object.keys(row).forEach(col => todasLasColumnas.add(col));
+                if (row && typeof row === 'object') {
+                    Object.keys(row).forEach(col => todasLasColumnas.add(col));
+                }
             });
 
-            const columnasOrdenadas = [
-                'FECHA REPROGRAMACION',
-                'OBSERVACION',
-                ...Array.from(todasLasColumnas).filter(col =>
-                    col !== 'FECHA REPROGRAMACION' && col !== 'OBSERVACION'
-                )
-            ];
+            // ✅ Ordenar columnas: editar primero, luego el resto
+            const columnasEditar = ['FECHA REPROGRAMACION', 'OBSERVACION'];
+            const columnasRestantes = Array.from(todasLasColumnas).filter(
+                col => !columnasEditar.includes(col)
+            );
+            const columnasOrdenadas = [...columnasEditar, ...columnasRestantes];
+
+            console.log('📑 Columnas en el Excel:', columnasOrdenadas);
 
             tableHTML = `
                 <div class="info-box">
@@ -1499,10 +1864,13 @@
         }
 
         return `
-            <div class="reprog-card fade-in">
+            <div class="reprog-card tipo-${tipo} fade-in">
                 <div class="card-header">
                     <div>
-                        <div class="card-title">De: ${reprog.auxiliarNombre}</div>
+                        <div class="card-title">
+                            ${tipo === 'reprogramaciones' ? '📋' : '⏰'} De: ${reprog.auxiliarNombre}
+                            <span style="display:inline-block;margin-left:10px;font-size:11px;padding:3px 8px;border-radius:12px;font-weight:600;${tipo === 'reprogramaciones' ? 'background:#dbeafe;color:#1e40af;' : 'background:#fef3c7;color:#92400e;'}">${tipo === 'reprogramaciones' ? 'REPROGRAMACIÓN' : 'PENDIENTE'}</span>
+                        </div>
                         <div class="card-meta">
                             <span><i class="far fa-calendar"></i>${fecha}</span>
                             <span><i class="fas fa-list-ol"></i>${datosExcel.length} registros</span>
@@ -1559,11 +1927,19 @@
             if (isOnline) {
                 const reprogRef = ref(db, `reprogramaciones/${mes}/${id}`);
                 const fechaRespuesta = new Date().toISOString();
-                await update(reprogRef, {
+                const updateData = {
                     estado: 'respondida',
-                    datosExcel: datos,
                     fechaRespuesta: fechaRespuesta
-                });
+                };
+                
+                // Actualizar el campo correspondiente según la pestaña
+                if (tabActiva === 'reprogramaciones') {
+                    updateData.datosReprogramacion = datos;
+                } else if (tabActiva === 'pendientes') {
+                    updateData.datosPendientes = datos;
+                }
+                
+                await update(reprogRef, updateData);
                 await offlineStorage.marcarCambioSincronizado(pendientes[0]?.timestamp);
                 const resta = await offlineStorage.obtenerCambiosPendientes();
                 actualizarContadorOffline(resta.length);
@@ -1576,19 +1952,28 @@
                     auxiliarNombre: reprogActual?.auxiliarNombre
                 });
                 
-                if (reprogActual && reprogActual.auxiliarEmail) {
-                    console.log('📤 Enviando correo a auxiliar...');
-                    await notificarAuxiliarReprogramacionCompletada({
-                        auxiliarEmail: reprogActual.auxiliarEmail,
-                        auxiliarNombre: reprogActual.auxiliarNombre,
-                        supervisorNombre: userData?.nombre || currentUser.displayName || 'Supervisor',
-                        archivoNombre: reprogActual.archivoNombre,
-                        totalRegistros: datos.length,
-                        fechaRespuesta: fechaRespuesta
-                    });
-                    console.log('✅ Correo enviado a auxiliar');
-                } else {
-                    console.warn('⚠️ No se puede enviar correo: auxiliarEmail no disponible');
+                // 📧 Enviar notificación a TODAS las auxiliares
+                try {
+                    console.log('📤 Enviando notificación a todas las auxiliares...');
+                    const auxiliares = await obtenerTodasLasAuxiliares();
+                    const emailsAuxiliares = auxiliares.map(auxiliar => auxiliar.email);
+
+                    if (emailsAuxiliares.length > 0) {
+                        await notificarAuxiliarReprogramacionCompletada({
+                            auxiliarEmail: emailsAuxiliares, // Array de emails
+                            auxiliarNombre: 'Todas las Auxiliares',
+                            supervisorNombre: userData?.nombre || currentUser.displayName || 'Supervisor',
+                            zona: reprogActual?.zona || 'N/A',
+                            archivoNombre: reprogActual?.archivoNombre || 'archivo.xlsx',
+                            totalRegistros: tabActiva === 'reprogramaciones' ?
+                                (reprogActual?.totalRegistrosReprogramacion || 0) :
+                                (reprogActual?.totalRegistrosPendientes || 0),
+                            fechaRespuesta: fechaRespuesta
+                        });
+                        console.log('✅ Notificación enviada a todas las auxiliares');
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Error enviando notificación a auxiliares:', e);
                 }
 
                 mostrarAlerta('success', '✓ Guardado y sincronizado');
@@ -1601,7 +1986,12 @@
             const index = todasReprogramaciones.findIndex(r => r.id === id);
             if (index !== -1) {
                 todasReprogramaciones[index].estado = 'respondida';
-                todasReprogramaciones[index].datosExcel = datos;
+                // Actualizar el campo correspondiente
+                if (tabActiva === 'reprogramaciones') {
+                    todasReprogramaciones[index].datosReprogramacion = datos;
+                } else if (tabActiva === 'pendientes') {
+                    todasReprogramaciones[index].datosPendientes = datos;
+                }
                 todasReprogramaciones[index].fechaRespuesta = new Date().toISOString();
             }
 
