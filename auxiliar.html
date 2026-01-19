@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Reprogramaciones</title>
+    <title>Sistema de Reprogramaciones</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="email-service.js"></script>
     <style>
@@ -494,8 +494,8 @@
 
     <div class="container">
         <div class="page-header">
-            <h2>Enviar Reprogramación</h2>
-            <p>Sube el archivo Excel con los datos para el supervisor</p>
+            <h2>📋 Reprogramaciones / Pendientes</h2>
+            <p>Sube el archivo Excel con las hojas "Reprogramaciones" y "Pendientes" para el supervisor</p>
         </div>
 
         <div class="alert alert-success" id="successAlert">
@@ -511,14 +511,19 @@
         <div class="section">
             <div class="section-title">
                 <i class="fas fa-cloud-upload-alt"></i>
-                Nueva Reprogramación
-            </div>
-
+                    Cargar Reprogramaciones/Pendientes
             <form id="uploadForm">
                 <div class="form-row">
-                    <label for="supervisorSelect">Supervisor a quien enviar</label>
-                    <select id="supervisorSelect" required>
-                        <option value="">Selecciona un supervisor...</option>
+                    <label for="zonaSelect">Zona a quien enviar</label>
+                    <select id="zonaSelect" required>
+                        <option value="">Selecciona una zona...</option>
+                        <option value="Antioquia">Antioquia</option>
+                        <option value="Centro">Centro</option>
+                        <option value="Eje Cafetero">Eje Cafetero</option>
+                        <option value="Norte">Norte</option>
+                        <option value="Oriente">Oriente</option>
+                        <option value="Tolima">Tolima</option>
+                        <option value="Occidente">Occidente</option>
                     </select>
                 </div>
 
@@ -529,7 +534,7 @@
                             <i class="fas fa-file-excel"></i>
                         </div>
                         <div class="upload-text">Arrastra tu archivo aquí o haz clic</div>
-                        <div class="upload-subtext">Formatos: .xlsx, .xls (máx 5MB)</div>
+                        <div class="upload-subtext">Formatos: .xlsx, .xls (máx 5MB) - Debe contener al menos una hoja: "Reprogramaciones" o "Pendientes"</div>
                         <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;" required>
                     </div>
                     <div class="file-name" id="fileName">
@@ -548,7 +553,7 @@
         <div class="section">
             <div class="section-title">
                 <i class="fas fa-history"></i>
-                Mis Reprogramaciones Enviadas
+                Todas las Reprogramaciones Enviadas
             </div>
 
             <div class="loader active" id="listLoader">
@@ -599,7 +604,6 @@
             if (user) {
                 currentUser = user;
                 await cargarDatosUsuario();
-                await cargarSupervisores();
                 cargarReprogramaciones();
                 iniciarEscuchaCambios(); // Iniciar escucha de cambios en tiempo real
             } else {
@@ -616,58 +620,270 @@
             }
         }
 
-        async function cargarSupervisores() {
-            try {
-                console.log('📥 Cargando supervisores...');
-                
-                // Intentar cargar desde caché primero
-                const cacheKey = 'supervisores_cache';
-                const cached = localStorage.getItem(cacheKey);
-                const cacheTime = localStorage.getItem(cacheKey + '_time');
-                
-                let supervisores = null;
-                
-                // Usar caché si tiene menos de 5 minutos
-                if (cached && cacheTime && (Date.now() - parseInt(cacheTime)) < 300000) {
-                    console.log('✅ Usando caché de supervisores');
-                    supervisores = JSON.parse(cached);
-                } else {
-                    console.log('🔄 Consultando Firebase...');
-                    const usuariosRef = ref(db, 'usuarios');
-                    const snapshot = await get(usuariosRef);
-                    
-                    if (snapshot.exists()) {
-                        const usuarios = snapshot.val();
-                        supervisores = Object.entries(usuarios)
-                            .filter(([uid, data]) => data.rol === 'supervisor')
-                            .map(([uid, data]) => ({ uid, nombre: data.nombre }));
-                        
-                        // Guardar en caché
-                        localStorage.setItem(cacheKey, JSON.stringify(supervisores));
-                        localStorage.setItem(cacheKey + '_time', Date.now().toString());
-                        console.log('💾 Supervisores guardados en caché');
+        // ========== MODALES PERSONALIZADOS ==========
+        function mostrarModalPersonalizado({
+            titulo = 'Confirmar acción',
+            mensaje = '¿Estás seguro?',
+            tipo = 'question',
+            confirmText = 'Continuar',
+            cancelText = 'Cancelar',
+            showInput = false,
+            inputPlaceholder = '',
+            inputHelp = '',
+            inputValue = ''
+        }) {
+            return new Promise((resolve) => {
+                // Crear modal dinámicamente
+                const modalHTML = `
+                    <div id="modalPersonalizadoAux" class="modal-overlay" style="
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: rgba(0, 0, 0, 0.7);
+                        backdrop-filter: blur(4px);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        z-index: 10000;
+                        opacity: 0;
+                        transition: opacity 0.3s ease;
+                    ">
+                        <div class="modal-container-personalizado" style="
+                            background: white;
+                            border-radius: 16px;
+                            max-width: 400px;
+                            width: 90%;
+                            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                            transform: scale(0.9) translateY(20px);
+                            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                            overflow: hidden;
+                        ">
+                            <div class="modal-icon" style="
+                                padding: 24px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 48px;
+                            ">
+                                <i class="fas ${tipo === 'warning' ? 'fa-exclamation-triangle' :
+                                               tipo === 'error' ? 'fa-exclamation-circle' :
+                                               tipo === 'success' ? 'fa-check-circle' :
+                                               'fa-question-circle'}" style="color: ${tipo === 'warning' ? '#f59e0b' :
+                                                                                   tipo === 'error' ? '#ef4444' :
+                                                                                   tipo === 'success' ? '#10b981' :
+                                                                                   '#6b7280'}"></i>
+                            </div>
+                            <div class="modal-content-personalizado" style="
+                                padding: 0 24px 20px 24px;
+                                text-align: center;
+                            ">
+                                <h3 class="modal-title-personalizado" style="
+                                    font-size: 20px;
+                                    font-weight: 700;
+                                    color: #1f2937;
+                                    margin-bottom: 12px;
+                                ">${titulo}</h3>
+                                <p class="modal-message-personalizado" style="
+                                    font-size: 15px;
+                                    color: #6b7280;
+                                    line-height: 1.6;
+                                    margin: 0;
+                                    white-space: pre-line;
+                                ">${mensaje}</p>
+                                ${showInput ? `
+                                    <div class="modal-input-container" style="margin-top: 20px;">
+                                        <input type="text" id="modalInputAux" class="modal-input" placeholder="${inputPlaceholder}" value="${inputValue}" style="
+                                            width: 100%;
+                                            padding: 12px 16px;
+                                            border: 2px solid #e2e8f0;
+                                            border-radius: 8px;
+                                            font-size: 16px;
+                                            color: #1f2937;
+                                            transition: all 0.2s;
+                                            box-sizing: border-box;
+                                        ">
+                                        ${inputHelp ? `<div class="modal-input-help" style="
+                                            font-size: 12px;
+                                            color: #9ca3af;
+                                            margin-top: 4px;
+                                            text-align: left;
+                                        ">${inputHelp}</div>` : ''}
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="modal-actions-personalizado" style="
+                                display: grid;
+                                grid-template-columns: 1fr 1fr;
+                                gap: 12px;
+                                padding: 0 24px 24px 24px;
+                            ">
+                                <button class="modal-btn-personalizado btn-cancel-personalizado" id="modalCancelAux" style="
+                                    padding: 14px 20px;
+                                    border: none;
+                                    border-radius: 10px;
+                                    font-size: 15px;
+                                    font-weight: 600;
+                                    cursor: pointer;
+                                    transition: all 0.2s ease;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    gap: 8px;
+                                    min-height: 52px;
+                                    background: #f3f4f6;
+                                    color: #6b7280;
+                                ">
+                                    <i class="fas fa-times"></i>
+                                    <span>${cancelText}</span>
+                                </button>
+                                <button class="modal-btn-personalizado btn-confirm-personalizado" id="modalConfirmAux" style="
+                                    padding: 14px 20px;
+                                    border: none;
+                                    border-radius: 10px;
+                                    font-size: 15px;
+                                    font-weight: 600;
+                                    cursor: pointer;
+                                    transition: all 0.2s ease;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    gap: 8px;
+                                    min-height: 52px;
+                                    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                                    color: white;
+                                    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+                                ">
+                                    <i class="fas fa-check"></i>
+                                    <span>${confirmText}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Agregar modal al DOM
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+                const modal = document.getElementById('modalPersonalizadoAux');
+                const confirmBtn = document.getElementById('modalConfirmAux');
+                const cancelBtn = document.getElementById('modalCancelAux');
+                const inputEl = document.getElementById('modalInputAux');
+
+                // Funciones de manejo
+                const handleConfirm = () => {
+                    cleanup();
+                    const result = showInput ? (inputEl ? inputEl.value.trim() : '') : true;
+                    resolve(result);
+                };
+
+                const handleCancel = () => {
+                    cleanup();
+                    resolve(showInput ? '' : false);
+                };
+
+                const handleOverlayClick = (e) => {
+                    if (e.target === modal) {
+                        cleanup();
+                        resolve(showInput ? '' : false);
                     }
-                }
-                
-                const select = document.getElementById('supervisorSelect');
-                select.innerHTML = '<option value="">Selecciona un supervisor...</option>';
-                
-                if (supervisores && supervisores.length > 0) {
-                    supervisores.forEach(sup => {
-                        const option = document.createElement('option');
-                        option.value = sup.uid;
-                        option.textContent = sup.nombre;
-                        select.appendChild(option);
-                    });
-                    console.log(`✅ ${supervisores.length} supervisores cargados`);
+                };
+
+                const handleKeyPress = (e) => {
+                    if (e.key === 'Enter' && showInput && inputEl) {
+                        handleConfirm();
+                    } else if (e.key === 'Escape') {
+                        handleCancel();
+                    }
+                };
+
+                const cleanup = () => {
+                    modal.remove();
+                    confirmBtn.removeEventListener('click', handleConfirm);
+                    cancelBtn.removeEventListener('click', handleCancel);
+                    modal.removeEventListener('click', handleOverlayClick);
+                    document.removeEventListener('keydown', handleKeyPress);
+                };
+
+                // Agregar event listeners
+                confirmBtn.addEventListener('click', handleConfirm);
+                cancelBtn.addEventListener('click', handleCancel);
+                modal.addEventListener('click', handleOverlayClick);
+                document.addEventListener('keydown', handleKeyPress);
+
+                // Mostrar modal
+                setTimeout(() => {
+                    modal.style.opacity = '1';
+                    modal.querySelector('.modal-container-personalizado').style.transform = 'scale(1) translateY(0)';
+                    if (showInput && inputEl) {
+                        setTimeout(() => inputEl.focus(), 100);
+                    }
+                }, 10);
+
+                if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+            });
+        }
+
+        // Cache de zonas para evitar consultas repetidas
+        let zonasCache = null;
+        let zonasCacheTime = 0;
+        const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
+
+        async function obtenerSupervisoresZona(zona) {
+            try {
+                // Verificar si tenemos datos en cache válidos
+                const ahora = Date.now();
+                if (!zonasCache || (ahora - zonasCacheTime) > CACHE_DURATION) {
+                    console.log('📥 Consultando configuración de zonas desde Firebase...');
+                    const zonasRef = ref(db, 'zonas');
+                    const snapshot = await get(zonasRef);
+
+                    if (snapshot.exists()) {
+                        zonasCache = snapshot.val();
+                        zonasCacheTime = ahora;
+                        console.log('✅ Zonas cargadas desde Firebase');
+                    } else {
+                        console.warn('⚠️ No se encontró configuración de zonas en Firebase');
+                        return [];
+                    }
                 } else {
-                    console.warn('⚠️ No hay supervisores disponibles');
-                    mostrarAlerta('error', 'No hay supervisores disponibles');
+                    console.log('✅ Usando zonas desde cache');
                 }
+
+                // Retornar supervisores de la zona solicitada
+                const zonaData = zonasCache[zona];
+                return zonaData ? zonaData.supervisores || [] : [];
+
             } catch (error) {
-                console.error('❌ Error al cargar supervisores:', error);
-                mostrarAlerta('error', 'Error al cargar supervisores: ' + error.message);
+                console.error('❌ Error al obtener supervisores de zona:', error);
+                return [];
             }
+        }
+
+        async function obtenerAuxiliares() {
+            // Obtener todos los usuarios auxiliares
+            const usuariosRef = ref(db, 'usuarios');
+            const snapshot = await get(usuariosRef);
+            
+            if (!snapshot.exists()) {
+                return [];
+            }
+            
+            const usuarios = snapshot.val();
+            const auxiliares = [];
+            
+            for (const [uid, data] of Object.entries(usuarios)) {
+                if (data.rol === 'auxiliar') {
+                    auxiliares.push({
+                        uid: uid,
+                        nombre: data.nombre,
+                        email: data.email
+                    });
+                }
+            }
+            
+            return auxiliares;
         }
 
         const uploadArea = document.getElementById('uploadArea');
@@ -715,8 +931,8 @@
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const supervisorId = document.getElementById('supervisorSelect').value;
-            if (!supervisorId || !selectedFile) {
+            const zona = document.getElementById('zonaSelect').value;
+            if (!zona || !selectedFile) {
                 mostrarAlerta('error', 'Completa todos los campos');
                 return;
             }
@@ -729,60 +945,168 @@
                 console.log('📤 Procesando archivo Excel...');
                 const excelData = await leerExcel(selectedFile);
                 
-                if (excelData.length > 1000) {
-                    if (!confirm(`El archivo tiene ${excelData.length} filas. ¿Deseas continuar? (Puede tardar un poco)`)) {
+                const totalRegistros = excelData.datosReprogramacion.length + excelData.datosPendientes.length;
+                if (totalRegistros > 1000) {
+                    const confirmar = await mostrarModalPersonalizado({
+                        titulo: 'Archivo Grande Detectado',
+                        mensaje: `El archivo tiene ${totalRegistros} filas totales.\n\n¿Deseas continuar con el procesamiento?\n\nPuede tardar un poco dependiendo del tamaño.`,
+                        tipo: 'warning',
+                        confirmText: 'Sí, continuar',
+                        cancelText: 'Cancelar'
+                    });
+
+                    if (!confirmar) {
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Reprogramación';
                         return;
                     }
                 }
                 
-                console.log('👤 Obteniendo datos del supervisor...');
-                const supervisorSnapshot = await get(ref(db, `usuarios/${supervisorId}`));
+                console.log('👥 Obteniendo supervisores de la zona...');
+                const supervisoresZona = await obtenerSupervisoresZona(zona);
                 
-                if (!supervisorSnapshot.exists()) {
-                    throw new Error('Supervisor no encontrado');
+                console.log('🔍 Supervisores obtenidos:', supervisoresZona);
+                console.log('🔍 Estructura detallada:', JSON.stringify(supervisoresZona, null, 2));
+                
+                if (supervisoresZona.length === 0) {
+                    throw new Error(`No hay supervisores asignados a la zona ${zona}`);
                 }
                 
-                const supervisorData = supervisorSnapshot.val();
+                // Validar y limpiar datos de supervisores
+                const supervisoresValidos = supervisoresZona.filter(s => {
+                    if (!s) {
+                        console.warn('⚠️ Supervisor nulo encontrado');
+                        return false;
+                    }
+                    if (!s.email) {
+                        console.warn('⚠️ Supervisor sin email encontrado:', s);
+                        return false;
+                    }
+                    return true;
+                }).map(s => ({
+                    uid: s.uid || s.id || 'sin-uid',
+                    nombre: s.nombre || 'Sin nombre',
+                    email: s.email
+                }));
+                
+                if (supervisoresValidos.length === 0) {
+                    throw new Error(`No hay supervisores válidos en la zona ${zona}`);
+                }
+                
+                console.log('✅ Supervisores válidos:', supervisoresValidos);
                 const mes = new Date().toISOString().slice(0, 7).replace('-', '');
                 const timestamp = new Date().toISOString();
                 
                 console.log('💾 Guardando en Firebase...');
                 const reprogRef = push(ref(db, `reprogramaciones/${mes}`));
 
-                // Estructura optimizada: metadata + datos
+                // Estructura optimizada: metadata + datos + estructura original
                 await set(reprogRef, {
                     // Metadata (pequeña)
                     auxiliarId: currentUser.uid,
                     auxiliarNombre: userData.nombre,
                     auxiliarEmail: userData.email || currentUser.email,
-                    supervisorId: supervisorId,
-                    supervisorNombre: supervisorData.nombre,
-                    supervisorEmail: supervisorData.email,
+                    zona: zona,
+                    supervisoresZona: supervisoresValidos,
                     fechaSubida: timestamp,
                     estado: 'pendiente',
                     archivoNombre: selectedFile.name,
-                    totalRegistros: excelData.length,
+                    totalRegistrosReprogramacion: excelData.datosReprogramacion.length,
+                    totalRegistrosPendientes: excelData.datosPendientes.length,
                     
-                    // Datos Excel (grande)
-                    datosExcel: excelData
+                    // Estructura original del Excel (para preservar formato)
+                    nombreHoja1: excelData.nombreHoja1,
+                    nombreHoja2: excelData.nombreHoja2,
+                    nombresPendientes: excelData.nombresPendientes || [],
+                    columnasHoja1: excelData.columnasHoja1,
+                    columnasHoja2: excelData.columnasHoja2,
+                    
+                    // Datos Excel (grandes)
+                    datosReprogramacion: excelData.datosReprogramacion,
+                    datosPendientes: excelData.datosPendientes,
+                    datosPendientesPorHoja: excelData.datosPendientesPorHoja || {}
                 });
 
                 console.log('✅ Reprogramación guardada exitosamente');
-                mostrarAlerta('success', `✓ ¡Reprogramación enviada! (${excelData.length} registros)`);
+                mostrarAlerta('success', `✓ ¡Reprogramaciones/Pendientes enviadas! (${excelData.datosReprogramacion.length + excelData.datosPendientes.length} registros totales)`);
                 
-                // 📧 Enviar correo al supervisor
+                // 📧 Enviar correos a TODOS los supervisores de la zona
                 try {
-                    await notificarSupervisorNuevaReprogramacion({
-                        supervisorEmail: supervisorData.email,
-                        supervisorNombre: supervisorData.nombre,
-                        auxiliarNombre: userData.nombre,
-                        archivoNombre: selectedFile.name,
-                        totalRegistros: excelData.length,
-                        fechaSubida: timestamp
-                    });
-                } catch (e) { console.warn('⚠️ Error email:', e); }
+                    // Para zona Norte, enviar a TODOS los supervisores en un solo correo
+                    if (zona === 'Norte' && supervisoresValidos.length > 1) {
+                        const emailsSupervisores = supervisoresValidos.map(s => s.email);
+                        await notificarSupervisorNuevaReprogramacion({
+                            supervisorEmail: emailsSupervisores, // Array de emails
+                            supervisorNombre: 'Supervisores de Zona Norte',
+                            auxiliarNombre: userData.nombre,
+                            zona: zona,
+                            archivoNombre: selectedFile.name,
+                            totalRegistrosReprogramacion: excelData.datosReprogramacion.length,
+                            totalRegistrosPendientes: excelData.datosPendientes.length,
+                            fechaSubida: timestamp
+                        });
+                    } else {
+                        // Para otras zonas, enviar individualmente
+                        for (const supervisor of supervisoresValidos) {
+                            await notificarSupervisorNuevaReprogramacion({
+                                supervisorEmail: supervisor.email,
+                                supervisorNombre: supervisor.nombre,
+                                auxiliarNombre: userData.nombre,
+                                zona: zona,
+                                archivoNombre: selectedFile.name,
+                                totalRegistrosReprogramacion: excelData.datosReprogramacion.length,
+                                totalRegistrosPendientes: excelData.datosPendientes.length,
+                                fechaSubida: timestamp
+                            });
+                        }
+                    }
+                } catch (e) { console.warn('⚠️ Error email supervisores:', e); }
+                
+                // 📧 Enviar notificación a TODAS las auxiliares
+                try {
+                    console.log('� Enviando notificación a todas las auxiliares...');
+                    const todasLasAuxiliares = await obtenerTodasLasAuxiliares();
+                    const emailsAuxiliares = todasLasAuxiliares.map(auxiliar => auxiliar.email);
+
+                    if (emailsAuxiliares.length > 0) {
+                        // Obtener el contenido del email
+                        const emailData = await notificarAuxiliaresNuevaReprogramacion({
+                            auxiliarNombre: userData.nombre,
+                            zona: zona,
+                            archivoNombre: selectedFile.name,
+                            totalRegistrosReprogramacion: excelData.datosReprogramacion.length,
+                            totalRegistrosPendientes: excelData.datosPendientes.length,
+                            fechaSubida: timestamp
+                        });
+                        
+                        console.log('📧 Contenido del email generado:', {
+                            tieneSubject: !!emailData?.subject,
+                            tieneHtml: !!emailData?.htmlContent,
+                            tieneText: !!emailData?.textContent,
+                            subject: emailData?.subject
+                        });
+
+                        // Enviar a cada auxiliar individualmente
+                        for (const email of emailsAuxiliares) {
+                            try {
+                                await enviarCorreo({
+                                    to: email,
+                                    toName: todasLasAuxiliares.find(aux => aux.email === email)?.nombre || 'Auxiliar',
+                                    subject: emailData.subject,
+                                    htmlContent: emailData.htmlContent,
+                                    textContent: emailData.textContent
+                                });
+                            } catch (emailError) {
+                                console.warn(`⚠️ Error enviando email a ${email}:`, emailError);
+                            }
+                        }
+                        console.log(`✅ Notificación enviada a ${emailsAuxiliares.length} auxiliares`);
+                    } else {
+                        console.warn('⚠️ No se encontraron auxiliares para notificar');
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Error obteniendo auxiliares:', e);
+                }
                 
                 // Limpiar caché de reprogramaciones para forzar recarga
                 localStorage.removeItem('reprogramaciones_' + currentUser.uid);
@@ -822,66 +1146,154 @@
                     try {
                         const data = new Uint8Array(e.target.result);
                         const workbook = XLSX.read(data, { type: 'array', cellDates: false });
-                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
                         
-                        // Validar que el archivo tenga datos
-                        if (!jsonData || jsonData.length === 0) {
-                            reject(new Error('El archivo Excel está vacío'));
+                        // Buscar hojas de forma flexible
+                        const sheetNames = workbook.SheetNames;
+                        console.log('📋 Hojas encontradas en el Excel:', sheetNames);
+                        
+                        // Buscar hoja de Reprogramaciones (acepta variaciones)
+                        const hojaReprogramacion = sheetNames.find(name => 
+                            name.toLowerCase().includes('reprogramac')
+                        );
+                        
+                        // Buscar hojas de Pendientes (acepta ME, SGI, o simplemente Pendientes)
+                        const hojasPendientes = sheetNames.filter(name => 
+                            name.toLowerCase().includes('pendiente')
+                        );
+                        
+                        console.log('🔍 Hoja Reprogramación encontrada:', hojaReprogramacion || 'Ninguna');
+                        console.log('🔍 Hojas Pendientes encontradas:', hojasPendientes);
+                        
+                        if (!hojaReprogramacion && hojasPendientes.length === 0) {
+                            reject(new Error(`El archivo debe contener hojas de "Reprogramaciones" o "Pendientes". Hojas encontradas: ${sheetNames.join(', ')}`));
                             return;
                         }
                         
-                        // Columnas que vienen en el Excel original (13 columnas)
-                        const columnasRequeridas = [
-                            'AID PROMOTOR', 'ID PV', 'ID EMPRESA', 'N_DIA', 'FECHA', 
-                            'MINUTOS', 'HORAS', 'NOMBRE PROMOTOR', 'NOMBRE PUNTO DE VENTA', 
-                            'NOMBRE EMPRESA', 'CIUDAD PV', 'DEPARTAMENTO PV', 'ZONA'
-                        ];
+                        // Inicializar arrays vacíos
+                        let datosReprogramacion = [];
+                        let datosPendientes = [];
                         
-                        // Validar estructura (verificar primera fila)
-                        const primeraFila = jsonData[0];
-                        const columnasEncontradas = Object.keys(primeraFila);
-                        const columnasFaltantes = columnasRequeridas.filter(
-                            col => !columnasEncontradas.includes(col)
-                        );
+                        // Leer hoja de Reprogramaciones si existe
+                        if (hojaReprogramacion) {
+                            const reprogramacionesSheet = workbook.Sheets[hojaReprogramacion];
+                            datosReprogramacion = XLSX.utils.sheet_to_json(reprogramacionesSheet);
+                            
+                            if (datosReprogramacion && datosReprogramacion.length > 0) {
+                                console.log(`✅ Hoja "${hojaReprogramacion}": ${datosReprogramacion.length} filas`);
+                            } else {
+                                console.warn(`⚠️ La hoja "${hojaReprogramacion}" está vacía`);
+                                datosReprogramacion = [];
+                            }
+                        }
                         
-                        if (columnasFaltantes.length > 0) {
-                            const mensaje = `Faltan columnas requeridas: ${columnasFaltantes.join(', ')}`;
-                            console.error('❌ Validación fallida:', mensaje);
-                            reject(new Error(mensaje));
+                        // Leer hojas de Pendientes si existen (guardar cada una por separado)
+                        let datosPendientesPorHoja = {};
+                        if (hojasPendientes.length > 0) {
+                            for (const nombreHoja of hojasPendientes) {
+                                const pendientesSheet = workbook.Sheets[nombreHoja];
+                                const datosParciales = XLSX.utils.sheet_to_json(pendientesSheet);
+                                
+                                if (datosParciales && datosParciales.length > 0) {
+                                    console.log(`✅ Hoja "${nombreHoja}": ${datosParciales.length} filas`);
+                                    datosPendientesPorHoja[nombreHoja] = datosParciales;
+                                    datosPendientes.push(...datosParciales); // Mantener array plano para conteo
+                                } else {
+                                    console.warn(`⚠️ La hoja "${nombreHoja}" está vacía`);
+                                }
+                            }
+                        }
+                        
+                        // Validar que al menos una hoja tenga datos
+                        if (datosReprogramacion.length === 0 && datosPendientes.length === 0) {
+                            reject(new Error('El archivo no contiene datos en ninguna de las hojas'));
                             return;
+                        }
+                        
+                        // Función para procesar datos de una hoja
+                        const procesarDatos = (jsonData, nombreHoja) => {
+                            // Validar que la hoja tenga datos
+                            if (!jsonData || jsonData.length === 0) {
+                                throw new Error(`La hoja ${nombreHoja} está vacía`);
+                            }
+                            
+                            // Obtener todas las columnas que tiene la hoja
+                            const primeraFila = jsonData[0];
+                            const columnasOriginales = Object.keys(primeraFila);
+                            
+                            if (columnasOriginales.length === 0) {
+                                throw new Error(`La hoja ${nombreHoja} no tiene columnas`);
+                            }
+                            
+                            console.log(`📋 Hoja "${nombreHoja}" - Columnas encontradas:`, columnasOriginales);
+                            
+                            // Agregar columnas que el supervisor llenará + convertir fechas
+                            const datosConvertidos = jsonData.map((row, index) => {
+                                const nuevaFila = {};
+                                
+                                // Copiar TODAS las columnas originales (sin filtrar)
+                                columnasOriginales.forEach(col => {
+                                    nuevaFila[col] = row[col] ?? '';
+                                });
+                                
+                                // Agregar columnas vacías para que el supervisor las complete
+                                nuevaFila['FECHA REPROGRAMACION'] = '';
+                                nuevaFila['OBSERVACION'] = '';
+                                
+                                // Convertir FECHA si existe y es un número serial
+                                if (nuevaFila['FECHA'] !== undefined && typeof nuevaFila['FECHA'] === 'number') {
+                                    const fechaBase = new Date(1900, 0, 1);
+                                    const dias = nuevaFila['FECHA'] - 2;
+                                    const fecha = new Date(fechaBase.getTime() + dias * 24 * 60 * 60 * 1000);
+                                    nuevaFila['FECHA'] = `${fecha.getDate()}/${fecha.getFullYear()}`;
+                                }
+                                
+                                return nuevaFila;
+                            });
+                            
+                            return datosConvertidos;
+                        };
+                        
+                        // Procesar solo las hojas que tengan datos
+                        let reprogramacionesProcesadas = [];
+                        let pendientesProcesadas = [];
+                        let pendientesPorHojaProcesadas = {};
+                        let columnasHoja1 = [];
+                        let columnasHoja2 = [];
+                        
+                        if (datosReprogramacion.length > 0) {
+                            reprogramacionesProcesadas = procesarDatos(datosReprogramacion, 'Reprogramaciones');
+                            columnasHoja1 = Object.keys(datosReprogramacion[0] || {});
+                            console.log(`📊 Reprogramaciones: ${reprogramacionesProcesadas.length} filas`);
+                        } else {
+                            console.log('ℹ️ No hay datos en la hoja "Reprogramaciones"');
+                        }
+                        
+                        if (datosPendientes.length > 0) {
+                            pendientesProcesadas = procesarDatos(datosPendientes, 'Pendientes');
+                            columnasHoja2 = Object.keys(datosPendientes[0] || {});
+                            console.log(`📊 Pendientes: ${pendientesProcesadas.length} filas`);
+                            
+                            // Procesar cada hoja por separado
+                            for (const [nombreHoja, datos] of Object.entries(datosPendientesPorHoja)) {
+                                pendientesPorHojaProcesadas[nombreHoja] = procesarDatos(datos, nombreHoja);
+                                console.log(`📊 Hoja "${nombreHoja}": ${pendientesPorHojaProcesadas[nombreHoja].length} filas procesadas`);
+                            }
+                        } else {
+                            console.log('ℹ️ No hay datos en la hoja "Pendientes"');
                         }
                         
                         console.log('✅ Validación Excel: Estructura correcta');
-                        console.log(`📊 Total de filas: ${jsonData.length}`);
                         
-                        // Agregar columnas que el supervisor llenará + convertir fechas
-                        const datosConvertidos = jsonData.map((row, index) => {
-                            const nuevaFila = {};
-                            
-                            // Copiar todas las columnas originales
-                            columnasRequeridas.forEach(col => {
-                                nuevaFila[col] = row[col] ?? '';
-                            });
-                            
-                            // Agregar columnas vacías para que el supervisor las complete
-                            nuevaFila['FECHA REPROGRAMACION'] = '';
-                            nuevaFila['OBSERVACION'] = '';
-                            
-                            // Convertir FECHA si es un número serial
-                            if (nuevaFila['FECHA'] && typeof nuevaFila['FECHA'] === 'number') {
-                                const fechaBase = new Date(1900, 0, 1);
-                                const dias = nuevaFila['FECHA'] - 2;
-                                const fecha = new Date(fechaBase.getTime() + dias * 24 * 60 * 60 * 1000);
-                                nuevaFila['FECHA'] = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`;
-                            }
-                            
-                            return nuevaFila;
+                        resolve({
+                            datosReprogramacion: reprogramacionesProcesadas,
+                            datosPendientes: pendientesProcesadas,
+                            datosPendientesPorHoja: pendientesPorHojaProcesadas,
+                            nombreHoja1: hojaReprogramacion || 'N/A',
+                            nombreHoja2: hojasPendientes.join(', ') || 'N/A',
+                            nombresPendientes: hojasPendientes,
+                            columnasHoja1: columnasHoja1,
+                            columnasHoja2: columnasHoja2
                         });
-                        
-                        console.log('✅ Excel procesado:', datosConvertidos.length, 'filas');
-                        console.log('📝 Primera fila:', datosConvertidos[0]);
-                        resolve(datosConvertidos);
                     } catch (error) {
                         console.error('❌ Error al procesar Excel:', error);
                         reject(error);
@@ -900,15 +1312,14 @@
             const loader = document.getElementById('listLoader');
             
             try {
-                console.log('📥 Cargando reprogramaciones del auxiliar...');
+                console.log('📥 Cargando todas las reprogramaciones...');
                 const meses = obtenerUltimosMeses(3);
                 const todasLasReprogs = [];
 
                 // Cargar todos los meses en paralelo (más rápido)
                 const promesas = meses.map(async mes => {
                     const reprogRef = ref(db, `reprogramaciones/${mes}`);
-                    const q = query(reprogRef, orderByChild('auxiliarId'), equalTo(currentUser.uid));
-                    const snapshot = await get(q);
+                    const snapshot = await get(reprogRef);
 
                     if (snapshot.exists()) {
                         const data = snapshot.val();
@@ -937,7 +1348,7 @@
                     reprogList.innerHTML = `
                         <div class="empty-state">
                             <div class="empty-icon"><i class="fas fa-inbox"></i></div>
-                            <div class="empty-text">No has enviado reprogramaciones todavía</div>
+                            <div class="empty-text">No hay reprogramaciones enviadas todavía</div>
                         </div>
                     `;
                 } else {
@@ -979,9 +1390,8 @@
             
             meses.forEach(mes => {
                 const reprogRef = ref(db, `reprogramaciones/${mes}`);
-                const q = query(reprogRef, orderByChild('auxiliarId'), equalTo(currentUser.uid));
                 
-                onChildChanged(q, (snapshot) => {
+                onChildChanged(reprogRef, (snapshot) => {
                     const reprogId = snapshot.key;
                     const nuevaReprog = snapshot.val();
                     
@@ -1126,7 +1536,7 @@
                 <div class="reprog-item">
                     <div class="reprog-header">
                         <div>
-                            <div class="reprog-title">Para: ${reprog.supervisorNombre}</div>
+                            <div class="reprog-title">Zona: ${reprog.zona}</div>
                             <div class="reprog-date">
                                 <i class="far fa-calendar"></i>
                                 ${fecha}
@@ -1143,7 +1553,7 @@
                         </div>
                         <div class="data-row">
                             <span class="data-label">Registros:</span>
-                            <span class="data-value">${reprog.datosExcel?.length || 0} filas</span>
+                            <span class="data-value">${(reprog.totalRegistrosReprogramacion || 0) + (reprog.totalRegistrosPendientes || 0)} filas totales</span>
                         </div>
                         ${respuestaHTML}
                     </div>
@@ -1175,77 +1585,75 @@
                     }
                 }
 
-                if (!reprogData || !reprogData.datosExcel) {
+                if (!reprogData || (!reprogData.datosReprogramacion && !reprogData.datosPendientes)) {
                     mostrarAlerta('error', 'No se encontraron datos');
                     return;
                 }
 
-                // Crear workbook manualmente para mantener el formato exacto
+                // Crear workbook preservando estructura original
                 const wb = XLSX.utils.book_new();
                 
-                // Definir el orden exacto de las columnas
-                const columnas = [
-                    'FECHA REPROGRAMACION',
-                    'OBSERVACION',
-                    'AID PROMOTOR',
-                    'ID PV',
-                    'ID EMPRESA',
-                    'N_DIA',
-                    'FECHA',
-                    'MINUTOS',
-                    'HORAS',
-                    'NOMBRE PROMOTOR',
-                    'NOMBRE PUNTO DE VENTA',
-                    'NOMBRE EMPRESA',
-                    'CIUDAD PV',
-                    'DEPARTAMENTO PV',
-                    'ZONA'
-                ];
-                
-                // Crear array de arrays (no objetos) para mantener el orden y formato
-                const datos = [columnas]; // Primera fila: encabezados
-                
-                reprogData.datosExcel.forEach(row => {
-                    const fila = columnas.map(col => {
-                        const valor = row[col];
-                        // Si es undefined o null, retornar string vacío
-                        if (valor === undefined || valor === null) return '';
-                        // Retornar el valor tal cual
-                        return valor;
+                // Función para crear hoja con estructura ORIGINAL
+                const crearHoja = (datos, nombreHoja, columnasOriginales) => {
+                    if (!datos || datos.length === 0) return;
+                    
+                    // Si no hay columnas originales guardadas, usar todas las del primer registro
+                    const columnas = columnasOriginales || Object.keys(datos[0]);
+                    
+                    console.log(`📄 Generando hoja "${nombreHoja}" con ${columnas.length} columnas`);
+                    console.log(`📋 Columnas: ${columnas.join(', ')}`);
+                    
+                    // Crear array de arrays preservando orden original
+                    const datosArray = [columnas]; // Primera fila: encabezados
+                    
+                    datos.forEach(row => {
+                        const fila = columnas.map(col => {
+                            const valor = row[col];
+                            // Si es undefined o null, retornar string vacío
+                            if (valor === undefined || valor === null) return '';
+                            // Retornar el valor tal cual
+                            return valor;
+                        });
+                        datosArray.push(fila);
                     });
-                    datos.push(fila);
-                });
+                    
+                    const ws = XLSX.utils.aoa_to_sheet(datosArray);
+                    
+                    // Ajustar anchos de columnas automáticamente
+                    const colWidths = columnas.map(col => {
+                        const maxLength = Math.max(
+                            col.length,
+                            ...datos.slice(0, 100).map(row => {
+                                const val = row[col];
+                                return val ? String(val).length : 0;
+                            })
+                        );
+                        return { wch: Math.min(maxLength + 2, 50) };
+                    });
+                    ws['!cols'] = colWidths;
+                    
+                    XLSX.utils.book_append_sheet(wb, ws, nombreHoja);
+                };
                 
-                const ws = XLSX.utils.aoa_to_sheet(datos);
+                // Crear hoja 1 con nombre y columnas originales
+                if (reprogData.datosReprogramacion && reprogData.datosReprogramacion.length > 0) {
+                    const nombreHoja = reprogData.nombreHoja1 || 'Hoja 1';
+                    crearHoja(reprogData.datosReprogramacion, nombreHoja, reprogData.columnasHoja1);
+                }
                 
-                // Ajustar anchos de columnas
-                const colWidths = [
-                    { wch: 18 }, // FECHA REPROGRAMACION
-                    { wch: 30 }, // OBSERVACION
-                    { wch: 12 }, // AID PROMOTOR
-                    { wch: 10 }, // ID PV
-                    { wch: 12 }, // ID EMPRESA
-                    { wch: 8 },  // N_DIA
-                    { wch: 12 }, // FECHA
-                    { wch: 10 }, // MINUTOS
-                    { wch: 8 },  // HORAS
-                    { wch: 30 }, // NOMBRE PROMOTOR
-                    { wch: 35 }, // NOMBRE PUNTO DE VENTA
-                    { wch: 35 }, // NOMBRE EMPRESA
-                    { wch: 15 }, // CIUDAD PV
-                    { wch: 15 }, // DEPARTAMENTO PV
-                    { wch: 12 }  // ZONA
-                ];
-                ws['!cols'] = colWidths;
+                // Crear hoja 2 con nombre y columnas originales
+                if (reprogData.datosPendientes && reprogData.datosPendientes.length > 0) {
+                    const nombreHoja = reprogData.nombreHoja2 || 'Hoja 2';
+                    crearHoja(reprogData.datosPendientes, nombreHoja, reprogData.columnasHoja2);
+                }
                 
-                XLSX.utils.book_append_sheet(wb, ws, 'Reprogramación');
-                
-                const nombreArchivo = `reprogramacion_${reprogData.supervisorNombre.replace(/ /g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+                const nombreArchivo = `${reprogData.archivoNombre.replace('.xlsx', '')}_RESPONDIDO_${new Date().toISOString().slice(0, 10)}.xlsx`;
                 XLSX.writeFile(wb, nombreArchivo);
 
-                mostrarAlerta('success', 'Excel descargado correctamente');
+                mostrarAlerta('success', '✓ Excel descargado con formato original');
+                console.log('✅ Excel generado:', nombreArchivo);
             } catch (error) {
-                console.error('Error:', error);
+                console.error('❌ Error al descargar:', error);
                 mostrarAlerta('error', 'Error al descargar: ' + error.message);
             }
         };
@@ -1271,6 +1679,36 @@
                 document.getElementById('errorMsg').textContent = mensaje;
                 errorAlert.classList.add('show');
                 setTimeout(() => errorAlert.classList.remove('show'), 4000);
+            }
+        }
+
+        // Función para obtener todas las auxiliares
+        async function obtenerTodasLasAuxiliares() {
+            try {
+                const usuariosRef = ref(db, 'usuarios');
+                const snapshot = await get(usuariosRef);
+
+                if (!snapshot.exists()) {
+                    return [];
+                }
+
+                const usuarios = snapshot.val();
+                const auxiliares = [];
+
+                for (const [uid, data] of Object.entries(usuarios)) {
+                    if (data.rol === 'auxiliar') {
+                        auxiliares.push({
+                            uid: uid,
+                            email: data.email,
+                            nombre: data.nombre
+                        });
+                    }
+                }
+
+                return auxiliares;
+            } catch (error) {
+                console.error('Error obteniendo auxiliares:', error);
+                return [];
             }
         }
     </script>
