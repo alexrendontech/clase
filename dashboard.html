@@ -541,6 +541,313 @@
             }
         }
 
+        /* Modal Gestión de Zonas */
+        .modal-zonas {
+            background: white;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-overlay.show .modal-zonas {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .modal-content {
+            padding: 24px;
+        }
+
+        /* Modal Personalizado */
+        .modal-container-personalizado {
+            background: white;
+            border-radius: 16px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .modal-overlay.show .modal-container-personalizado {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-icon {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+
+        .modal-icon .fa-question-circle {
+            color: #f59e0b;
+        }
+
+        .modal-icon.warning .fa-exclamation-triangle {
+            color: #f59e0b;
+        }
+
+        .modal-icon.error .fa-exclamation-circle {
+            color: #ef4444;
+        }
+
+        .modal-icon.success .fa-check-circle {
+            color: #10b981;
+        }
+
+        .modal-content-personalizado {
+            padding: 0 24px 20px 24px;
+            text-align: center;
+        }
+
+        .modal-title-personalizado {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .modal-message-personalizado {
+            font-size: 15px;
+            color: #6b7280;
+            line-height: 1.6;
+            margin: 0;
+            white-space: pre-line;
+        }
+
+        .modal-input-container {
+            margin-top: 20px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #1f2937;
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .modal-input-help {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 4px;
+            text-align: left;
+        }
+
+        .modal-actions-personalizado {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 0 24px 24px 24px;
+        }
+
+        .modal-btn-personalizado {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 52px;
+            touch-action: manipulation;
+        }
+
+        .modal-btn-personalizado:active {
+            transform: scale(0.97);
+        }
+
+        .btn-cancel-personalizado {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .btn-cancel-personalizado:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-confirm-personalizado {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-confirm-personalizado:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        }
+
+        @media (max-width: 480px) {
+            .modal-actions-personalizado {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-container-personalizado {
+                max-width: 95%;
+                margin: 20px;
+            }
+        }
+
+        /* Gestión de Zonas */
+        .modal-zonas {
+            background: white;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-overlay.show .modal-zonas {
+            transform: scale(1);
+        }
+
+        .zona-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .zona-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .zona-name {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .supervisor-count {
+            background: #3b82f6;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .supervisor-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .supervisor-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .supervisor-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 2px;
+        }
+
+        .supervisor-info p {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .supervisor-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: white;
+            min-width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-small:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
         /* Modal Gestión Usuarios */
         .modal-overlay {
             position: fixed;
@@ -938,6 +1245,21 @@
             color: #1e40af;
         }
 
+        .role-badge.ejecutivo {
+            background: #fce7f3;
+            color: #be185d;
+        }
+
+        .role-badge.analista {
+            background: #e0f2fe;
+            color: #0c4a6e;
+        }
+
+        .role-badge.especialista {
+            background: #f3e8ff;
+            color: #7c2d12;
+        }
+
         .role-badge.auxiliar {
             background: #d1fae5;
             color: #065f46;
@@ -997,6 +1319,10 @@
             <div class="user-info">
                 <span class="user-name" id="userName">Admin</span>
             </div>
+            <button class="logout-btn" onclick="abrirGestionZonas()" style="background: #10b981; color: white; margin-right: 10px;">
+                <i class="fas fa-map-marked-alt"></i>
+                Gestionar Zonas
+            </button>
             <button class="logout-btn" onclick="abrirGestionUsuarios()" style="background: #3b82f6; color: white; margin-right: 10px;">
                 <i class="fas fa-users-cog"></i>
                 Gestionar Usuarios
@@ -1190,11 +1516,19 @@
                             </div>
                             <div class="form-group-modal">
                                 <label>Rol <span class="required">*</span></label>
-                                <select id="createRol" required>
-                                    <option value="">Seleccionar rol...</option>
+                                <select id="createRol" required onchange="toggleZonaField('create')">
                                     <option value="admin">Administrador</option>
                                     <option value="supervisor">Supervisor</option>
+                                    <option value="ejecutivo">Ejecutivo</option>
+                                    <option value="analista">Analista</option>
+                                    <option value="especialista">Especialista</option>
                                     <option value="auxiliar">Auxiliar</option>
+                                </select>
+                            </div>
+                            <div class="form-group-modal" id="createZonaGroup" style="display: none;">
+                                <label>Zona <span class="required">*</span></label>
+                                <select id="createZonaSelect" required>
+                                    <option value="">Cargando zonas...</option>
                                 </select>
                             </div>
                             <div class="loader-modal" id="createLoader">
@@ -1259,9 +1593,12 @@
                             </div>
                             <div class="form-group-modal">
                                 <label>Rol <span class="required">*</span></label>
-                                <select id="editRol" required>
+                                <select id="editRol" required onchange="toggleZonaField('edit')">
                                     <option value="admin">Administrador</option>
                                     <option value="supervisor">Supervisor</option>
+                                    <option value="ejecutivo">Ejecutivo</option>
+                                    <option value="analista">Analista</option>
+                                    <option value="especialista">Especialista</option>
                                     <option value="auxiliar">Auxiliar</option>
                                 </select>
                             </div>
@@ -1269,6 +1606,12 @@
                                 <label>Correo (solo lectura)</label>
                                 <input type="email" id="editEmail" disabled>
                             </div>
+                        </div>
+                        <div class="form-group-modal" id="editZonaGroup" style="display: none;">
+                            <label>Zona <span class="required">*</span></label>
+                            <select id="editZonaSelect" required>
+                                <option value="">Cargando zonas...</option>
+                            </select>
                         </div>
                         <div class="loader-modal" id="editLoader">
                             <div class="spinner-modal"></div>
@@ -1290,10 +1633,91 @@
         </div>
     </div>
 
+    <!-- Modal Gestión de Zonas -->
+    <div class="modal-overlay" id="modalZonas">
+        <div class="modal-zonas">
+            <div class="modal-header">
+                <h2><i class="fas fa-map-marked-alt"></i> Gestión de Zonas</h2>
+                <button class="modal-close" onclick="cerrarModalZonas()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+
+    <!-- Modal Personalizado para Confirmaciones y Prompts -->
+    <div class="modal-overlay" id="modalPersonalizado">
+        <div class="modal-container-personalizado">
+            <div class="modal-icon" id="modalIconPersonalizado">
+                <i class="fas fa-question-circle"></i>
+            </div>
+            <div class="modal-content-personalizado">
+                <h3 class="modal-title-personalizado" id="modalTitlePersonalizado">Confirmar acción</h3>
+                <p class="modal-message-personalizado" id="modalMessagePersonalizado">¿Estás seguro?</p>
+
+                <!-- Campo de input para prompts -->
+                <div class="modal-input-container" id="modalInputContainer" style="display: none;">
+                    <input type="text" id="modalInput" class="modal-input" placeholder="Ingresa el valor">
+                    <div class="modal-input-help" id="modalInputHelp"></div>
+                </div>
+            </div>
+            <div class="modal-actions-personalizado">
+                <button class="modal-btn-personalizado btn-cancel-personalizado" id="modalCancelPersonalizado">
+                    <i class="fas fa-times"></i>
+                    <span id="modalCancelText">Cancelar</span>
+                </button>
+                <button class="modal-btn-personalizado btn-confirm-personalizado" id="modalConfirmPersonalizado">
+                    <i class="fas fa-check"></i>
+                    <span id="modalConfirmText">Continuar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+                <div class="alert-modal alert-success" id="successAlertZonas">
+                    <i class="fas fa-check-circle"></i>
+                    <span id="successMsgZonas"></span>
+                </div>
+                <div class="alert-modal alert-error" id="errorAlertZonas">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="errorMsgZonas"></span>
+                </div>
+
+                <div class="loader-modal active" id="zonasLoader">
+                    <div class="spinner-modal"></div>
+                    <div style="color: #9ca3af; font-size: 13px;">Cargando zonas...</div>
+                </div>
+
+                <div id="zonasContent" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 style="margin: 0; color: #1f2937;">Configuración de Zonas</h3>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-modal" onclick="inicializarZonasDefault()" style="background: #6b7280;">
+                                <i class="fas fa-magic"></i>
+                                Inicializar
+                            </button>
+                            <button class="btn-modal primary" onclick="agregarNuevaZona()">
+                                <i class="fas fa-plus"></i>
+                                Nueva Zona
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 8px; color: #1e40af; font-size: 13px;">
+                            <i class="fas fa-info-circle"></i>
+                            <span><strong>Gestión de Zonas:</strong> Agrega, edita o elimina supervisores. Los cambios se aplican automáticamente.</span>
+                        </div>
+                    </div>
+
+                    <div id="zonasList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyBDRqsZI8EQaGn1lCc4Y5rIcfmLE7969zY",
@@ -1781,6 +2205,66 @@
             usuarioEditando = null;
         };
 
+        // Cache de zonas para dashboard
+        let zonasDashboardCache = null;
+
+        // Función para cargar zonas dinámicamente
+        async function cargarZonasSelect(selectId) {
+            try {
+                const select = document.getElementById(selectId);
+
+                // Si ya tenemos cache, usar eso
+                if (zonasDashboardCache) {
+                    poblarSelectZonas(select, zonasDashboardCache);
+                    return;
+                }
+
+                // Consultar zonas desde Firebase
+                const zonasRef = ref(db, 'zonas');
+                const snapshot = await get(zonasRef);
+
+                if (snapshot.exists()) {
+                    zonasDashboardCache = snapshot.val();
+                    poblarSelectZonas(select, zonasDashboardCache);
+                } else {
+                    select.innerHTML = '<option value="">No hay zonas configuradas</option>';
+                    console.warn('⚠️ No se encontraron zonas en Firebase');
+                }
+            } catch (error) {
+                console.error('❌ Error al cargar zonas:', error);
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">Error al cargar zonas</option>';
+            }
+        }
+
+        function poblarSelectZonas(select, zonasData) {
+            select.innerHTML = '<option value="">Selecciona una zona</option>';
+
+            Object.keys(zonasData).sort().forEach(zona => {
+                const option = document.createElement('option');
+                option.value = zona;
+                option.textContent = zona;
+                select.appendChild(option);
+            });
+        }
+
+        // Función para mostrar/ocultar campo zona
+        window.toggleZonaField = function(type) {
+            const rol = document.getElementById(`${type}Rol`).value;
+            const zonaGroup = document.getElementById(`${type}ZonaGroup`);
+            const zonaSelect = document.getElementById(`${type}ZonaSelect`);
+
+            if (rol === 'supervisor') {
+                zonaGroup.style.display = 'block';
+                // Cargar zonas cuando se muestra el campo
+                cargarZonasSelect(`${type}ZonaSelect`);
+            } else {
+                zonaGroup.style.display = 'none';
+                // Limpiar selección cuando se oculta
+                if (zonaSelect) zonaSelect.value = '';
+            }
+        };
+
         // Crear Usuario
         document.getElementById('createUserForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1789,6 +2273,16 @@
             const email = document.getElementById('createEmail').value.trim();
             const password = document.getElementById('createPassword').value;
             const rol = document.getElementById('createRol').value;
+            
+            // Validar zona si es supervisor
+            let zona = null;
+            if (rol === 'supervisor') {
+                zona = document.getElementById('createZonaSelect').value;
+                if (!zona) {
+                    mostrarAlertaModal('error', 'Por favor selecciona una zona para el supervisor', 'create');
+                    return;
+                }
+            }
             
             if (!nombre || !email || !password || !rol) {
                 mostrarAlertaModal('error', 'Por favor completa todos los campos', 'create');
@@ -1808,13 +2302,19 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 
-                await set(refDB(db, `usuarios/${user.uid}`), {
+                const userData = {
                     nombre: nombre,
                     email: email,
                     rol: rol,
                     fechaCreacion: new Date().toISOString(),
                     ultimaActualizacion: new Date().toISOString()
-                });
+                };
+                
+                if (rol === 'supervisor' && zona) {
+                    userData.zona = zona;
+                }
+                
+                await set(refDB(db, `usuarios/${user.uid}`), userData);
                 
                 mostrarAlertaModal('success', `✓ Usuario ${nombre} creado correctamente`, 'create');
                 document.getElementById('createUserForm').reset();
@@ -1855,6 +2355,17 @@
             const nombre = document.getElementById('editNombre').value.trim();
             const rol = document.getElementById('editRol').value;
             
+            // Validar zona si es supervisor
+            let zona = [];
+            if (rol === 'supervisor') {
+                const zonaCheckboxes = document.querySelectorAll('input[name="editZona"]:checked');
+                zona = Array.from(zonaCheckboxes).map(cb => cb.value);
+                if (zona.length === 0) {
+                    mostrarAlertaModal('error', 'Por favor selecciona al menos una zona para el supervisor', 'edit');
+                    return;
+                }
+            }
+            
             if (!nombre || !rol) {
                 mostrarAlertaModal('error', 'Por favor completa todos los campos', 'edit');
                 return;
@@ -1868,11 +2379,17 @@
             try {
                 const { ref: refDB, update } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js');
                 
-                await update(refDB(db, `usuarios/${usuarioEditando.uid}`), {
+                const updateData = {
                     nombre: nombre,
                     rol: rol,
                     ultimaActualizacion: new Date().toISOString()
-                });
+                };
+                
+                if (rol === 'supervisor' && zona.length > 0) {
+                    updateData.zona = zona;
+                }
+                
+                await update(refDB(db, `usuarios/${usuarioEditando.uid}`), updateData);
                 
                 mostrarAlertaModal('success', '✓ Usuario actualizado correctamente', 'edit');
                 cargarUsuariosModal();
@@ -2025,6 +2542,20 @@
             document.getElementById('editNombre').value = user.nombre || '';
             document.getElementById('editRol').value = user.rol || '';
             document.getElementById('editEmail').value = user.email || '';
+
+            // Mostrar/ocultar campo zona y cargar zona actual
+            toggleZonaField('edit');
+
+            // Si es supervisor y tiene zona asignada, seleccionarla después de cargar las opciones
+            if (user.rol === 'supervisor') {
+                setTimeout(() => {
+                    const zonaSelect = document.getElementById('editZonaSelect');
+                    if (zonaSelect && user.zona) {
+                        zonaSelect.value = user.zona;
+                    }
+                }, 100); // Pequeño delay para asegurar que las opciones estén cargadas
+            }
+
             document.getElementById('editUserSection').style.display = 'block';
             document.getElementById('editUserSection').scrollIntoView({ behavior: 'smooth' });
         };
@@ -2051,6 +2582,583 @@
                 console.error('Error:', error);
             }
         };
+
+        // ========== MODALES PERSONALIZADOS ==========
+        function mostrarModalPersonalizado({
+            titulo = 'Confirmar acción',
+            mensaje = '¿Estás seguro?',
+            tipo = 'question',
+            confirmText = 'Continuar',
+            cancelText = 'Cancelar',
+            showInput = false,
+            inputPlaceholder = '',
+            inputHelp = '',
+            inputValue = ''
+        }) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('modalPersonalizado');
+                const titleEl = document.getElementById('modalTitlePersonalizado');
+                const messageEl = document.getElementById('modalMessagePersonalizado');
+                const iconEl = document.getElementById('modalIconPersonalizado');
+                const inputContainer = document.getElementById('modalInputContainer');
+                const inputEl = document.getElementById('modalInput');
+                const inputHelpEl = document.getElementById('modalInputHelp');
+                const confirmBtn = document.getElementById('modalConfirmPersonalizado');
+                const cancelBtn = document.getElementById('modalCancelPersonalizado');
+                const confirmTextEl = document.getElementById('modalConfirmText');
+                const cancelTextEl = document.getElementById('modalCancelText');
+
+                // Configurar contenido
+                titleEl.textContent = titulo;
+                messageEl.textContent = mensaje;
+                confirmTextEl.textContent = confirmText;
+                cancelTextEl.textContent = cancelText;
+
+                // Configurar icono
+                iconEl.className = 'modal-icon';
+                if (tipo === 'warning') {
+                    iconEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                    iconEl.classList.add('warning');
+                } else if (tipo === 'error') {
+                    iconEl.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+                    iconEl.classList.add('error');
+                } else if (tipo === 'success') {
+                    iconEl.innerHTML = '<i class="fas fa-check-circle"></i>';
+                    iconEl.classList.add('success');
+                } else {
+                    iconEl.innerHTML = '<i class="fas fa-question-circle"></i>';
+                }
+
+                // Configurar input si es necesario
+                if (showInput) {
+                    inputContainer.style.display = 'block';
+                    inputEl.placeholder = inputPlaceholder;
+                    inputEl.value = inputValue;
+                    inputHelpEl.textContent = inputHelp;
+                    setTimeout(() => inputEl.focus(), 100);
+                } else {
+                    inputContainer.style.display = 'none';
+                }
+
+                // Funciones de manejo
+                const handleConfirm = () => {
+                    cleanup();
+                    const result = showInput ? inputEl.value.trim() : true;
+                    resolve(result);
+                };
+
+                const handleCancel = () => {
+                    cleanup();
+                    resolve(showInput ? '' : false);
+                };
+
+                const handleOverlayClick = (e) => {
+                    if (e.target === modal) {
+                        cleanup();
+                        resolve(showInput ? '' : false);
+                    }
+                };
+
+                const handleKeyPress = (e) => {
+                    if (e.key === 'Enter' && showInput) {
+                        handleConfirm();
+                    } else if (e.key === 'Escape') {
+                        handleCancel();
+                    }
+                };
+
+                const cleanup = () => {
+                    modal.classList.remove('show');
+                    confirmBtn.removeEventListener('click', handleConfirm);
+                    cancelBtn.removeEventListener('click', handleCancel);
+                    modal.removeEventListener('click', handleOverlayClick);
+                    document.removeEventListener('keydown', handleKeyPress);
+                };
+
+                // Agregar event listeners
+                confirmBtn.addEventListener('click', handleConfirm);
+                cancelBtn.addEventListener('click', handleCancel);
+                modal.addEventListener('click', handleOverlayClick);
+                document.addEventListener('keydown', handleKeyPress);
+
+                // Mostrar modal
+                modal.classList.add('show');
+                if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+            });
+        }
+
+        // ========== GESTIÓN DE ZONAS ==========
+        let zonasData = {};
+
+        window.abrirGestionZonas = function() {
+            document.getElementById('modalZonas').classList.add('show');
+            cargarZonasModal();
+        };
+
+        window.cerrarModalZonas = function() {
+            document.getElementById('modalZonas').classList.remove('show');
+        };
+
+        async function cargarZonasModal() {
+            const content = document.getElementById('zonasContent');
+            const loader = document.getElementById('zonasLoader');
+
+            loader.classList.add('active');
+            content.style.display = 'none';
+
+            try {
+                const zonasRef = ref(db, 'zonas');
+                const snapshot = await get(zonasRef);
+
+                if (snapshot.exists()) {
+                    zonasData = snapshot.val();
+                    renderizarZonas();
+                    loader.classList.remove('active');
+                    content.style.display = 'block';
+                } else {
+                    mostrarAlertaZonas('error', 'No se encontraron zonas configuradas en la base de datos');
+                    loader.classList.remove('active');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarAlertaZonas('error', 'Error al cargar zonas: ' + error.message);
+                loader.classList.remove('active');
+            }
+        }
+
+        function renderizarZonas() {
+            const zonasList = document.getElementById('zonasList');
+            const zonasOrdenadas = Object.keys(zonasData).sort();
+
+            zonasList.innerHTML = zonasOrdenadas.map(zonaNombre => {
+                const zona = zonasData[zonaNombre];
+                const supervisores = zona.supervisores || [];
+
+                return `
+                    <div class="zona-card">
+                        <div class="zona-header">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="zona-name">${zonaNombre}</span>
+                                <button class="btn-small" onclick="editarNombreZona('${zonaNombre}')" style="background: #6b7280;" title="Editar nombre">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="supervisor-count">${supervisores.length} supervisor${supervisores.length !== 1 ? 'es' : ''}</span>
+                                <div class="supervisor-actions">
+                                    <button class="btn-small btn-primary" onclick="agregarSupervisorZona('${zonaNombre}')" title="Agregar supervisor" style="background: #10b981; color: white; border: none; padding: 6px 10px; border-radius: 4px;">
+                                        <i class="fas fa-user-plus"></i>
+                                    </button>
+                                    <button class="btn-small btn-danger" onclick="eliminarZona('${zonaNombre}')" title="Eliminar zona">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="supervisor-list">
+                            ${supervisores.length === 0 ?
+                                '<div style="text-align: center; color: #9ca3af; padding: 20px;">No hay supervisores asignados</div>' :
+                                supervisores.map((supervisor, index) => `
+                                    <div class="supervisor-item">
+                                        <div class="supervisor-info">
+                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                <h4>${supervisor.nombre}</h4>
+                                                <button class="btn-small" onclick="editarSupervisor('${zonaNombre}', ${index})" style="background: #6b7280;" title="Editar supervisor">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </div>
+                                            <p>${supervisor.email}</p>
+                                        </div>
+                                        <div class="supervisor-actions">
+                                            <button class="btn-small btn-danger" onclick="eliminarSupervisor('${zonaNombre}', ${index})" title="Eliminar supervisor">
+                                                <i class="fas fa-user-minus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                `).join('')
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.migrarZonasSistema = async function() {
+            try {
+                // Verificar permisos primero
+                const testRef = ref(db, 'zonas/test_permissions');
+                await set(testRef, { test: true });
+                await set(testRef, null); // Limpiar test
+
+                const zonasRef = ref(db, 'zonas');
+                const snapshot = await get(zonasRef);
+
+                let confirmar = false;
+
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    const zonasCount = Object.keys(data).length;
+
+                    confirmar = await mostrarModalPersonalizado({
+                        titulo: 'Actualizar Sistema de Zonas',
+                        mensaje: `Las zonas ya están configuradas: ${zonasCount} zonas encontradas.\n\n¿Quieres ACTUALIZAR los datos con la información correcta de los supervisores?\n\n⚠️ Esto reemplazará toda la configuración existente.`,
+                        tipo: 'warning',
+                        confirmText: 'Sí, actualizar',
+                        cancelText: 'Cancelar'
+                    });
+
+                    if (!confirmar) {
+                        mostrarAlertaZonas('info', 'Actualización cancelada.');
+                        return;
+                    }
+                } else {
+                    confirmar = await mostrarModalPersonalizado({
+                        titulo: 'Migrar Sistema de Zonas',
+                        mensaje: '¿Estás seguro de migrar el sistema de zonas?\n\nEsto poblará automáticamente las zonas con la configuración estándar.\n\n⚠️ Asegúrate de que las reglas de Firebase estén actualizadas.',
+                        tipo: 'warning',
+                        confirmText: 'Sí, migrar',
+                        cancelText: 'Cancelar'
+                    });
+
+                    if (!confirmar) {
+                        return;
+                    }
+                }
+
+                // Zonas por defecto con datos reales de usuarios de Eficacia
+                const zonasDefault = {
+                    "Antioquia": {
+                        supervisores: [
+                            { nombre: "JUAN CARLOS GARCIA ROJAS", email: "juan_garcia@eficacia.com.co" },
+                            { nombre: "JUAN DAVID CARDONA", email: "Juan_cardona@eficacia.com.co" },
+                            { nombre: "Jairo Alonso Arango Posada", email: "jairo_arango@eficacia.com.co" }
+                        ]
+                    },
+                    "Centro": {
+                        supervisores: [
+                            { nombre: "ESTHER AVELLA BOHORQUEZ", email: "esther_avella@eficacia.com.co" },
+                            { nombre: "NELSON PACHECO HERNANDEZ", email: "nelson_pacheco@eficacia.com.co" }
+                        ]
+                    },
+                    "Eje Cafetero": {
+                        supervisores: [
+                            { nombre: "INGRID JULIANA HERRERA VALENCIA", email: "ingrid_herrera@eficacia.com.co" },
+                            { nombre: "ALEXANDER CATAÑO", email: "alexander_catano@eficacia.com.co" }
+                        ]
+                    },
+                    "Norte": {
+                        supervisores: [
+                            { nombre: "KELLY NIÑO", email: "kellys_nino@eficacia.com.co" },
+                            { nombre: "ILDER AMARIS", email: "Ilder_Amaris@eficacia.com.co" },
+                            { nombre: "INGRI YILLIEM ROSERO REYES", email: "ingry_rosero@eficacia.com.co" },
+                            { nombre: "ALEXANDER CATAÑO", email: "alexander_catano@eficacia.com.co" }
+                        ]
+                    },
+                    "Oriente": {
+                        supervisores: [
+                            { nombre: "MARIA FERNANDA CHAPARRO VESGA", email: "maria_Chaparro@eficacia.com.co" }
+                        ]
+                    },
+                    "Tolima": {
+                        supervisores: [
+                            { nombre: "INGRID JULIANA HERRERA VALENCIA", email: "ingrid_herrera@eficacia.com.co" },
+                            { nombre: "ALEXANDER CATAÑO", email: "alexander_catano@eficacia.com.co" }
+                        ]
+                    },
+                    "Occidente": {
+                        supervisores: [
+                            { nombre: "INGRI YILLIEM ROSERO REYES", email: "ingry_rosero@eficacia.com.co" },
+                            { nombre: "ALEXANDER CATAÑO", email: "alexander_catano@eficacia.com.co" }
+                        ]
+                    }
+                };
+
+                await set(zonasRef, zonasDefault);
+                mostrarAlertaZonas('success', '✅ Sistema de zonas actualizado exitosamente. Se configuraron 7 zonas con 16 supervisores con los datos correctos de Eficacia.');
+
+                // Recargar datos
+                cargarZonasModal();
+
+            } catch (error) {
+                console.error('Error en migración:', error);
+
+                let mensajeError = '❌ Error al migrar zonas: ' + error.message;
+
+                if (error.message.includes('PERMISSION_DENIED') || error.code === 403) {
+                    mensajeError = '🚫 ERROR DE PERMISOS EN FIREBASE\n\n' +
+                        'Las reglas de Firebase no están actualizadas.\n\n' +
+                        'SOLUCIÓN RÁPIDA:\n\n' +
+                        '1. Ve a: https://console.firebase.google.com/\n' +
+                        '2. Selecciona tu proyecto "reprogramacionesme"\n' +
+                        '3. Ve a: Realtime Database → Rules\n' +
+                        '4. REEMPLAZA todo el contenido con:\n\n' +
+                        '{\n' +
+                        '  "rules": {\n' +
+                        '    ".read": false,\n' +
+                        '    ".write": false,\n' +
+                        '    "usuarios": {\n' +
+                        '      ".read": true,\n' +
+                        '      ".indexOn": ["rol", "email"],\n' +
+                        '      "$uid": {\n' +
+                        '        ".write": "auth != null || !data.exists()"\n' +
+                        '      }\n' +
+                        '    },\n' +
+                        '    "reprogramaciones": {\n' +
+                        '      "$mes": {\n' +
+                        '        ".read": "auth != null",\n' +
+                        '        ".write": "auth != null",\n' +
+                        '        ".indexOn": ["auxiliarId", "supervisorId", "estado", "fechaSubida"],\n' +
+                        '        "$reprogId": {\n' +
+                        '          ".read": "auth != null",\n' +
+                        '          ".write": "auth != null"\n' +
+                        '        }\n' +
+                        '      }\n' +
+                        '    },\n' +
+                        '    "zonas": {\n' +
+                        '      ".read": "auth != null",\n' +
+                        '      ".write": "auth != null && root.child(\'usuarios\').child(auth.uid).child(\'rol\').val() == \'admin\'",\n' +
+                        '      ".indexOn": ["supervisores"]\n' +
+                        '    }\n' +
+                        '  }\n' +
+                        '}\n\n' +
+                        '5. Haz clic en "Publish"\n' +
+                        '6. Espera 1-2 minutos\n' +
+                        '7. Vuelve aquí y haz clic en "Migrar Zonas"';
+                }
+
+                mostrarAlertaZonas('error', mensajeError);
+            }
+        };
+
+        window.inicializarZonasDefault = async function() {
+            await migrarZonasSistema();
+        };
+
+        window.agregarNuevaZona = async function() {
+            const zonaNombre = await mostrarModalPersonalizado({
+                titulo: 'Nueva Zona',
+                mensaje: 'Ingresa el nombre de la nueva zona:',
+                showInput: true,
+                inputPlaceholder: 'Ej: Antioquia, Centro, Norte...',
+                inputHelp: 'El nombre debe ser único y descriptivo',
+                confirmText: 'Crear Zona',
+                cancelText: 'Cancelar'
+            });
+
+            if (!zonaNombre) return;
+
+            const zonaLimpia = zonaNombre.trim();
+            if (zonasData[zonaLimpia]) {
+                mostrarAlertaZonas('error', 'Esta zona ya existe');
+                return;
+            }
+
+            zonasData[zonaLimpia] = { supervisores: [] };
+            guardarZonas();
+        };
+
+        window.editarNombreZona = async function(zonaActual) {
+            const nuevoNombre = await mostrarModalPersonalizado({
+                titulo: 'Editar Nombre de Zona',
+                mensaje: `Cambiar nombre de "${zonaActual}" a:`,
+                showInput: true,
+                inputPlaceholder: 'Nuevo nombre de zona',
+                inputValue: zonaActual,
+                inputHelp: 'El nombre debe ser único',
+                confirmText: 'Guardar Cambios',
+                cancelText: 'Cancelar'
+            });
+
+            if (!nuevoNombre || nuevoNombre.trim() === zonaActual) return;
+
+            const nombreLimpio = nuevoNombre.trim();
+            if (zonasData[nombreLimpio]) {
+                mostrarAlertaZonas('error', 'Ya existe una zona con ese nombre');
+                return;
+            }
+
+            // Crear nueva zona con el nuevo nombre
+            zonasData[nombreLimpio] = zonasData[zonaActual];
+            // Eliminar zona antigua
+            delete zonasData[zonaActual];
+
+            guardarZonas();
+        };
+
+        window.agregarSupervisorZona = async function(zonaNombre) {
+            // Primero pedir nombre
+            const nombre = await mostrarModalPersonalizado({
+                titulo: 'Agregar Supervisor',
+                mensaje: `Ingresa el nombre del supervisor para la zona "${zonaNombre}":`,
+                showInput: true,
+                inputPlaceholder: 'Ej: Juan García',
+                inputHelp: 'Nombre completo del supervisor',
+                confirmText: 'Siguiente',
+                cancelText: 'Cancelar'
+            });
+
+            if (!nombre) return;
+
+            // Después pedir email
+            const email = await mostrarModalPersonalizado({
+                titulo: 'Agregar Supervisor',
+                mensaje: `Ingresa el email del supervisor "${nombre}":`,
+                showInput: true,
+                inputPlaceholder: 'Ej: juan.garcia@empresa.com',
+                inputHelp: 'Email corporativo válido',
+                confirmText: 'Agregar Supervisor',
+                cancelText: 'Cancelar'
+            });
+
+            if (!email) return;
+
+            if (!zonasData[zonaNombre].supervisores) {
+                zonasData[zonaNombre].supervisores = [];
+            }
+
+            // Verificar si ya existe
+            const existe = zonasData[zonaNombre].supervisores.some(s => s.email === email.trim());
+            if (existe) {
+                mostrarAlertaZonas('error', 'Este supervisor ya está asignado a esta zona');
+                return;
+            }
+
+            zonasData[zonaNombre].supervisores.push({
+                nombre: nombre.trim(),
+                email: email.trim()
+            });
+
+            guardarZonas();
+        };
+
+        window.editarSupervisor = async function(zonaNombre, index) {
+            const supervisor = zonasData[zonaNombre].supervisores[index];
+
+            // Editar nombre
+            const nuevoNombre = await mostrarModalPersonalizado({
+                titulo: 'Editar Supervisor',
+                mensaje: `Nuevo nombre para "${supervisor.nombre}":`,
+                showInput: true,
+                inputPlaceholder: 'Nombre completo',
+                inputValue: supervisor.nombre,
+                inputHelp: 'Actualiza el nombre del supervisor',
+                confirmText: 'Siguiente',
+                cancelText: 'Cancelar'
+            });
+
+            if (!nuevoNombre) return;
+
+            // Editar email
+            const nuevoEmail = await mostrarModalPersonalizado({
+                titulo: 'Editar Supervisor',
+                mensaje: `Nuevo email para "${nuevoNombre}":`,
+                showInput: true,
+                inputPlaceholder: 'Email corporativo',
+                inputValue: supervisor.email,
+                inputHelp: 'Actualiza el email del supervisor',
+                confirmText: 'Guardar Cambios',
+                cancelText: 'Cancelar'
+            });
+
+            if (!nuevoEmail) return;
+
+            // Verificar si el email ya existe en otros supervisores de esta zona
+            const emailExiste = zonasData[zonaNombre].supervisores.some((s, i) =>
+                i !== index && s.email === nuevoEmail.trim()
+            );
+            if (emailExiste) {
+                mostrarAlertaZonas('error', 'Este email ya está asignado a otro supervisor en esta zona');
+                return;
+            }
+
+            zonasData[zonaNombre].supervisores[index] = {
+                nombre: nuevoNombre.trim(),
+                email: nuevoEmail.trim()
+            };
+
+            guardarZonas();
+        };
+
+        window.eliminarSupervisor = async function(zonaNombre, index) {
+            const supervisor = zonasData[zonaNombre].supervisores[index];
+
+            const confirmar = await mostrarModalPersonalizado({
+                titulo: 'Eliminar Supervisor',
+                mensaje: `¿Estás seguro de eliminar al supervisor "${supervisor.nombre}"?\n\nEsta acción no se puede deshacer.`,
+                tipo: 'warning',
+                confirmText: 'Sí, eliminar',
+                cancelText: 'Cancelar'
+            });
+
+            if (confirmar) {
+                zonasData[zonaNombre].supervisores.splice(index, 1);
+                guardarZonas();
+            }
+        };
+
+        window.eliminarZona = async function(zonaNombre) {
+            const supervisoresCount = zonasData[zonaNombre].supervisores.length;
+
+            const confirmar = await mostrarModalPersonalizado({
+                titulo: 'Eliminar Zona',
+                mensaje: `¿Estás seguro de eliminar la zona "${zonaNombre}"?\n\nEsto eliminará ${supervisoresCount} supervisor${supervisoresCount !== 1 ? 'es' : ''} asignados a esta zona.\n\nEsta acción no se puede deshacer.`,
+                tipo: 'error',
+                confirmText: 'Sí, eliminar zona',
+                cancelText: 'Cancelar'
+            });
+
+            if (confirmar) {
+                delete zonasData[zonaNombre];
+                guardarZonas();
+            }
+        };
+
+        async function guardarZonas() {
+            try {
+                const zonasRef = ref(db, 'zonas');
+                await set(zonasRef, zonasData);
+
+                // Calcular estadísticas
+                const totalZonas = Object.keys(zonasData).length;
+                const totalSupervisores = Object.values(zonasData).reduce((total, zona) => total + zona.supervisores.length, 0);
+
+                mostrarAlertaZonas('success', `✅ Zonas actualizadas correctamente. ${totalZonas} zonas con ${totalSupervisores} supervisores.`);
+                renderizarZonas();
+
+                // Limpiar cache para forzar recarga
+                zonasDashboardCache = null;
+
+                // Actualizar selectores en formularios si están abiertos
+                if (document.getElementById('createZonaSelect')) {
+                    cargarZonasSelect('createZonaSelect');
+                }
+                if (document.getElementById('editZonaSelect')) {
+                    cargarZonasSelect('editZonaSelect');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+
+                let mensajeError = 'Error al guardar zonas: ' + error.message;
+                if (error.message.includes('PERMISSION_DENIED')) {
+                    mensajeError = '🚫 Sin permisos para modificar zonas. Solo administradores pueden hacer cambios.';
+                }
+
+                mostrarAlertaZonas('error', mensajeError);
+            }
+        }
+
+        function mostrarAlertaZonas(tipo, mensaje) {
+            const alertId = tipo === 'success' ? 'successAlertZonas' : 'errorAlertZonas';
+            const msgId = tipo === 'success' ? 'successMsgZonas' : 'errorMsgZonas';
+
+            const alert = document.getElementById(alertId);
+            const msgElement = document.getElementById(msgId);
+
+            msgElement.textContent = mensaje;
+            alert.classList.add('show');
+            setTimeout(() => alert.classList.remove('show'), 4000);
+        }
     </script>
 </body>
 </html>
