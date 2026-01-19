@@ -307,42 +307,60 @@
         .table-wrapper {
             border: 1px solid var(--border);
             border-radius: 8px;
-            overflow: hidden;
+            overflow-x: auto;
+            overflow-y: visible;
+            -webkit-overflow-scrolling: touch;
             margin-top: 12px;
+            background: white;
         }
 
         .data-table {
             width: 100%;
+            min-width: 600px;
             border-collapse: collapse;
             font-size: 12px;
         }
 
         .data-table th {
             background: #f8fafc;
-            padding: 8px;
+            padding: 12px 8px;
             text-align: left;
             font-weight: 600;
             color: var(--text-secondary);
             border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .data-table td {
-            padding: 8px;
+            padding: 10px 8px;
             border-bottom: 1px solid var(--border);
         }
 
         .editable-cell input, .editable-cell textarea {
             width: 100%;
-            border: 1px solid var(--border);
+            min-width: 150px;
+            border: 2px solid var(--border);
             border-radius: 6px;
-            padding: 8px;
+            padding: 10px;
             font-size: 14px;
+            font-family: inherit;
+            box-sizing: border-box;
+            min-height: 44px;
+            background: white;
+        }
+        
+        .editable-cell textarea {
+            min-height: 60px;
+            resize: vertical;
         }
         
         .editable-cell input:focus, .editable-cell textarea:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
         }
 
         .btn {
@@ -856,13 +874,23 @@
         const reprogs = itemsFiltrados.filter(r => r.datosReprogramacion?.length > 0);
         const pends = itemsFiltrados.filter(r => r.datosPendientes?.length > 0);
 
+        // Contar total de hojas de pendientes (incluyendo subdivisiones)
+        let totalHojasPendientes = 0;
+        pends.forEach(r => {
+            if (r.datosPendientesPorHoja && Object.keys(r.datosPendientesPorHoja).length > 0) {
+                totalHojasPendientes += Object.keys(r.datosPendientesPorHoja).length;
+            } else {
+                totalHojasPendientes += 1; // Fallback para formato antiguo
+            }
+        });
+
         // Actualizar Badges de los Tabs Internos con la cantidad FILTRADA
         const rBadge = document.getElementById('reprogBadge');
         if(reprogs.length > 0) { rBadge.textContent = reprogs.length; rBadge.style.display = 'block'; } 
         else rBadge.style.display = 'none';
 
         const pBadge = document.getElementById('pendientesBadge');
-        if(pends.length > 0) { pBadge.textContent = pends.length; pBadge.style.display = 'block'; }
+        if(totalHojasPendientes > 0) { pBadge.textContent = totalHojasPendientes; pBadge.style.display = 'block'; }
         else pBadge.style.display = 'none';
 
         // 3. Renderizar Reprogramaciones
@@ -874,13 +902,31 @@
             containerR.innerHTML = reprogs.map(r => crearCardReprog(r, 'reprogramaciones')).join('');
         }
 
-        // 4. Renderizar Pendientes (Tareas)
+        // 4. Renderizar Pendientes (Tareas) - CADA HOJA POR SEPARADO
         const containerP = document.getElementById('pendientesContainer');
         if(pends.length===0) {
             const msg = tabActual === 'respondidas' ? 'No hay historial de tareas' : 'No hay tareas pendientes';
             containerP.innerHTML = emptyStateHTML('clock', msg);
         } else {
-            containerP.innerHTML = pends.map(r => crearCardReprog(r, 'pendientes')).join('');
+            // Agrupar por reprogramación y luego por hoja
+            let htmlPendientes = '';
+            pends.forEach(reprog => {
+                // Si tiene datosPendientesPorHoja, renderizar cada hoja por separado
+                if (reprog.datosPendientesPorHoja && Object.keys(reprog.datosPendientesPorHoja).length > 0) {
+                    for (const [nombreHoja, datos] of Object.entries(reprog.datosPendientesPorHoja)) {
+                        const reprogConHoja = { 
+                            ...reprog, 
+                            datosPendientes: datos, 
+                            nombreHojaActual: nombreHoja 
+                        };
+                        htmlPendientes += crearCardReprog(reprogConHoja, 'pendientes');
+                    }
+                } else {
+                    // Fallback: si no tiene el nuevo formato, usar el antiguo
+                    htmlPendientes += crearCardReprog(reprog, 'pendientes');
+                }
+            });
+            containerP.innerHTML = htmlPendientes;
         }
     }
 
@@ -893,9 +939,12 @@
         const datos = tipo === 'reprogramaciones' ? (reprog.datosReprogramacion||[]) : (reprog.datosPendientes||[]);
         const estadoClass = reprog.estado==='respondida'?'badge-answered':'badge-pending';
         
+        // Crear ID único para cada hoja (importante cuando hay múltiples hojas)
+        const edicionId = reprog.nombreHojaActual ? `${reprog.id}_${reprog.nombreHojaActual}` : reprog.id;
+        
         // Init cache edicion solo si está pendiente
-        if (!datosEditados[reprog.id] && reprog.estado === 'pendiente') {
-            datosEditados[reprog.id] = datos.map(row => ({...row, 'FECHA REPROGRAMACION': row['FECHA REPROGRAMACION']||'', 'OBSERVACION': row['OBSERVACION']||''}));
+        if (!datosEditados[edicionId] && reprog.estado === 'pendiente') {
+            datosEditados[edicionId] = datos.map(row => ({...row, 'FECHA REPROGRAMACION': row['FECHA REPROGRAMACION']||'', 'OBSERVACION': row['OBSERVACION']||''}));
         }
 
         let tableHTML = '';
@@ -906,15 +955,19 @@
             const allCols = ['FECHA REPROGRAMACION', 'OBSERVACION', ...cols]; 
 
             tableHTML = `
+                <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 10px 12px; border-radius: 6px; margin: 12px 0 8px 0; font-size: 12px; color: #1e40af; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-hand-point-right" style="font-size: 16px;"></i>
+                    <span style="font-weight: 600;">Desliza horizontalmente para ver todas las columnas</span>
+                </div>
                 <div class="table-wrapper">
                     <table class="data-table">
                         <thead><tr>${allCols.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
                         <tbody>
-                            ${datos.map((row, i) => `<tr>${allCols.map(col => renderCell(col, row, i, reprog.id)).join('')}</tr>`).join('')}
+                            ${datos.map((row, i) => `<tr>${allCols.map(col => renderCell(col, row, i, edicionId)).join('')}</tr>`).join('')}
                         </tbody>
                     </table>
                 </div>
-                <button class="btn ${isOnline?'btn-success':'btn-warning'}" onclick="guardarRespuestas('${reprog.mes}', '${reprog.id}')">
+                <button class="btn ${isOnline?'btn-success':'btn-warning'}" onclick="guardarRespuestas('${reprog.mes}', '${edicionId}', '${reprog.nombreHojaActual || ''}')">
                     <i class="fas ${isOnline?'fa-check':'fa-save'}"></i> ${isOnline?'Enviar Respuesta':'Guardar Offline'}
                 </button>
             `;
@@ -923,6 +976,10 @@
         else if (reprog.estado === 'respondida' && datos.length > 0) {
              const cols = Object.keys(datos[0] || {});
              tableHTML = `
+                <div style="background: #d1fae5; border-left: 4px solid #10b981; padding: 10px 12px; border-radius: 6px; margin: 12px 0 8px 0; font-size: 12px; color: #065f46; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-check-circle" style="font-size: 16px;"></i>
+                    <span style="font-weight: 600;">Respondida - Desliza para ver todos los datos</span>
+                </div>
                 <div class="table-wrapper" style="opacity:0.8;">
                     <table class="data-table">
                         <thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
@@ -941,7 +998,10 @@
             <div class="reprog-card tipo-${tipo}">
                 <div class="card-header">
                     <div>
-                        <div class="card-title">${reprog.auxiliarNombre}</div>
+                        <div class="card-title">
+                            ${reprog.auxiliarNombre}
+                            ${reprog.nombreHojaActual ? `<span style="display:inline-block;margin-left:10px;font-size:12px;padding:4px 10px;border-radius:8px;background:#fef3c7;color:#92400e;font-weight:600;">📄 ${reprog.nombreHojaActual}</span>` : ''}
+                        </div>
                         <div class="card-subtitle"><i class="far fa-calendar"></i> ${fecha} &bull; ${datos.length} items</div>
                     </div>
                     <span class="status-badge ${estadoClass}">${reprog.estado}</span>
@@ -964,7 +1024,7 @@
         if(datosEditados[r]) datosEditados[r][i][f] = el.value;
     };
 
-    window.guardarRespuestas = async function(mes, id) {
+    window.guardarRespuestas = async function(mes, id, nombreHoja = '') {
         const datos = datosEditados[id];
         if(!datos) return;
         if(datos.some(d => !d['FECHA REPROGRAMACION'] || !d['OBSERVACION'])) {
@@ -979,8 +1039,17 @@
             await offlineStorage.guardarCambioPendiente(id, mes, datos);
             if(isOnline) {
                 const updateData = { estado: 'respondida', fechaRespuesta: new Date().toISOString() };
-                if(tabActiva === 'reprogramaciones') updateData.datosReprogramacion = datos;
-                else updateData.datosPendientes = datos;
+                
+                if(tabActiva === 'reprogramaciones') {
+                    updateData.datosReprogramacion = datos;
+                } else {
+                    // Si hay nombre de hoja, guardar en la estructura por hoja
+                    if(nombreHoja) {
+                        updateData[`datosPendientesPorHoja/${nombreHoja}`] = datos;
+                    } else {
+                        updateData.datosPendientes = datos;
+                    }
+                }
 
                 await update(ref(db, `reprogramaciones/${mes}/${id}`), updateData);
                 await offlineStorage.marcarCambioSincronizado((await offlineStorage.obtenerCambiosPendientes())[0]?.timestamp);
@@ -1003,8 +1072,15 @@
             const idx = todasReprogramaciones.findIndex(r=>r.id===id);
             if(idx!==-1) {
                 todasReprogramaciones[idx].estado = 'respondida';
-                if(tabActiva==='reprogramaciones') todasReprogramaciones[idx].datosReprogramacion = datos;
-                else todasReprogramaciones[idx].datosPendientes = datos;
+                if(tabActiva==='reprogramaciones') {
+                    todasReprogramaciones[idx].datosReprogramacion = datos;
+                } else {
+                    if(nombreHoja && todasReprogramaciones[idx].datosPendientesPorHoja) {
+                        todasReprogramaciones[idx].datosPendientesPorHoja[nombreHoja] = datos;
+                    } else {
+                        todasReprogramaciones[idx].datosPendientes = datos;
+                    }
+                }
                 todasReprogramaciones[idx].fechaRespuesta = new Date().toISOString();
             }
             actualizarEstadisticas();
