@@ -44,7 +44,7 @@
             overflow: hidden;
         }
 
-        /* --- HEADER --- */
+        /* --- HEADER ESTILO APP --- */
         .header {
             background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
@@ -96,7 +96,7 @@
             backdrop-filter: blur(4px);
         }
 
-        /* --- STATS --- */
+        /* --- STATS CARDS (Mini Dashboard) --- */
         .header-stats {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -135,7 +135,7 @@
         .stat-card.warning .stat-number { color: #fdba74; }
         .stat-card.offline .stat-number { color: #fca5a5; }
 
-        /* --- FILTROS --- */
+        /* --- FILTROS SUPERIORES (Pills) --- */
         .filter-scroller {
             background: var(--bg-primary);
             padding: 12px 16px;
@@ -179,7 +179,7 @@
         }
         .filter-pill.active .pill-badge { background: rgba(255,255,255,0.2); }
 
-        /* --- MAIN --- */
+        /* --- CONTENT AREA --- */
         .main-container {
             flex: 1;
             overflow-y: auto;
@@ -187,14 +187,14 @@
             position: relative;
         }
 
-        /* --- SEGMENTED CONTROL --- */
+        /* --- SEGMENTED CONTROL (Estilo iOS) --- */
         .app-segment-container {
             background: #e2e8f0;
             border-radius: 14px;
             padding: 4px;
             display: flex;
             margin-bottom: 20px;
-            position: sticky;
+            position: sticky; /* Sticky dentro del contenedor */
             top: 0;
             z-index: 90;
         }
@@ -243,13 +243,21 @@
             border: 2px solid #e2e8f0;
         }
         
-        .segment-btn.active .segment-badge { border-color: white; }
-        .segment-desc {
-            font-size: 10px; opacity: 0.7; font-weight: 400; display: none;
+        .segment-btn.active .segment-badge {
+            border-color: white;
         }
-        @media (min-width: 380px) { .segment-desc { display: block; } }
 
-        /* --- CARDS --- */
+        .segment-desc {
+            font-size: 10px;
+            opacity: 0.7;
+            font-weight: 400;
+            display: none;
+        }
+        @media (min-width: 380px) {
+            .segment-desc { display: block; }
+        }
+
+        /* --- CARDS & TABLES --- */
         .reprog-card {
             background: white;
             border-radius: 16px;
@@ -295,62 +303,59 @@
         .badge-pending { background: #fff7ed; color: #c2410c; }
         .badge-answered { background: #f0fdf4; color: #15803d; }
 
-        /* --- ARREGLO DE SCROLL DE TABLAS --- */
+        /* Tablas Responsive */
         .table-wrapper {
             border: 1px solid var(--border);
             border-radius: 8px;
-            /* Clave para el scroll */
-            width: 100%;
-            overflow-x: auto; 
+            overflow-x: auto;
+            overflow-y: visible;
             -webkit-overflow-scrolling: touch;
             margin-top: 12px;
             background: white;
-            position: relative;
         }
 
         .data-table {
+            width: 100%;
+            min-width: 600px;
             border-collapse: collapse;
             font-size: 12px;
-            /* Obliga a la tabla a no comprimirse */
-            width: auto;
-            min-width: 100%; 
         }
 
         .data-table th {
             background: #f8fafc;
-            padding: 12px 10px;
+            padding: 12px 8px;
             text-align: left;
             font-weight: 600;
             color: var(--text-secondary);
             border-bottom: 1px solid var(--border);
-            /* ESTO arregla que los nombres se corten */
-            white-space: nowrap; 
+            white-space: nowrap;
             position: sticky;
             top: 0;
             z-index: 10;
         }
 
         .data-table td {
-            padding: 10px 10px;
+            padding: 10px 8px;
             border-bottom: 1px solid var(--border);
-            /* Evita que el contenido se rompa feo */
-            min-width: 100px; 
-            max-width: 300px;
         }
 
         .editable-cell input, .editable-cell textarea {
             width: 100%;
-            min-width: 160px; /* Ancho mínimo para inputs */
+            min-width: 150px;
             border: 2px solid var(--border);
             border-radius: 6px;
             padding: 10px;
             font-size: 14px;
             font-family: inherit;
             box-sizing: border-box;
+            min-height: 44px;
             background: white;
         }
         
-        .editable-cell textarea { min-height: 60px; resize: vertical; }
+        .editable-cell textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
         
         .editable-cell input:focus, .editable-cell textarea:focus {
             outline: none;
@@ -377,14 +382,26 @@
         .btn-success { background: var(--success); color: white; }
         .btn-warning { background: var(--warning); color: white; }
 
-        /* Estados y Utilidades */
-        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
+        /* Estados */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
         .empty-state i { font-size: 40px; margin-bottom: 12px; opacity: 0.3; }
         
+        /* Banner de conexión */
         .connection-banner {
-            position: fixed; top: 0; left: 0; right: 0; padding: 8px; text-align: center;
-            font-size: 12px; font-weight: 600; color: white; z-index: 1000;
-            transform: translateY(-100%); transition: transform 0.3s;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            z-index: 1000;
+            transform: translateY(-100%);
+            transition: transform 0.3s;
         }
         .connection-banner.show { transform: translateY(0); }
         .connection-banner.online { background: var(--success); }
@@ -394,34 +411,68 @@
         .tab-pane.active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .loader { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px; }
+        /* Loader */
+        .loader {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
         .loader.active { display: flex; }
         .spinner {
-            width: 30px; height: 30px; border: 3px solid #e2e8f0; border-top-color: var(--primary);
-            border-radius: 50%; animation: spin 0.8s linear infinite;
+            width: 30px; height: 30px;
+            border: 3px solid #e2e8f0;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* Alertas */
         .alert-toast {
-            position: fixed; bottom: 20px; left: 20px; right: 20px; background: white;
-            padding: 16px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            display: flex; align-items: center; gap: 12px; z-index: 2000;
-            transform: translateY(150%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 2000;
+            transform: translateY(150%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border-left: 5px solid var(--primary);
         }
         .alert-toast.show { transform: translateY(0); }
         .alert-toast.success { border-color: var(--success); }
         .alert-toast.error { border-color: var(--error); }
         
+        /* Modal */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-            z-index: 9999; display: flex; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.2s;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.2s;
         }
         .modal-overlay.show { opacity: 1; pointer-events: all; }
         .modal-card {
-            background: white; width: 90%; max-width: 320px; border-radius: 20px;
-            padding: 24px; text-align: center; transform: scale(0.9); transition: transform 0.2s;
+            background: white;
+            width: 90%;
+            max-width: 320px;
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.2s;
         }
         .modal-overlay.show .modal-card { transform: scale(1); }
     </style>
@@ -589,9 +640,9 @@
                 req.onerror = () => resolve([]);
             });
         }
-        async guardarCambioPendiente(reprogId, mes, datos) {
+        async guardarCambioPendiente(reprogId, mes, datos, tipo = 'reprogramaciones', nombreHoja = '') {
             const tx = this.db.transaction(['cambiosPendientes'], 'readwrite');
-            const cambio = { timestamp: Date.now(), reprogId, mes, datos, sincronizado: false };
+            const cambio = { timestamp: Date.now(), reprogId, mes, datos, tipo, nombreHoja, sincronizado: false };
             await tx.objectStore('cambiosPendientes').put(cambio);
             return cambio;
         }
@@ -630,7 +681,7 @@
     let primeraCargar = true, dbReady = false;
     let tabActiva = 'pendientes'; 
 
-    // Inner Tabs Logic
+    // Inner Tabs Logic (Segmented Control)
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const tabName = btn.dataset.tab;
@@ -642,14 +693,14 @@
         });
     });
 
-    // Outer Filters Logic
+    // Outer Filters Logic (Pills)
     window.cambiarTab = function(nuevoTab) {
         tabActual = nuevoTab;
         document.querySelectorAll('.filter-pill').forEach(t => {
             t.classList.remove('active');
             if (t.dataset.tab === nuevoTab) t.classList.add('active');
         });
-        mostrarReprogramaciones();
+        mostrarReprogramaciones(); // Re-renderizar con filtro
     };
 
     const connectionBanner = document.getElementById('connectionBanner');
@@ -774,9 +825,24 @@
         let sync = 0;
         for(const c of pendientes) {
             try {
-                await update(ref(db, `reprogramaciones/${c.mes}/${c.reprogId}`), {
-                    estado: 'respondida', datosExcel: c.datos, fechaRespuesta: new Date().toISOString()
-                });
+                // Determinar si es reprogramación o pendiente basado en los datos guardados
+                const updateData = {
+                    estado: 'respondida',
+                    fechaRespuesta: new Date().toISOString()
+                };
+                
+                // Si el cambio tiene información sobre el tipo, usarlo
+                // Si tiene nombreHoja, es una tarea pendiente
+                if(c.nombreHoja) {
+                    updateData[`datosPendientesPorHoja/${c.nombreHoja}`] = c.datos;
+                } else if(c.tipo === 'pendientes') {
+                    updateData.datosPendientes = c.datos;
+                } else {
+                    // Por defecto, asumir que es reprogramación
+                    updateData.datosReprogramacion = c.datos;
+                }
+                
+                await update(ref(db, `reprogramaciones/${c.mes}/${c.reprogId}`), updateData);
                 await offlineStorage.marcarCambioSincronizado(c.timestamp);
                 sync++;
             } catch(e){ console.error(e); }
@@ -794,6 +860,7 @@
     }
 
     function actualizarEstadisticas() {
+        // Stats Superiores siempre muestran la carga de trabajo (Pendientes reales)
         const pendingTotal = todasReprogramaciones.filter(r => r.estado === 'pendiente');
         const rCount = pendingTotal.filter(r => r.datosReprogramacion?.length > 0).length;
         const pCount = pendingTotal.filter(r => r.datosPendientes?.length > 0).length;
@@ -804,28 +871,35 @@
     }
 
     function mostrarReprogramaciones() {
+        // 1. FILTRADO PRINCIPAL (Lógica corregida)
         let itemsFiltrados = [];
         
         if (tabActual === 'pendientes') {
+            // Solo mostrar las que NO han sido respondidas
             itemsFiltrados = todasReprogramaciones.filter(r => r.estado === 'pendiente');
         } else if (tabActual === 'respondidas') {
+            // Solo mostrar el HISTORIAL (las ya respondidas)
             itemsFiltrados = todasReprogramaciones.filter(r => r.estado === 'respondida');
         } else {
+            // Tab 'Todas': mostrar todo
             itemsFiltrados = todasReprogramaciones;
         }
 
+        // 2. Separar para los Tabs Internos (Reprogramaciones vs Pendientes)
         const reprogs = itemsFiltrados.filter(r => r.datosReprogramacion?.length > 0);
-        const pends = itemsFiltrados.filter(r => (r.datosPendientes?.length > 0) || (r.datosPendientesPorHoja && Object.keys(r.datosPendientesPorHoja).length > 0));
+        const pends = itemsFiltrados.filter(r => r.datosPendientes?.length > 0);
 
+        // Contar total de hojas de pendientes (incluyendo subdivisiones)
         let totalHojasPendientes = 0;
         pends.forEach(r => {
             if (r.datosPendientesPorHoja && Object.keys(r.datosPendientesPorHoja).length > 0) {
                 totalHojasPendientes += Object.keys(r.datosPendientesPorHoja).length;
             } else {
-                totalHojasPendientes += 1;
+                totalHojasPendientes += 1; // Fallback para formato antiguo
             }
         });
 
+        // Actualizar Badges de los Tabs Internos con la cantidad FILTRADA
         const rBadge = document.getElementById('reprogBadge');
         if(reprogs.length > 0) { rBadge.textContent = reprogs.length; rBadge.style.display = 'block'; } 
         else rBadge.style.display = 'none';
@@ -834,6 +908,7 @@
         if(totalHojasPendientes > 0) { pBadge.textContent = totalHojasPendientes; pBadge.style.display = 'block'; }
         else pBadge.style.display = 'none';
 
+        // 3. Renderizar Reprogramaciones
         const containerR = document.getElementById('reprogContainer');
         if(reprogs.length===0) {
             const msg = tabActual === 'respondidas' ? 'No hay historial de reprogramaciones' : 'No hay reprogramaciones pendientes';
@@ -842,27 +917,27 @@
             containerR.innerHTML = reprogs.map(r => crearCardReprog(r, 'reprogramaciones')).join('');
         }
 
+        // 4. Renderizar Pendientes (Tareas) - CADA HOJA POR SEPARADO
         const containerP = document.getElementById('pendientesContainer');
         if(pends.length===0) {
             const msg = tabActual === 'respondidas' ? 'No hay historial de tareas' : 'No hay tareas pendientes';
             containerP.innerHTML = emptyStateHTML('clock', msg);
         } else {
+            // Agrupar por reprogramación y luego por hoja
             let htmlPendientes = '';
             pends.forEach(reprog => {
-                // Aquí corregimos para asegurar que TODAS las hojas (SGI, etc.) se rendericen
+                // Si tiene datosPendientesPorHoja, renderizar cada hoja por separado
                 if (reprog.datosPendientesPorHoja && Object.keys(reprog.datosPendientesPorHoja).length > 0) {
                     for (const [nombreHoja, datos] of Object.entries(reprog.datosPendientesPorHoja)) {
-                        if (datos && datos.length > 0) {
-                            const reprogConHoja = { 
-                                ...reprog, 
-                                datosPendientes: datos, 
-                                nombreHojaActual: nombreHoja 
-                            };
-                            htmlPendientes += crearCardReprog(reprogConHoja, 'pendientes');
-                        }
+                        const reprogConHoja = { 
+                            ...reprog, 
+                            datosPendientes: datos, 
+                            nombreHojaActual: nombreHoja 
+                        };
+                        htmlPendientes += crearCardReprog(reprogConHoja, 'pendientes');
                     }
-                } else if (reprog.datosPendientes && reprog.datosPendientes.length > 0) {
-                    // Fallback para datos antiguos sin hojas
+                } else {
+                    // Fallback: si no tiene el nuevo formato, usar el antiguo
                     htmlPendientes += crearCardReprog(reprog, 'pendientes');
                 }
             });
@@ -879,14 +954,17 @@
         const datos = tipo === 'reprogramaciones' ? (reprog.datosReprogramacion||[]) : (reprog.datosPendientes||[]);
         const estadoClass = reprog.estado==='respondida'?'badge-answered':'badge-pending';
         
+        // Crear ID único para cada hoja (importante cuando hay múltiples hojas)
         const edicionId = reprog.nombreHojaActual ? `${reprog.id}_${reprog.nombreHojaActual}` : reprog.id;
         
+        // Init cache edicion solo si está pendiente
         if (!datosEditados[edicionId] && reprog.estado === 'pendiente') {
             datosEditados[edicionId] = datos.map(row => ({...row, 'FECHA REPROGRAMACION': row['FECHA REPROGRAMACION']||'', 'OBSERVACION': row['OBSERVACION']||''}));
         }
 
         let tableHTML = '';
         
+        // Si está pendiente, mostrar tabla editable
         if(reprog.estado==='pendiente' && datos.length>0) {
             const cols = Object.keys(datos[0] || {}).filter(c => c!=='FECHA REPROGRAMACION' && c!=='OBSERVACION');
             const allCols = ['FECHA REPROGRAMACION', 'OBSERVACION', ...cols]; 
@@ -894,7 +972,7 @@
             tableHTML = `
                 <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 10px 12px; border-radius: 6px; margin: 12px 0 8px 0; font-size: 12px; color: #1e40af; display: flex; align-items: center; gap: 8px;">
                     <i class="fas fa-hand-point-right" style="font-size: 16px;"></i>
-                    <span style="font-weight: 600;">Desliza horizontalmente la tabla para ver todo</span>
+                    <span style="font-weight: 600;">Desliza horizontalmente para ver todas las columnas</span>
                 </div>
                 <div class="table-wrapper">
                     <table class="data-table">
@@ -909,12 +987,13 @@
                 </button>
             `;
         } 
+        // Si YA está respondida, mostrar tabla SOLO LECTURA (Historial)
         else if (reprog.estado === 'respondida' && datos.length > 0) {
              const cols = Object.keys(datos[0] || {});
              tableHTML = `
                 <div style="background: #d1fae5; border-left: 4px solid #10b981; padding: 10px 12px; border-radius: 6px; margin: 12px 0 8px 0; font-size: 12px; color: #065f46; display: flex; align-items: center; gap: 8px;">
                     <i class="fas fa-check-circle" style="font-size: 16px;"></i>
-                    <span style="font-weight: 600;">Respondida - Desliza para ver historial</span>
+                    <span style="font-weight: 600;">Respondida - Desliza para ver todos los datos</span>
                 </div>
                 <div class="table-wrapper" style="opacity:0.8;">
                     <table class="data-table">
@@ -933,16 +1012,12 @@
         return `
             <div class="reprog-card tipo-${tipo}">
                 <div class="card-header">
-                    <div style="overflow:hidden;">
+                    <div>
                         <div class="card-title">
                             ${reprog.auxiliarNombre}
+                            ${reprog.nombreHojaActual ? `<span style="display:inline-block;margin-left:10px;font-size:12px;padding:4px 10px;border-radius:8px;background:#fef3c7;color:#92400e;font-weight:600;">📄 ${reprog.nombreHojaActual}</span>` : ''}
                         </div>
-                        <div style="margin-top:4px; display:flex; flex-wrap:wrap; gap:5px;">
-                             ${reprog.nombreHojaActual ? `<span style="font-size:11px; padding:3px 8px; border-radius:6px; background:#fef3c7; color:#92400e; font-weight:700; border:1px solid #fcd34d;">📄 ${reprog.nombreHojaActual}</span>` : ''}
-                        </div>
-                        <div class="card-subtitle" style="margin-top:4px;">
-                             <i class="far fa-calendar"></i> ${fecha} &bull; ${datos.length} items
-                        </div>
+                        <div class="card-subtitle"><i class="far fa-calendar"></i> ${fecha} &bull; ${datos.length} items</div>
                     </div>
                     <span class="status-badge ${estadoClass}">${reprog.estado}</span>
                 </div>
@@ -976,13 +1051,15 @@
         btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
 
         try {
-            await offlineStorage.guardarCambioPendiente(id, mes, datos);
+            // Guardar con información del tipo para sincronización correcta
+            await offlineStorage.guardarCambioPendiente(id, mes, datos, tabActiva, nombreHoja);
             if(isOnline) {
                 const updateData = { estado: 'respondida', fechaRespuesta: new Date().toISOString() };
                 
                 if(tabActiva === 'reprogramaciones') {
                     updateData.datosReprogramacion = datos;
                 } else {
+                    // Si hay nombre de hoja, guardar en la estructura por hoja
                     if(nombreHoja) {
                         updateData[`datosPendientesPorHoja/${nombreHoja}`] = datos;
                     } else {
@@ -1023,6 +1100,7 @@
                 todasReprogramaciones[idx].fechaRespuesta = new Date().toISOString();
             }
             actualizarEstadisticas();
+            // Si estábamos en "Pendientes" y acabamos de responder, la tarjeta desaparecerá al recargar la vista
             mostrarReprogramaciones(); 
 
         } catch(e) {
@@ -1031,6 +1109,7 @@
         }
     };
 
+    // UI Helpers
     function mostrarAlerta(tipo, msg) {
         const toast = document.getElementById('mainToast');
         const icon = document.getElementById('toastIcon');
