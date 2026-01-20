@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="format-detection" content="telephone=no">
@@ -801,6 +802,9 @@
                     mostrarReprogramaciones();
                     mostrarAlerta('success', `Nueva asignación de ${val.auxiliarNombre}`);
                 }
+            }, (error) => {
+                // Suprimir errores 403 iniciales (permisos durante carga)
+                if(error.code !== 'PERMISSION_DENIED') console.error('Error listener:', error);
             });
             onChildChanged(rRef, (snap) => {
                 const val = snap.val();
@@ -813,6 +817,9 @@
                         mostrarReprogramaciones();
                     }
                 }
+            }, (error) => {
+                // Suprimir errores 403 iniciales (permisos durante carga)
+                if(error.code !== 'PERMISSION_DENIED') console.error('Error listener:', error);
             });
         });
     }
@@ -887,15 +894,21 @@
 
         // 2. Separar para los Tabs Internos (Reprogramaciones vs Pendientes)
         const reprogs = itemsFiltrados.filter(r => r.datosReprogramacion?.length > 0);
-        const pends = itemsFiltrados.filter(r => r.datosPendientes?.length > 0);
+        
+        // ✅ FILTRAR PENDIENTES: Formato antiguo O nuevo
+        const pends = itemsFiltrados.filter(r => {
+            const tieneFormatoAntiguo = r.datosPendientes?.length > 0;
+            const tieneFormatoNuevo = r.datosPendientesPorHoja && Object.keys(r.datosPendientesPorHoja).length > 0;
+            return tieneFormatoAntiguo || tieneFormatoNuevo;
+        });
 
         // Contar total de hojas de pendientes (incluyendo subdivisiones)
         let totalHojasPendientes = 0;
         pends.forEach(r => {
             if (r.datosPendientesPorHoja && Object.keys(r.datosPendientesPorHoja).length > 0) {
                 totalHojasPendientes += Object.keys(r.datosPendientesPorHoja).length;
-            } else {
-                totalHojasPendientes += 1; // Fallback para formato antiguo
+            } else if (r.datosPendientes?.length > 0) {
+                totalHojasPendientes += 1; // Formato antiguo
             }
         });
 
@@ -982,7 +995,7 @@
                         </tbody>
                     </table>
                 </div>
-                <button class="btn ${isOnline?'btn-success':'btn-warning'}" onclick="guardarRespuestas('${reprog.mes}', '${edicionId}', '${reprog.nombreHojaActual || ''}')">
+                <button class="btn ${isOnline?'btn-success':'btn-warning'}" onclick="guardarRespuestas('${reprog.mes}', '${reprog.id}', '${edicionId}', '${reprog.nombreHojaActual || ''}')">
                     <i class="fas ${isOnline?'fa-check':'fa-save'}"></i> ${isOnline?'Enviar Respuesta':'Guardar Offline'}
                 </button>
             `;
@@ -1039,73 +1052,136 @@
         if(datosEditados[r]) datosEditados[r][i][f] = el.value;
     };
 
-    window.guardarRespuestas = async function(mes, id, nombreHoja = '') {
-        const datos = datosEditados[id];
-        if(!datos) return;
+    window.guardarRespuestas = async function(mes, reprogId, edicionId, nombreHoja = '') {
+        // ✅ USAR edicionId PARA ACCEDER A LOS DATOS (puede ser compuesto)
+        // ✅ USAR reprogId PARA GUARDAR EN FIREBASE (siempre es el ID real)
+        const datos = datosEditados[edicionId];
+        
+        console.log('🔧 guardarRespuestas llamada:', { mes, reprogId, edicionId, nombreHoja, tieneDatos: !!datos });
+        
+        if(!datos) {
+            mostrarAlerta('error', 'No hay datos para guardar');
+            return;
+        }
+        
+        if(!datos || datos.length === 0) {
+            mostrarAlerta('error', 'No hay datos para guardar');
+            return;
+        }
+
         if(datos.some(d => !d['FECHA REPROGRAMACION'] || !d['OBSERVACION'])) {
             if(!(await mostrarModal('Campos vacíos', '¿Enviar con campos vacíos?'))) return;
         }
 
         const btn = event.target;
         const originalText = btn.innerHTML;
-        btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        btn.disabled = true; 
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
 
         try {
-            // Guardar con información del tipo para sincronización correcta
-            await offlineStorage.guardarCambioPendiente(id, mes, datos, tabActiva, nombreHoja);
-            if(isOnline) {
-                const updateData = { estado: 'respondida', fechaRespuesta: new Date().toISOString() };
-                
-                if(tabActiva === 'reprogramaciones') {
-                    updateData.datosReprogramacion = datos;
-                } else {
-                    // Si hay nombre de hoja, guardar en la estructura por hoja
-                    if(nombreHoja) {
-                        updateData[`datosPendientesPorHoja/${nombreHoja}`] = datos;
-                    } else {
-                        updateData.datosPendientes = datos;
+            const updateData = { 
+                estado: 'respondida', 
+                fechaRespuesta: new Date().toISOString(),
+                supervisorId: currentUser.uid,
+                supervisorNombre: userData?.nombre || 'Supervisor',
+                supervisorEmail: currentUser.email
+            };
+            
+            // ✅ GUARDAR SEGÚN EL TIPO DE DATOS
+            if(tabActiva === 'reprogramaciones') {
+                updateData.datosReprogramacion = datos;
+                console.log('💾 Guardando datosReprogramacion:', datos.length + ' filas');
+            } else if (tabActiva === 'pendientes') {
+                if(nombreHoja) {
+                    // Estructura nueva por hoja
+                    if(!updateData.datosPendientesPorHoja) {
+                        updateData.datosPendientesPorHoja = {};
                     }
+                    updateData.datosPendientesPorHoja[nombreHoja] = datos;
+                    console.log('💾 Guardando datosPendientesPorHoja["' + nombreHoja + '"]:', datos.length + ' filas');
+                } else {
+                    // Estructura antigua
+                    updateData.datosPendientes = datos;
+                    console.log('💾 Guardando datosPendientes:', datos.length + ' filas');
                 }
+            }
 
-                await update(ref(db, `reprogramaciones/${mes}/${id}`), updateData);
-                await offlineStorage.marcarCambioSincronizado((await offlineStorage.obtenerCambiosPendientes())[0]?.timestamp);
-                
-                try {
-                    const auxs = await obtenerTodasLasAuxiliares();
-                    const emails = auxs.map(a=>a.email);
-                    if(emails.length) await notificarAuxiliarReprogramacionCompletada({
-                        auxiliarEmail: emails, auxiliarNombre: 'Todas', supervisorNombre: userData?.nombre,
-                        fechaRespuesta: updateData.fechaRespuesta
-                    });
-                } catch(e) {}
-                
-                mostrarAlerta('success', 'Enviado correctamente');
+            // ✅ GUARDAR EN FIREBASE CON EL ID REAL
+            if(isOnline) {
+                await update(ref(db, `reprogramaciones/${mes}/${reprogId}`), updateData);
+                console.log('✅ Guardado en Firebase:', `reprogramaciones/${mes}/${reprogId}`);
             } else {
-                mostrarAlerta('warning', 'Guardado localmente');
+                console.warn('⚠️ Sin conexión, no se pudo guardar en Firebase');
             }
             
-            delete datosEditados[id];
-            const idx = todasReprogramaciones.findIndex(r=>r.id===id);
-            if(idx!==-1) {
-                todasReprogramaciones[idx].estado = 'respondida';
-                if(tabActiva==='reprogramaciones') {
-                    todasReprogramaciones[idx].datosReprogramacion = datos;
+            // ✅ NOTIFICAR A CADA AUXILIAR INDIVIDUALMENTE
+            try {
+                console.log('📧 Obteniendo auxiliares...');
+                const auxs = await obtenerTodasLasAuxiliares();
+                console.log('👥 Auxiliares encontradas:', auxs.length);
+                
+                if(auxs.length > 0) {
+                    const reprogOriginal = todasReprogramaciones.find(r => r.id === reprogId);
+                    const totalReg = (reprogOriginal?.totalRegistrosReprogramacion || 0) + 
+                                     (reprogOriginal?.totalRegistrosPendientes || 0);
+                    
+                    // ✅ ENVIAR UN EMAIL A CADA AUXILIAR (NO ARRAY)
+                    for (const auxiliar of auxs) {
+                        try {
+                            console.log('📨 Enviando email a:', auxiliar.email);
+                            
+                            await notificarAuxiliarReprogramacionCompletada({
+                                auxiliarEmail: auxiliar.email,        // ✅ STRING individual
+                                auxiliarNombre: auxiliar.nombre,
+                                supervisorNombre: userData?.nombre || 'Supervisor',
+                                zona: reprogOriginal?.zona || 'N/A',
+                                archivoNombre: reprogOriginal?.archivoNombre || 'archivo.xlsx',
+                                totalRegistros: totalReg || datos.length,
+                                fechaRespuesta: updateData.fechaRespuesta
+                            });
+                            
+                            console.log('✅ Email enviado correctamente a:', auxiliar.email);
+                        } catch (emailError) {
+                            console.error('❌ Error enviando email a ' + auxiliar.email + ':', emailError);
+                        }
+                    }
                 } else {
+                    console.warn('⚠️ No hay auxiliares para notificar');
+                }
+            } catch(notifError) {
+                console.error('❌ Error en notificación:', notifError);
+            }
+            
+            // ✅ ACTUALIZAR ESTADO LOCAL (borrar cache de edición)
+            delete datosEditados[edicionId];
+            const idx = todasReprogramaciones.findIndex(r => r.id === reprogId);
+            if(idx !== -1) {
+                todasReprogramaciones[idx].estado = 'respondida';
+                todasReprogramaciones[idx].fechaRespuesta = updateData.fechaRespuesta;
+                
+                if(tabActiva === 'reprogramaciones') {
+                    todasReprogramaciones[idx].datosReprogramacion = datos;
+                } else if(tabActiva === 'pendientes') {
                     if(nombreHoja && todasReprogramaciones[idx].datosPendientesPorHoja) {
                         todasReprogramaciones[idx].datosPendientesPorHoja[nombreHoja] = datos;
                     } else {
                         todasReprogramaciones[idx].datosPendientes = datos;
                     }
                 }
-                todasReprogramaciones[idx].fechaRespuesta = new Date().toISOString();
             }
+            
             actualizarEstadisticas();
-            // Si estábamos en "Pendientes" y acabamos de responder, la tarjeta desaparecerá al recargar la vista
-            mostrarReprogramaciones(); 
+            mostrarReprogramaciones();
+            
+            mostrarAlerta('success', '✅ Respuesta enviada y emails notificados');
+            btn.disabled = false;
+            btn.innerHTML = originalText;
 
-        } catch(e) {
-            mostrarAlerta('error', 'Error al guardar');
-            btn.disabled = false; btn.innerHTML = originalText;
+        } catch(error) {
+            console.error('❌ Error crítico al guardar:', error);
+            mostrarAlerta('error', 'Error: ' + error.message);
+            btn.disabled = false; 
+            btn.innerHTML = originalText;
         }
     };
 
