@@ -569,7 +569,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getDatabase, ref, push, set, onValue, onChildChanged, query, orderByChild, equalTo, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getDatabase, ref, push, set, onValue, onChildChanged, onChildAdded, query, orderByChild, equalTo, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyBDRqsZI8EQaGn1lCc4Y5rIcfmLE7969zY",
@@ -1244,7 +1244,10 @@
                                     const fechaBase = new Date(1900, 0, 1);
                                     const dias = nuevaFila['FECHA'] - 2;
                                     const fecha = new Date(fechaBase.getTime() + dias * 24 * 60 * 60 * 1000);
-                                    nuevaFila['FECHA'] = `${fecha.getDate()}/${fecha.getFullYear()}`;
+                                    const d = fecha.getDate();
+                                    const m = String(fecha.getMonth() + 1).padStart(2, '0');
+                                    const y = fecha.getFullYear();
+                                    nuevaFila['FECHA'] = `${d}/${m}/${y}`;
                                 }
                                 
                                 return nuevaFila;
@@ -1387,26 +1390,53 @@
         function iniciarEscuchaCambios() {
             console.log('👂 Iniciando escucha de cambios en reprogramaciones...');
             const meses = obtenerUltimosMeses(3);
+            let primeraVez = true;
             
             meses.forEach(mes => {
                 const reprogRef = ref(db, `reprogramaciones/${mes}`);
                 
-                onChildChanged(reprogRef, (snapshot) => {
+                // Escuchar NUEVAS reprogramaciones
+                onChildAdded(reprogRef, (snapshot) => {
+                    // Ignorar la primera carga (ya se hizo con get())
+                    if (primeraVez) {
+                        setTimeout(() => { primeraVez = false; }, 2000);
+                        return;
+                    }
+                    
                     const reprogId = snapshot.key;
                     const nuevaReprog = snapshot.val();
                     
-                    if (nuevaReprog) {
+                    if (nuevaReprog && nuevaReprog.auxiliarId === currentUser.uid) {
+                        console.log('🆕 Nueva reprogramación asignada:', reprogId);
+                        mostrarAlerta('success', `Nueva reprogramación de ${nuevaReprog.supervisorNombre || 'supervisor'}`);
+                        
+                        // Recargar lista completa para mostrar la nueva
+                        cargarReprogramaciones();
+                    }
+                });
+                
+                // Escuchar CAMBIOS en reprogramaciones existentes
+                onChildChanged(reprogRef, (snapshot) => {
+                    const reprogId = snapshot.key;
+                    const reprogActualizada = snapshot.val();
+                    
+                    if (reprogActualizada && reprogActualizada.auxiliarId === currentUser.uid) {
                         const estadoAnterior = reprogramacionesActuales.get(reprogId);
-                        const estadoNuevo = nuevaReprog.estado;
+                        const estadoNuevo = reprogActualizada.estado;
+                        
+                        console.log(`🔄 Cambio detectado en ${reprogId}: ${estadoAnterior} → ${estadoNuevo}`);
+                        
+                        // Actualizar el mapa
+                        reprogramacionesActuales.set(reprogId, estadoNuevo);
                         
                         // Si cambió de pendiente a respondida, notificar
                         if (estadoAnterior === 'pendiente' && estadoNuevo === 'respondida') {
-                            mostrarNotificacionReprogramacion(nuevaReprog);
-                            // Actualizar el mapa
-                            reprogramacionesActuales.set(reprogId, estadoNuevo);
-                            // Recargar la lista para mostrar el cambio
-                            cargarReprogramaciones();
+                            mostrarNotificacionReprogramacion(reprogActualizada);
+                            mostrarAlerta('success', `✓ Reprogramación completada por supervisor`);
                         }
+                        
+                        // Recargar la lista para reflejar el cambio
+                        cargarReprogramaciones();
                     }
                 });
             });
@@ -1574,52 +1604,141 @@
 
         window.descargarExcel = async function(reprogId) {
             try {
+                console.log('📥 Iniciando descarga de Excel para ID:', reprogId);
+                
                 const meses = obtenerUltimosMeses(3);
                 let reprogData = null;
+                let mesEncontrado = null;
 
+                // Buscar en los últimos 3 meses
                 for (const mes of meses) {
                     const snapshot = await get(ref(db, `reprogramaciones/${mes}/${reprogId}`));
                     if (snapshot.exists()) {
                         reprogData = snapshot.val();
+                        mesEncontrado = mes;
+                        console.log('✅ Datos encontrados en mes:', mes);
                         break;
                     }
                 }
 
-                if (!reprogData || (!reprogData.datosReprogramacion && !reprogData.datosPendientes)) {
-                    mostrarAlerta('error', 'No se encontraron datos');
+                if (!reprogData) {
+                    mostrarAlerta('error', 'No se encontraron datos para esta reprogramación');
                     return;
                 }
 
-                // Crear workbook preservando estructura original
+                // Validar que existan datos para descargar
+                const tieneDatos = reprogData.datosReprogramacion || 
+                                   reprogData.datosPendientes || 
+                                   reprogData.datosPendientesPorHoja;
+                
+                if (!tieneDatos) {
+                    mostrarAlerta('error', 'No hay datos completados para descargar');
+                    return;
+                }
+
+                console.log('📊 Estructura de datos encontrada:', {
+                    datosReprogramacion: reprogData.datosReprogramacion?.length || 0,
+                    datosPendientes: reprogData.datosPendientes?.length || 0,
+                    datosPendientesPorHoja: reprogData.datosPendientesPorHoja ? 
+                        Object.keys(reprogData.datosPendientesPorHoja).length : 0
+                });
+
+                // Crear workbook
                 const wb = XLSX.utils.book_new();
                 
-                // Función para crear hoja con estructura ORIGINAL
+                // ✅ FUNCIÓN PARA CONVERTIR FECHAS - Preserva formato d/MM/yyyy
+                const convertirFecha = (fecha) => {
+                    if (!fecha) return '';
+                    
+                    // Si ya está en formato d/MM/yyyy (3/01/2026), mantenerlo tal cual
+                    if (typeof fecha === 'string' && /^\d{1,2}\/\d{2}\/\d{4}$/.test(fecha)) {
+                        return fecha;
+                    }
+                    
+                    // Si está en formato ISO (2026-01-03 o 2026-01-03T00:00:00)
+                    if (typeof fecha === 'string' && /^\d{4}-\d{2}-\d{2}/.test(fecha)) {
+                        const [year, month, day] = fecha.split('T')[0].split('-');
+                        return `${parseInt(day)}/${month}/${year}`;
+                    }
+                    
+                    // Si es número serial de Excel
+                    if (typeof fecha === 'number') {
+                        const fechaBase = new Date(1900, 0, 1);
+                        const dias = fecha - 2;
+                        const fechaObj = new Date(fechaBase.getTime() + dias * 24 * 60 * 60 * 1000);
+                        const d = fechaObj.getDate();
+                        const m = String(fechaObj.getMonth() + 1).padStart(2, '0');
+                        const y = fechaObj.getFullYear();
+                        return `${d}/${m}/${y}`;
+                    }
+                    
+                    return fecha;
+                };
+                
+                // ✅ FUNCIÓN PARA CREAR CADA HOJA
                 const crearHoja = (datos, nombreHoja, columnasOriginales) => {
-                    if (!datos || datos.length === 0) return;
+                    if (!datos || datos.length === 0) {
+                        console.log('⚠️ No hay datos para la hoja:', nombreHoja);
+                        return;
+                    }
                     
-                    // Si no hay columnas originales guardadas, usar todas las del primer registro
-                    const columnas = columnasOriginales || Object.keys(datos[0]);
+                    // ✅ IMPORTANTE: Usar TODAS las columnas de los datos, NO solo las originales
+                    // Esto incluye FECHA REPROGRAMACION y OBSERVACION que el supervisor llenó
+                    const todasLasColumnas = Object.keys(datos[0]);
                     
-                    console.log(`📄 Generando hoja "${nombreHoja}" con ${columnas.length} columnas`);
-                    console.log(`📋 Columnas: ${columnas.join(', ')}`);
+                    // Priorizar columnas especiales al inicio si existen
+                    const columnasEspeciales = ['FECHA REPROGRAMACION', 'OBSERVACION'];
+                    const columnasRestantes = todasLasColumnas.filter(c => !columnasEspeciales.includes(c));
                     
-                    // Crear array de arrays preservando orden original
-                    const datosArray = [columnas]; // Primera fila: encabezados
+                    // Mantener las especiales al inicio, luego el resto
+                    const columnas = [
+                        ...columnasEspeciales.filter(c => todasLasColumnas.includes(c)),
+                        ...columnasRestantes
+                    ];
                     
-                    datos.forEach(row => {
+                    console.log(`📄 Generando hoja "${nombreHoja}":`);
+                    console.log(`   - Total filas: ${datos.length}`);
+                    console.log(`   - Columnas (${columnas.length}): ${columnas.join(', ')}`);
+                    console.log(`   - Incluye datos del supervisor: ${columnasEspeciales.filter(c => todasLasColumnas.includes(c)).join(', ')}`);
+                    
+                    // Crear array de arrays con encabezados
+                    const datosArray = [columnas];
+                    
+                    // Procesar cada fila
+                    datos.forEach((row, idx) => {
                         const fila = columnas.map(col => {
                             const valor = row[col];
-                            // Si es undefined o null, retornar string vacío
+                            
+                            // Manejar valores vacíos
                             if (valor === undefined || valor === null) return '';
-                            // Retornar el valor tal cual
+                            
+                            // ✅ CONVERTIR TODAS LAS COLUMNAS DE FECHAS (FECHA y FECHA REPROGRAMACION)
+                            if (col === 'FECHA' || col === 'FECHA REPROGRAMACION') {
+                                return convertirFecha(valor);
+                            }
+                            
                             return valor;
                         });
                         datosArray.push(fila);
                     });
                     
+                    // Crear hoja de cálculo
                     const ws = XLSX.utils.aoa_to_sheet(datosArray);
                     
-                    // Ajustar anchos de columnas automáticamente
+                    // Aplicar formato a encabezados (fila 1)
+                    const headerStyle = {
+                        font: { bold: true, color: { rgb: "FFFFFF" } },
+                        fill: { fgColor: { rgb: "4472C4" } },
+                        alignment: { horizontal: "center", vertical: "center" }
+                    };
+                    
+                    columnas.forEach((col, idx) => {
+                        const cellRef = XLSX.utils.encode_cell({ r: 0, c: idx });
+                        if (!ws[cellRef]) ws[cellRef] = { t: 's', v: col };
+                        ws[cellRef].s = headerStyle;
+                    });
+                    
+                    // Ajustar anchos de columnas
                     const colWidths = columnas.map(col => {
                         const maxLength = Math.max(
                             col.length,
@@ -1633,27 +1752,44 @@
                     ws['!cols'] = colWidths;
                     
                     XLSX.utils.book_append_sheet(wb, ws, nombreHoja);
+                    console.log(`✅ Hoja "${nombreHoja}" agregada al workbook`);
                 };
                 
-                // Crear hoja 1 con nombre y columnas originales
+                // ✅ CREAR HOJA DE REPROGRAMACIONES
                 if (reprogData.datosReprogramacion && reprogData.datosReprogramacion.length > 0) {
-                    const nombreHoja = reprogData.nombreHoja1 || 'Hoja 1';
+                    const nombreHoja = reprogData.nombreHoja1 || 'Reprogramaciones';
                     crearHoja(reprogData.datosReprogramacion, nombreHoja, reprogData.columnasHoja1);
                 }
                 
-                // Crear hoja 2 con nombre y columnas originales
+                // ✅ CREAR HOJA DE PENDIENTES (formato antiguo)
                 if (reprogData.datosPendientes && reprogData.datosPendientes.length > 0) {
-                    const nombreHoja = reprogData.nombreHoja2 || 'Hoja 2';
+                    const nombreHoja = reprogData.nombreHoja2 || 'Pendientes';
                     crearHoja(reprogData.datosPendientes, nombreHoja, reprogData.columnasHoja2);
                 }
                 
-                const nombreArchivo = `${reprogData.archivoNombre.replace('.xlsx', '')}_RESPONDIDO_${new Date().toISOString().slice(0, 10)}.xlsx`;
+                // ✅ CREAR HOJAS DE PENDIENTES POR NOMBRE (formato nuevo)
+                if (reprogData.datosPendientesPorHoja && typeof reprogData.datosPendientesPorHoja === 'object') {
+                    for (const [nombreHoja, datos] of Object.entries(reprogData.datosPendientesPorHoja)) {
+                        if (datos && datos.length > 0) {
+                            const columnasHoja = reprogData.columnasPorHoja?.[nombreHoja] || 
+                                                 reprogData.columnasHoja2;
+                            crearHoja(datos, nombreHoja, columnasHoja);
+                        }
+                    }
+                }
+                
+                // Generar nombre de archivo con timestamp
+                const timestamp = new Date().toISOString().slice(0, 10);
+                const nombreBase = reprogData.archivoNombre.replace('.xlsx', '');
+                const nombreArchivo = `${nombreBase}_RESPONDIDO_${timestamp}.xlsx`;
+                
+                // Descargar archivo
                 XLSX.writeFile(wb, nombreArchivo);
 
-                mostrarAlerta('success', '✓ Excel descargado con formato original');
-                console.log('✅ Excel generado:', nombreArchivo);
+                mostrarAlerta('success', '✓ Excel descargado con todas las columnas');
+                console.log('✅ Descarga completada:', nombreArchivo);
             } catch (error) {
-                console.error('❌ Error al descargar:', error);
+                console.error('❌ Error al descargar Excel:', error);
                 mostrarAlerta('error', 'Error al descargar: ' + error.message);
             }
         };
