@@ -327,7 +327,23 @@ Este es un mensaje automático, por favor no responder directamente a este corre
 }
 
 async function notificarAuxiliarReprogramacionCompletada(data) {
+    // ✅ Recibe UN email individual, no un array
     const { auxiliarEmail, auxiliarNombre, supervisorNombre, zona, archivoNombre, totalRegistros, fechaRespuesta } = data;
+    
+    console.log('📧 notificarAuxiliarReprogramacionCompletada llamada con:', {
+        auxiliarEmail,
+        auxiliarNombre,
+        supervisorNombre,
+        zona,
+        archivoNombre,
+        totalRegistros
+    });
+    
+    // Validar que auxiliarEmail sea un string
+    if (typeof auxiliarEmail !== 'string') {
+        console.error('❌ auxiliarEmail debe ser un string, recibido:', typeof auxiliarEmail);
+        throw new Error('auxiliarEmail debe ser un string individual, no un array');
+    }
     
     const fecha = new Date(fechaRespuesta).toLocaleDateString('es-CO', {
         day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
