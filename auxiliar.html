@@ -2,58 +2,67 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistema de Reprogramaciones</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="email-service.js"></script>
+    <script src="email-service.js?v=2"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #fafafa;
-            color: #2d3748;
-            line-height: 1.5;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+            -webkit-tap-highlight-color: transparent;
         }
 
+        /* Topbar Premium */
         .topbar {
-            background: white;
-            border-bottom: 1px solid #e5e7eb;
-            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            padding: 16px 32px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
         }
 
         .brand i {
-            color: #3b82f6;
-            font-size: 22px;
+            background: linear-gradient(135deg, #0f172a 0%, #064e3b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 26px;
+            filter: drop-shadow(0 2px 4px rgba(5, 150, 105, 0.3));
         }
 
         .brand h1 {
-            font-size: 19px;
-            font-weight: 600;
-            color: #1f2937;
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.5px;
         }
 
         .user-section {
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 24px;
         }
 
         .user-info {
@@ -61,160 +70,241 @@
         }
 
         .user-name {
-            font-size: 14px;
-            font-weight: 500;
-            color: #374151;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e293b;
         }
 
         .user-role {
-            font-size: 12px;
-            color: #9ca3af;
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
         }
 
         .logout-btn {
-            background: #f3f4f6;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            padding: 10px 18px;
+            border-radius: 10px;
             cursor: pointer;
-            color: #6b7280;
-            font-size: 13px;
-            transition: all 0.2s;
+            color: #475569;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
 
         .logout-btn:hover {
-            background: #e5e7eb;
-            color: #374151;
+            background: #fee2e2;
+            color: #ef4444;
+            border-color: #fca5a5;
+            transform: translateY(-1px);
         }
 
+        /* Container */
         .container {
             max-width: 1100px;
             margin: 0 auto;
-            padding: 28px 20px;
+            padding: 40px 24px;
         }
 
         .page-header {
-            margin-bottom: 32px;
+            margin-bottom: 36px;
+            animation: fadeInDown 0.5s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .page-header h2 {
-            font-size: 26px;
-            color: #111827;
-            margin-bottom: 6px;
-            font-weight: 600;
+            font-size: 28px;
+            color: #0f172a;
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         .page-header p {
-            color: #6b7280;
-            font-size: 14px;
+            color: #64748b;
+            font-size: 16px;
         }
 
+        /* Secciones estilo Tarjeta Premium */
         .section {
             background: white;
-            border-radius: 8px;
-            padding: 24px;
-            margin-bottom: 24px;
-            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 32px;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.02), 0 4px 6px rgba(0, 0, 0, 0.01);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.6s ease-out backwards;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section:hover {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.04), 0 5px 15px rgba(0, 0, 0, 0.02);
         }
 
         .section-title {
-            font-size: 17px;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 18px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 24px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f1f5f9;
         }
 
         .section-title i {
-            color: #3b82f6;
-            font-size: 19px;
+            color: #059669;
+            font-size: 20px;
+            background: #ecfdf5;
+            padding: 10px;
+            border-radius: 12px;
         }
 
+        /* Formularios */
         .form-row {
-            margin-bottom: 18px;
+            margin-bottom: 24px;
         }
 
         label {
             display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: #374151;
-            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 8px;
         }
 
         select, input[type="text"] {
             width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 14px;
-            color: #1f2937;
-            background: white;
-            transition: border 0.2s;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px; /* Previene iOS zoom */
+            color: #1e293b;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px;
+        }
+
+        input[type="text"] {
+            background-image: none;
+            cursor: text;
+        }
+
+        select:hover, input[type="text"]:hover {
+            background: #f1f5f9;
         }
 
         select:focus, input[type="text"]:focus {
             outline: none;
-            border-color: #3b82f6;
+            border-color: #059669;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1);
         }
 
+        /* Upload Area Premium */
         .upload-area {
-            border: 2px dashed #d1d5db;
-            border-radius: 8px;
-            padding: 35px 20px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 16px;
+            padding: 48px 24px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
-            background: #fafafa;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+            position: relative;
+            overflow: hidden;
         }
 
-        .upload-area:hover {
-            border-color: #3b82f6;
-            background: #f0f9ff;
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .upload-area:hover::before {
+            opacity: 1;
+        }
+
+        .upload-area:hover, .upload-area.drag-over {
+            border-color: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(5, 150, 105, 0.05);
         }
 
         .upload-area.drag-over {
-            border-color: #3b82f6;
-            background: #eff6ff;
+            background: #ecfdf5;
+            border-width: 3px;
         }
 
         .upload-icon {
-            font-size: 38px;
-            color: #9ca3af;
-            margin-bottom: 12px;
+            font-size: 48px;
+            color: #94a3b8;
+            margin-bottom: 16px;
+            transition: transform 0.3s ease, color 0.3s ease;
+            position: relative;
+            z-index: 1;
         }
 
         .upload-area:hover .upload-icon {
-            color: #3b82f6;
+            color: #059669;
+            transform: scale(1.1) translateY(-5px);
         }
 
         .upload-text {
-            font-size: 15px;
-            color: #6b7280;
-            margin-bottom: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
         }
 
         .upload-subtext {
-            font-size: 13px;
-            color: #9ca3af;
+            font-size: 14px;
+            color: #64748b;
+            position: relative;
+            z-index: 1;
         }
 
         .file-name {
             display: none;
-            margin-top: 15px;
-            padding: 10px 14px;
+            margin-top: 16px;
+            padding: 14px 20px;
             background: #f0fdf4;
             border: 1px solid #bbf7d0;
-            border-radius: 6px;
-            font-size: 13px;
-            color: #166534;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #15803d;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            animation: slideInUp 0.3s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .file-name.show {
@@ -223,43 +313,64 @@
 
         .file-name i {
             color: #16a34a;
+            font-size: 18px;
         }
 
+        /* Botones */
         .btn {
-            padding: 11px 20px;
+            padding: 14px 24px;
             border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            gap: 10px;
         }
 
         .btn-primary {
-            background: #3b82f6;
+            background: linear-gradient(135deg, #0f172a 0%, #0f172a 100%);
             color: white;
+            box-shadow: 0 8px 16px rgba(15, 23, 42, 0.25);
+            width: 100%;
         }
 
         .btn-primary:hover {
-            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px rgba(15, 23, 42, 0.35);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
         }
 
         .btn-primary:disabled {
-            background: #93c5fd;
+            background: #cbd5e1;
+            box-shadow: none;
             cursor: not-allowed;
+            transform: none;
         }
 
+        /* Alertas */
         .alert {
-            padding: 12px 16px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 13px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 15px;
+            font-weight: 500;
             display: none;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            animation: slideInDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .alert.show {
@@ -269,149 +380,170 @@
         .alert-success {
             background: #f0fdf4;
             border: 1px solid #bbf7d0;
-            color: #166534;
+            color: #15803d;
         }
 
         .alert-error {
             background: #fef2f2;
             border: 1px solid #fecaca;
-            color: #991b1b;
+            color: #b91c1c;
         }
 
+        /* Reprogramaciones Items */
         .reprog-item {
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 18px;
-            margin-bottom: 14px;
-            transition: all 0.2s;
-            background: #fafafa;
+            border: 1px solid #f1f5f9;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reprog-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #e2e8f0;
+            transition: background 0.3s ease;
         }
 
         .reprog-item:hover {
-            border-color: #cbd5e1;
+            border-color: #e2e8f0;
             background: white;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.03);
+            transform: translateY(-2px);
+        }
+
+        .reprog-item:hover::before {
+            background: #059669;
         }
 
         .reprog-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
 
         .reprog-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 4px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 6px;
         }
 
         .reprog-date {
-            font-size: 12px;
-            color: #9ca3af;
+            font-size: 13px;
+            color: #64748b;
             display: flex;
             align-items: center;
-            gap: 5px;
-        }
-
-        .status-badge {
-            padding: 5px 12px;
-            border-radius: 12px;
-            font-size: 12px;
+            gap: 6px;
             font-weight: 500;
         }
 
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         .badge-pending {
-            background: #fef3c7;
-            color: #92400e;
+            background: #fffbeb;
+            color: #b45309;
+            border: 1px solid #fde68a;
         }
 
         .badge-answered {
-            background: #d1fae5;
-            color: #065f46;
+            background: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
         }
 
         .reprog-body {
-            padding-top: 12px;
-            border-top: 1px solid #e5e7eb;
+            padding-top: 16px;
+            border-top: 1px dashed #e2e8f0;
         }
 
         .data-row {
             display: flex;
             justify-content: space-between;
-            padding: 6px 0;
-            font-size: 13px;
+            padding: 8px 0;
+            font-size: 14px;
+            border-bottom: 1px solid #f8fafc;
         }
 
         .data-label {
-            color: #6b7280;
+            color: #64748b;
             font-weight: 500;
         }
 
         .data-value {
-            color: #1f2937;
-            font-weight: 500;
+            color: #0f172a;
+            font-weight: 600;
         }
 
         .answer-box {
-            margin-top: 14px;
-            padding: 14px;
-            background: #eff6ff;
-            border-radius: 6px;
-            border-left: 3px solid #3b82f6;
+            margin-top: 16px;
+            padding: 16px 20px;
+            background: #ecfdf5;
+            border-radius: 12px;
+            border-left: 4px solid #059669;
         }
 
         .answer-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #1e40af;
+            font-size: 13px;
+            font-weight: 700;
+            color: #065f46;
             margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .answer-content {
-            font-size: 14px;
-            color: #1f2937;
+            font-size: 15px;
+            color: #1e293b;
             line-height: 1.6;
         }
 
+        /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 50px 20px;
-            color: #9ca3af;
+            padding: 60px 20px;
+            color: #94a3b8;
         }
 
         .empty-icon {
-            font-size: 50px;
-            margin-bottom: 16px;
-            opacity: 0.5;
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.4;
+            background: linear-gradient(135deg, #94a3b8 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .empty-text {
-            font-size: 15px;
-            color: #6b7280;
+            font-size: 16px;
+            color: #64748b;
+            font-weight: 500;
         }
 
+        /* Loader */
         .loader {
             display: none;
             text-align: center;
-            padding: 30px;
-        }
-
-        .footer {
-            background: white;
-            border-top: 1px solid #e5e7eb;
-            padding: 20px;
-            text-align: center;
-            margin-top: 40px;
-            color: #6b7280;
-            font-size: 13px;
-        }
-
-        .footer i {
-            color: #ef4444;
-            margin: 0 4px;
+            padding: 40px;
         }
 
         .loader.active {
@@ -419,13 +551,13 @@
         }
 
         .spinner {
-            border: 3px solid #f3f4f6;
-            border-top: 3px solid #3b82f6;
+            border: 4px solid #f1f5f9;
+            border-top: 4px solid #059669;
             border-radius: 50%;
-            width: 35px;
-            height: 35px;
+            width: 40px;
+            height: 40px;
             animation: spin 0.8s linear infinite;
-            margin: 0 auto 12px;
+            margin: 0 auto 16px;
         }
 
         @keyframes spin {
@@ -434,25 +566,60 @@
         }
 
         .download-btn {
-            background: #f3f4f6;
-            border: 1px solid #d1d5db;
-            color: #374151;
-            padding: 7px 14px;
-            font-size: 12px;
-            margin-top: 10px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 12px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
         .download-btn:hover {
-            background: #e5e7eb;
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: #0f172a;
         }
 
+        /* Footer */
+        .footer {
+            background: transparent;
+            padding: 32px 20px;
+            text-align: center;
+            margin-top: 40px;
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .footer i {
+            color: #ef4444;
+            margin: 0 6px;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.2); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.2); }
+            60% { transform: scale(1); }
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
             .topbar {
-                padding: 12px 16px;
+                padding: 16px 20px;
             }
 
             .user-section {
-                gap: 12px;
+                gap: 16px;
             }
 
             .user-info {
@@ -460,16 +627,21 @@
             }
 
             .container {
-                padding: 20px 16px;
+                padding: 24px 16px;
             }
 
             .section {
-                padding: 18px;
+                padding: 24px 20px;
+                border-radius: 16px;
             }
 
             .reprog-header {
                 flex-direction: column;
-                gap: 10px;
+                gap: 12px;
+            }
+            
+            .page-header h2 {
+                font-size: 24px;
             }
         }
     </style>
@@ -512,6 +684,7 @@
             <div class="section-title">
                 <i class="fas fa-cloud-upload-alt"></i>
                     Cargar Reprogramaciones/Pendientes
+            </div>
             <form id="uploadForm">
                 <div class="form-row">
                     <label for="zonaSelect">Zona a quien enviar</label>
@@ -928,6 +1101,44 @@
             fileName.classList.add('show');
         }
 
+        // ==================== CONFIGURACIÓN DE CLOUDINARY ====================
+        // Configura tus datos de Cloudinary aquí:
+        const CLOUDINARY_CLOUD_NAME = 'dm0f1phca'; 
+        const CLOUDINARY_UPLOAD_PRESET = 'reprogramaciones_preset'; 
+
+        async function subirACloudinary(file) {
+            if (!CLOUDINARY_CLOUD_NAME || CLOUDINARY_CLOUD_NAME === 'TU_CLOUD_NAME') {
+                console.warn('⚠️ Cloudinary no está configurado. Se guardará sin URL de archivo.');
+                return null;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+            
+            const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/raw/upload`;
+            
+            try {
+                console.log('📤 Subiendo archivo a Cloudinary...');
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error?.message || 'Error en respuesta de Cloudinary');
+                }
+                
+                const data = await response.json();
+                console.log('✅ Archivo subido exitosamente a Cloudinary:', data.secure_url);
+                return data.secure_url;
+            } catch (error) {
+                console.error('❌ Error al subir a Cloudinary:', error);
+                throw new Error('Error al subir el archivo a Cloudinary: ' + error.message);
+            }
+        }
+
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -996,6 +1207,15 @@
                 console.log('✅ Supervisores válidos:', supervisoresValidos);
                 const mes = new Date().toISOString().slice(0, 7).replace('-', '');
                 const timestamp = new Date().toISOString();
+
+                // ☁️ Subir archivo a Cloudinary antes de guardar en Firebase
+                let excelUrl = null;
+                try {
+                    excelUrl = await subirACloudinary(selectedFile);
+                } catch (cloudinaryError) {
+                    console.error('⚠️ Falló la subida a Cloudinary:', cloudinaryError);
+                    throw new Error('No se pudo completar la operación porque falló la carga a Cloudinary. Verifica tu conexión.');
+                }
                 
                 console.log('💾 Guardando en Firebase...');
                 const reprogRef = push(ref(db, `reprogramaciones/${mes}`));
@@ -1011,6 +1231,7 @@
                     fechaSubida: timestamp,
                     estado: 'pendiente',
                     archivoNombre: selectedFile.name,
+                    archivoUrl: excelUrl || '', // URL de Cloudinary
                     totalRegistrosReprogramacion: excelData.datosReprogramacion.length,
                     totalRegistrosPendientes: excelData.datosPendientes.length,
                     
@@ -1020,6 +1241,7 @@
                     nombresPendientes: excelData.nombresPendientes || [],
                     columnasHoja1: excelData.columnasHoja1,
                     columnasHoja2: excelData.columnasHoja2,
+                    columnasPorHoja: excelData.columnasPorHoja || {},
                     
                     // Datos Excel (grandes)
                     datosReprogramacion: excelData.datosReprogramacion,
@@ -1043,7 +1265,9 @@
                             archivoNombre: selectedFile.name,
                             totalRegistrosReprogramacion: excelData.datosReprogramacion.length,
                             totalRegistrosPendientes: excelData.datosPendientes.length,
-                            fechaSubida: timestamp
+                            fechaSubida: timestamp,
+                            excelUrl: excelUrl,
+                            excelFile: selectedFile // ✅ FIX v3: Pasar archivo original para base64
                         });
                     } else {
                         // Para otras zonas, enviar individualmente
@@ -1056,7 +1280,9 @@
                                 archivoNombre: selectedFile.name,
                                 totalRegistrosReprogramacion: excelData.datosReprogramacion.length,
                                 totalRegistrosPendientes: excelData.datosPendientes.length,
-                                fechaSubida: timestamp
+                                fechaSubida: timestamp,
+                                excelUrl: excelUrl,
+                                excelFile: selectedFile // ✅ FIX v3: Pasar archivo original para base64
                             });
                         }
                     }
@@ -1064,7 +1290,7 @@
                 
                 // 📧 Enviar notificación a TODAS las auxiliares
                 try {
-                    console.log('� Enviando notificación a todas las auxiliares...');
+                    console.log('📬 Enviando notificación a todas las auxiliares...');
                     const todasLasAuxiliares = await obtenerTodasLasAuxiliares();
                     const emailsAuxiliares = todasLasAuxiliares.map(auxiliar => auxiliar.email);
 
@@ -1086,7 +1312,7 @@
                             subject: emailData?.subject
                         });
 
-                        // Enviar a cada auxiliar individualmente
+                        // Enviar a cada auxiliar individualmente CON ADJUNTO POR URL
                         for (const email of emailsAuxiliares) {
                             try {
                                 await enviarCorreo({
@@ -1094,7 +1320,15 @@
                                     toName: todasLasAuxiliares.find(aux => aux.email === email)?.nombre || 'Auxiliar',
                                     subject: emailData.subject,
                                     htmlContent: emailData.htmlContent,
-                                    textContent: emailData.textContent
+                                    textContent: emailData.textContent,
+                                    attachments: excelUrl ? [{
+                                        url: excelUrl,
+                                        name: selectedFile.name,
+                                        file: selectedFile // ✅ FIX v3: Pasar File para base64 confiable
+                                    }] : (selectedFile ? [{
+                                        file: selectedFile,
+                                        name: selectedFile.name
+                                    }] : undefined)
                                 });
                             } catch (emailError) {
                                 console.warn(`⚠️ Error enviando email a ${email}:`, emailError);
@@ -1172,14 +1406,29 @@
                         // Inicializar arrays vacíos
                         let datosReprogramacion = [];
                         let datosPendientes = [];
+                        let columnasReprogramacion = [];
+                        let columnasPendientes = [];
                         
                         // Leer hoja de Reprogramaciones si existe
                         if (hojaReprogramacion) {
                             const reprogramacionesSheet = workbook.Sheets[hojaReprogramacion];
+                            
+                            // ✅ EXTRAER ORDEN ORIGINAL DE COLUMNAS (primera fila del Excel)
+                            const range = XLSX.utils.decode_range(reprogramacionesSheet['!ref']);
+                            columnasReprogramacion = [];
+                            for (let C = range.s.c; C <= range.e.c; ++C) {
+                                const cellAddress = XLSX.utils.encode_cell({ r: range.s.r, c: C });
+                                const cell = reprogramacionesSheet[cellAddress];
+                                if (cell && cell.v) {
+                                    columnasReprogramacion.push(String(cell.v));
+                                }
+                            }
+                            
                             datosReprogramacion = XLSX.utils.sheet_to_json(reprogramacionesSheet);
                             
                             if (datosReprogramacion && datosReprogramacion.length > 0) {
                                 console.log(`✅ Hoja "${hojaReprogramacion}": ${datosReprogramacion.length} filas`);
+                                console.log(`✅ Orden de columnas preservado:`, columnasReprogramacion);
                             } else {
                                 console.warn(`⚠️ La hoja "${hojaReprogramacion}" está vacía`);
                                 datosReprogramacion = [];
@@ -1188,15 +1437,35 @@
                         
                         // Leer hojas de Pendientes si existen (guardar cada una por separado)
                         let datosPendientesPorHoja = {};
+                        let columnasPorHoja = {};
                         if (hojasPendientes.length > 0) {
                             for (const nombreHoja of hojasPendientes) {
                                 const pendientesSheet = workbook.Sheets[nombreHoja];
+                                
+                                // ✅ EXTRAER ORDEN ORIGINAL DE COLUMNAS
+                                const range = XLSX.utils.decode_range(pendientesSheet['!ref']);
+                                const columnasHoja = [];
+                                for (let C = range.s.c; C <= range.e.c; ++C) {
+                                    const cellAddress = XLSX.utils.encode_cell({ r: range.s.r, c: C });
+                                    const cell = pendientesSheet[cellAddress];
+                                    if (cell && cell.v) {
+                                        columnasHoja.push(String(cell.v));
+                                    }
+                                }
+                                
                                 const datosParciales = XLSX.utils.sheet_to_json(pendientesSheet);
                                 
                                 if (datosParciales && datosParciales.length > 0) {
                                     console.log(`✅ Hoja "${nombreHoja}": ${datosParciales.length} filas`);
+                                    console.log(`✅ Orden de columnas preservado:`, columnasHoja);
                                     datosPendientesPorHoja[nombreHoja] = datosParciales;
+                                    columnasPorHoja[nombreHoja] = columnasHoja;
                                     datosPendientes.push(...datosParciales); // Mantener array plano para conteo
+                                    
+                                    // Guardar columnasPendientes de la primera hoja
+                                    if (columnasPendientes.length === 0) {
+                                        columnasPendientes = columnasHoja;
+                                    }
                                 } else {
                                     console.warn(`⚠️ La hoja "${nombreHoja}" está vacía`);
                                 }
@@ -1228,7 +1497,7 @@
                             
                             // Agregar columnas que el supervisor llenará + convertir fechas
                             const datosConvertidos = jsonData.map((row, index) => {
-                                const nuevaFila = {};
+                                const nuevaFila = { _rowIndex: index };
                                 
                                 // Copiar TODAS las columnas originales (sin filtrar)
                                 columnasOriginales.forEach(col => {
@@ -1260,12 +1529,9 @@
                         let reprogramacionesProcesadas = [];
                         let pendientesProcesadas = [];
                         let pendientesPorHojaProcesadas = {};
-                        let columnasHoja1 = [];
-                        let columnasHoja2 = [];
                         
                         if (datosReprogramacion.length > 0) {
                             reprogramacionesProcesadas = procesarDatos(datosReprogramacion, 'Reprogramaciones');
-                            columnasHoja1 = Object.keys(datosReprogramacion[0] || {});
                             console.log(`📊 Reprogramaciones: ${reprogramacionesProcesadas.length} filas`);
                         } else {
                             console.log('ℹ️ No hay datos en la hoja "Reprogramaciones"');
@@ -1273,7 +1539,6 @@
                         
                         if (datosPendientes.length > 0) {
                             pendientesProcesadas = procesarDatos(datosPendientes, 'Pendientes');
-                            columnasHoja2 = Object.keys(datosPendientes[0] || {});
                             console.log(`📊 Pendientes: ${pendientesProcesadas.length} filas`);
                             
                             // Procesar cada hoja por separado
@@ -1294,8 +1559,9 @@
                             nombreHoja1: hojaReprogramacion || 'N/A',
                             nombreHoja2: hojasPendientes.join(', ') || 'N/A',
                             nombresPendientes: hojasPendientes,
-                            columnasHoja1: columnasHoja1,
-                            columnasHoja2: columnasHoja2
+                            columnasHoja1: columnasReprogramacion,
+                            columnasHoja2: columnasPendientes,
+                            columnasPorHoja: columnasPorHoja
                         });
                     } catch (error) {
                         console.error('❌ Error al procesar Excel:', error);
@@ -1682,24 +1948,28 @@
                         return;
                     }
                     
-                    // ✅ IMPORTANTE: Usar TODAS las columnas de los datos, NO solo las originales
-                    // Esto incluye FECHA REPROGRAMACION y OBSERVACION que el supervisor llenó
+                    // Ordenar por índice original para preservar el orden de subida
+                    datos = [...datos].sort((a, b) => (a._rowIndex ?? 0) - (b._rowIndex ?? 0));
+                    
+                    // ✅ USAR ORDEN ORIGINAL DE COLUMNAS DEL EXCEL
                     const todasLasColumnas = Object.keys(datos[0]);
+                    let columnas;
                     
-                    // Priorizar columnas especiales al inicio si existen
-                    const columnasEspeciales = ['FECHA REPROGRAMACION', 'OBSERVACION'];
-                    const columnasRestantes = todasLasColumnas.filter(c => !columnasEspeciales.includes(c));
+                    if (columnasOriginales && columnasOriginales.length > 0) {
+                        const columnasNuevas = todasLasColumnas.filter(c => !columnasOriginales.includes(c) && c !== '_rowIndex');
+                        columnas = [...columnasOriginales, ...columnasNuevas];
+                        console.log(`📄 Usando orden original + ${columnasNuevas.length} columnas nuevas:`, columnasNuevas);
+                    } else {
+                        columnas = todasLasColumnas.filter(c => c !== '_rowIndex');
+                        console.log('⚠️ No hay columnasOriginales, usando todas las columnas');
+                    }
                     
-                    // Mantener las especiales al inicio, luego el resto
-                    const columnas = [
-                        ...columnasEspeciales.filter(c => todasLasColumnas.includes(c)),
-                        ...columnasRestantes
-                    ];
+                    // Excluir columna interna _rowIndex del Excel de salida
+                    columnas = columnas.filter(c => c !== '_rowIndex');
                     
                     console.log(`📄 Generando hoja "${nombreHoja}":`);
                     console.log(`   - Total filas: ${datos.length}`);
                     console.log(`   - Columnas (${columnas.length}): ${columnas.join(', ')}`);
-                    console.log(`   - Incluye datos del supervisor: ${columnasEspeciales.filter(c => todasLasColumnas.includes(c)).join(', ')}`);
                     
                     // Crear array de arrays con encabezados
                     const datosArray = [columnas];
@@ -1761,14 +2031,8 @@
                     crearHoja(reprogData.datosReprogramacion, nombreHoja, reprogData.columnasHoja1);
                 }
                 
-                // ✅ CREAR HOJA DE PENDIENTES (formato antiguo)
-                if (reprogData.datosPendientes && reprogData.datosPendientes.length > 0) {
-                    const nombreHoja = reprogData.nombreHoja2 || 'Pendientes';
-                    crearHoja(reprogData.datosPendientes, nombreHoja, reprogData.columnasHoja2);
-                }
-                
-                // ✅ CREAR HOJAS DE PENDIENTES POR NOMBRE (formato nuevo)
-                if (reprogData.datosPendientesPorHoja && typeof reprogData.datosPendientesPorHoja === 'object') {
+                // ✅ CREAR HOJAS DE PENDIENTES (preferir formato nuevo, fallback antiguo)
+                if (reprogData.datosPendientesPorHoja && typeof reprogData.datosPendientesPorHoja === 'object' && Object.keys(reprogData.datosPendientesPorHoja).length > 0) {
                     for (const [nombreHoja, datos] of Object.entries(reprogData.datosPendientesPorHoja)) {
                         if (datos && datos.length > 0) {
                             const columnasHoja = reprogData.columnasPorHoja?.[nombreHoja] || 
@@ -1776,6 +2040,9 @@
                             crearHoja(datos, nombreHoja, columnasHoja);
                         }
                     }
+                } else if (reprogData.datosPendientes && reprogData.datosPendientes.length > 0) {
+                    const nombreHoja = reprogData.nombreHoja2 || 'Pendientes';
+                    crearHoja(reprogData.datosPendientes, nombreHoja, reprogData.columnasHoja2);
                 }
                 
                 // Generar nombre de archivo con timestamp

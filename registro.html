@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Usuarios</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #fafafa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header-bar {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 24px;
+            margin: -20px -20px 24px -20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+
+        .header-bar h1 {
+            font-size: 18px;
+            color: #1f2937;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-bar h1 i {
+            color: #3b82f6;
+        }
+
+        .back-btn {
+            background: #f3f4f6;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #6b7280;
+            font-size: 13px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 24px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title i {
+            color: #3b82f6;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert.show {
+            display: flex;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-info {
+            background: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #1f2937;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        input:disabled {
+            background: #f3f4f6;
+            cursor: not-allowed;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            width: 100%;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-primary:disabled {
+            background: #93c5fd;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+            width: 100%;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-icon {
+            padding: 6px 10px;
+            font-size: 12px;
+            background: transparent;
+            color: #6b7280;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-icon:hover {
+            background: #f9fafb;
+            color: #374151;
+        }
+
+        .btn-icon.edit {
+            color: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .btn-icon.edit:hover {
+            background: #eff6ff;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 16px;
+        }
+
+        .loader.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 2px solid #e5e7eb;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 0.6s linear infinite;
+            margin: 0 auto 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .users-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .user-item {
+            background: #fafafa;
+            padding: 14px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .user-item:hover {
+            background: #f3f4f6;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 2px;
+        }
+
+        .user-details {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .role-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .badge-auxiliar {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-supervisor {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-admin {
+            background: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-title i {
+            color: #3b82f6;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .info-box {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+        }
+
+        .info-box-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .info-box-content {
+            font-size: 14px;
+            color: #1f2937;
+        }
+
+        .password-toggle {
+            position: relative;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .password-toggle-btn:hover {
+            color: #6b7280;
+        }
+
+        /* Estilos para carga masiva */
+        .upload-section {
+            background: #f9fafb;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 20px;
+        }
+
+        .upload-section:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .upload-section.dragover {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #9ca3af;
+            margin-bottom: 12px;
+        }
+
+        .upload-text {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .upload-hint {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 13px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .preview-table th {
+            background: #f9fafb;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .preview-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #6b7280;
+        }
+
+        .preview-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .progress-container {
+            display: none;
+            margin: 20px 0;
+        }
+
+        .progress-container.active {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #2563eb);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 13px;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        .results-summary {
+            display: none;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #e5e7eb;
+        }
+
+        .results-summary.show {
+            display: block;
+        }
+
+        .result-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-icon {
+            width: 24px;
+            font-size: 16px;
+        }
+
+        .result-icon.success {
+            color: #10b981;
+        }
+
+        .result-icon.error {
+            color: #ef4444;
+        }
+
+        .result-text {
+            flex: 1;
+            font-size: 13px;
+            color: #374151;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-number.success {
+            color: #10b981;
+        }
+
+        .stat-number.error {
+            color: #ef4444;
+        }
+
+        .stat-number.total {
+            color: #3b82f6;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-bar {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .modal {
+                width: 95%;
+            }
+
+            .summary-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-bar">
+        <h1>
+            <i class="fas fa-users-cog"></i>
+            Gestión de Usuarios
+        </h1>
+        <a href="login.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Volver al Login
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="grid">
+            <!-- Tarjeta de registro individual -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-user-plus"></i>
+                    Registrar Nuevo Usuario
+                </div>
+
+                <div class="alert alert-success" id="successAlert">
+                    <i class="fas fa-check-circle"></i>
+                    <span id="successMsg"></span>
+                </div>
+
+                <div class="alert alert-error" id="errorAlert">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="errorMsg"></span>
+                </div>
+
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label>Nombre completo <span class="required">*</span></label>
+                        <input type="text" id="nombre" placeholder="Ej: María García López" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Correo electrónico <span class="required">*</span></label>
+                        <input type="email" id="email" placeholder="usuario@empresa.com" required>
+                        <div class="help-text">Este será su usuario para iniciar sesión</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Contraseña <span class="required">*</span></label>
+                        <input type="password" id="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                        <div class="help-text">Mínimo 6 caracteres</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Rol <span class="required">*</span></label>
+                        <select id="rol" required>
+                            <option value="">Selecciona un rol...</option>
+                            <option value="auxiliar">Auxiliar de Seguimiento</option>
+                            <option value="supervisor">Supervisor</option>
+                            <option value="ejecutivo">Ejecutivo</option>
+                            <option value="analista">Analista</option>
+                            <option value="especialista">Especialista</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+
+                    <div class="loader" id="loader">
+                        <div class="spinner"></div>
+                        <p style="color: #6b7280; font-size: 13px;">Creando usuario...</p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Crear Usuario</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Tarjeta de carga masiva -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-file-excel"></i>
+                    Carga Masiva desde Excel
+                </div>
+
+                <div class="alert alert-info" style="display: flex;">
+                    <i class="fas fa-info-circle"></i>
+                    <span>El Excel debe tener: NOMBRE COMPLETO, CORREO, ROL, CONTRASEÑA</span>
+                </div>
+
+                <div class="upload-section" id="uploadSection">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="upload-text">
+                        <strong>Haz clic o arrastra tu archivo Excel aquí</strong>
+                    </div>
+                    <div class="upload-hint">
+                        Formatos soportados: .xlsx, .xls
+                    </div>
+                    <input type="file" id="excelFile" class="file-input" accept=".xlsx,.xls">
+                </div>
+
+                <div id="previewContainer"></div>
+
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Cargando usuarios...</div>
+                </div>
+
+                <div class="results-summary" id="resultsSummary">
+                    <div class="summary-stats">
+                        <div class="stat-card">
+                            <div class="stat-number total" id="totalProcessed">0</div>
+                            <div class="stat-label">Total Procesados</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number success" id="totalSuccess">0</div>
+                            <div class="stat-label">Exitosos</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number error" id="totalErrors">0</div>
+                            <div class="stat-label">Errores</div>
+                        </div>
+                    </div>
+                    <div id="resultsDetails"></div>
+                </div>
+
+                <button type="button" class="btn btn-primary" id="uploadBtn" style="display: none;">
+                    <i class="fas fa-upload"></i>
+                    <span>Cargar Usuarios</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="grid" style="margin-top: 24px;">
+            <div class="card" style="grid-column: 1 / -1;">
+                <div class="card-title">
+                    <i class="fas fa-users"></i>
+                    Usuarios Registrados
+                </div>
+                <div class="users-list" id="usersList">
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <div>Cargando usuarios...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edición -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-user-edit"></i>
+                    Editar Usuario
+                </div>
+                <button class="modal-close" onclick="cerrarModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-success" id="editSuccessAlert">
+                    <i class="fas fa-check-circle"></i>
+                    <span id="editSuccessMsg"></span>
+                </div>
+
+                <div class="alert alert-error" id="editErrorAlert">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="editErrorMsg"></span>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-box-title">Correo Electrónico</div>
+                    <div class="info-box-content" id="editEmail"></div>
+                </div>
+
+                <form id="editForm">
+                    <div class="form-group">
+                        <label>Nombre completo <span class="required">*</span></label>
+                        <input type="text" id="editNombre" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Rol <span class="required">*</span></label>
+                        <select id="editRol" required>
+                            <option value="auxiliar">Auxiliar de Seguimiento</option>
+                            <option value="supervisor">Supervisor</option>
+                            <option value="ejecutivo">Ejecutivo</option>
+                            <option value="analista">Analista</option>
+                            <option value="especialista">Especialista</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+
+                    <div class="loader" id="editLoader">
+                        <div class="spinner"></div>
+                        <p style="color: #6b7280; font-size: 13px;">Actualizando usuario...</p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="editSubmitBtn">
+                        <i class="fas fa-save"></i>
+                        <span>Guardar Cambios</span>
+                    </button>
+
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModal()">
+                        <i class="fas fa-times"></i>
+                        <span>Cancelar</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, createUserWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getDatabase, ref, set, onValue, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // ========== MODALES PERSONALIZADOS ==========
+        function mostrarModalPersonalizado({
+            titulo = 'Confirmar acción',
+            mensaje = '¿Estás seguro?',
+            tipo = 'question',
+            confirmText = 'Continuar',
+            cancelText = 'Cancelar',
+            showInput = false,
+            inputPlaceholder = '',
+            inputHelp = '',
+            inputValue = ''
+        }) {
+            return new Promise((resolve) => {
+                // Crear modal dinámicamente
+                const modalHTML = `
+                    <div id="modalPersonalizadoReg" class="modal-overlay" style="
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: rgba(0, 0, 0, 0.7);
+                        backdrop-filter: blur(4px);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        z-index: 10000;
+                        opacity: 0;
+                        transition: opacity 0.3s ease;
+                    ">
+                        <div class="modal-container-personalizado" style="
+                            background: white;
+                            border-radius: 16px;
+                            max-width: 400px;
+                            width: 90%;
+                            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                            transform: scale(0.9) translateY(20px);
+                            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                            overflow: hidden;
+                        ">
+                            <div class="modal-icon" style="
+                                padding: 24px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 48px;
+                            ">
+                                <i class="fas ${tipo === 'warning' ? 'fa-exclamation-triangle' :
+                                               tipo === 'error' ? 'fa-exclamation-circle' :
+                                               tipo === 'success' ? 'fa-check-circle' :
+                                               'fa-question-circle'}" style="color: ${tipo === 'warning' ? '#f59e0b' :
+                                                                                   tipo === 'error' ? '#ef4444' :
+                                                                                   tipo === 'success' ? '#10b981' :
+                                                                                   '#6b7280'}"></i>
+                            </div>
+                            <div class="modal-content-personalizado" style="
+                                padding: 0 24px 20px 24px;
+                                text-align: center;
+                            ">
+                                <h3 class="modal-title-personalizado" style="
+                                    font-size: 20px;
+                                    font-weight: 700;
+                                    color: #1f2937;
+                                    margin-bottom: 12px;
+                                ">${titulo}</h3>
+                                <p class="modal-message-personalizado" style="
+                                    font-size: 15px;
+                                    color: #6b7280;
+                                    line-height: 1.6;
+                                    margin: 0;
+                                    white-space: pre-line;
+                                ">${mensaje}</p>
+                            </div>
+                            <div class="modal-actions-personalizado" style="
+                                display: grid;
+                                grid-template-columns: 1fr 1fr;
+                                gap: 12px;
+                                padding: 0 24px 24px 24px;
+                            ">
+                                <button class="modal-btn-personalizado btn-cancel-personalizado" id="modalCancelReg" style="
+                                    padding: 14px 20px;
+                                    border: none;
+                                    border-radius: 10px;
+                                    font-size: 15px;
+                                    font-weight: 600;
+                                    cursor: pointer;
+                                    transition: all 0.2s ease;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    gap: 8px;
+                                    min-height: 52px;
+                                    background: #f3f4f6;
+                                    color: #6b7280;
+                                ">
+                                    <i class="fas fa-times"></i>
+                                    <span>${cancelText}</span>
+                                </button>
+                                <button class="modal-btn-personalizado btn-confirm-personalizado" id="modalConfirmReg" style="
+                                    padding: 14px 20px;
+                                    border: none;
+                                    border-radius: 10px;
+                                    font-size: 15px;
+                                    font-weight: 600;
+                                    cursor: pointer;
+                                    transition: all 0.2s ease;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    gap: 8px;
+                                    min-height: 52px;
+                                    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                                    color: white;
+                                    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+                                ">
+                                    <i class="fas fa-check"></i>
+                                    <span>${confirmText}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Agregar modal al DOM
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+                const modal = document.getElementById('modalPersonalizadoReg');
+                const confirmBtn = document.getElementById('modalConfirmReg');
+                const cancelBtn = document.getElementById('modalCancelReg');
+
+                // Funciones de manejo
+                const handleConfirm = () => {
+                    cleanup();
+                    resolve(true);
+                };
+
+                const handleCancel = () => {
+                    cleanup();
+                    resolve(false);
+                };
+
+                const handleOverlayClick = (e) => {
+                    if (e.target === modal) {
+                        cleanup();
+                        resolve(false);
+                    }
+                };
+
+                const handleKeyPress = (e) => {
+                    if (e.key === 'Escape') {
+                        handleCancel();
+                    }
+                };
+
+                const cleanup = () => {
+                    modal.remove();
+                    confirmBtn.removeEventListener('click', handleConfirm);
+                    cancelBtn.removeEventListener('click', handleCancel);
+                    modal.removeEventListener('click', handleOverlayClick);
+                    document.removeEventListener('keydown', handleKeyPress);
+                };
+
+                // Agregar event listeners
+                confirmBtn.addEventListener('click', handleConfirm);
+                cancelBtn.addEventListener('click', handleCancel);
+                modal.addEventListener('click', handleOverlayClick);
+                document.addEventListener('keydown', handleKeyPress);
+
+                // Mostrar modal
+                setTimeout(() => {
+                    modal.style.opacity = '1';
+                    modal.querySelector('.modal-container-personalizado').style.transform = 'scale(1) translateY(0)';
+                }, 10);
+
+                if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+            });
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBDRqsZI8EQaGn1lCc4Y5rIcfmLE7969zY",
+            authDomain: "reprogramacionesme.firebaseapp.com",
+            databaseURL: "https://reprogramacionesme-default-rtdb.firebaseio.com",
+            projectId: "reprogramacionesme",
+            storageBucket: "reprogramacionesme.firebasestorage.app",
+            messagingSenderId: "674035461204",
+            appId: "1:674035461204:web:a70b7793f71ae1c5e311c1",
+            measurementId: "G-T4VJ4EQKNT"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let usuarioEditando = null;
+
+        // Funciones globales
+        window.abrirModalEditar = function(uid, userData) {
+            usuarioEditando = { uid, ...userData };
+            
+            document.getElementById('editEmail').textContent = userData.email;
+            document.getElementById('editNombre').value = userData.nombre;
+            document.getElementById('editRol').value = userData.rol;
+            
+            document.getElementById('editModal').classList.add('show');
+        };
+
+        window.cerrarModal = function() {
+            document.getElementById('editModal').classList.remove('show');
+            document.getElementById('editForm').reset();
+            document.getElementById('editSuccessAlert').classList.remove('show');
+            document.getElementById('editErrorAlert').classList.remove('show');
+            usuarioEditando = null;
+        };
+
+        window.togglePassword = function(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            
+            const btn = input.nextElementSibling.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.classList.remove('fa-eye');
+                btn.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                btn.classList.remove('fa-eye-slash');
+                btn.classList.add('fa-eye');
+            }
+        };
+
+        function mostrarAlerta(tipo, mensaje, contexto = 'main') {
+            const prefix = contexto === 'edit' ? 'edit' : '';
+            const successAlert = document.getElementById(`${prefix}${prefix ? 'S' : 's'}uccessAlert`);
+            const errorAlert = document.getElementById(`${prefix}${prefix ? 'E' : 'e'}rrorAlert`);
+            
+            if (tipo === 'success') {
+                document.getElementById(`${prefix}${prefix ? 'S' : 's'}uccessMsg`).textContent = mensaje;
+                successAlert.classList.add('show');
+                setTimeout(() => successAlert.classList.remove('show'), 5000);
+            } else {
+                document.getElementById(`${prefix}${prefix ? 'E' : 'e'}rrorMsg`).textContent = mensaje;
+                errorAlert.classList.add('show');
+                setTimeout(() => errorAlert.classList.remove('show'), 5000);
+            }
+        }
+
+        // Formulario de registro
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const nombre = document.getElementById('nombre').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const rol = document.getElementById('rol').value;
+
+            if (!nombre || !email || !password || !rol) {
+                mostrarAlerta('error', 'Por favor completa todos los campos');
+                return;
+            }
+
+            if (password.length < 6) {
+                mostrarAlerta('error', 'La contraseña debe tener al menos 6 caracteres');
+                return;
+            }
+
+            const loader = document.getElementById('loader');
+            const submitBtn = document.getElementById('submitBtn');
+            loader.classList.add('active');
+            submitBtn.disabled = true;
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                await set(ref(db, `usuarios/${user.uid}`), {
+                    nombre: nombre,
+                    email: email,
+                    rol: rol,
+                    fechaCreacion: new Date().toISOString(),
+                    ultimaActualizacion: new Date().toISOString()
+                });
+
+                mostrarAlerta('success', `✓ Usuario ${nombre} creado correctamente`);
+                document.getElementById('registerForm').reset();
+                await signOut(auth);
+
+            } catch (error) {
+                console.error('Error completo:', error);
+
+                let mensajeError = 'Error al crear usuario';
+
+                switch(error.code) {
+                    case 'auth/email-already-in-use':
+                        mensajeError = 'Este correo ya está registrado';
+                        break;
+                    case 'auth/invalid-email':
+                        mensajeError = 'Correo electrónico inválido';
+                        break;
+                    case 'auth/weak-password':
+                        mensajeError = 'La contraseña es muy débil';
+                        break;
+                    case 'auth/operation-not-allowed':
+                        mensajeError = 'Operación no permitida. Verifica la configuración de Firebase';
+                        break;
+                    case 'permission-denied':
+                    case 'PERMISSION_DENIED':
+                        mensajeError = 'Error de permisos. Verifica las reglas de Firebase Database';
+                        break;
+                    default:
+                        mensajeError = `Error: ${error.message}`;
+                }
+
+                mostrarAlerta('error', mensajeError);
+            } finally {
+                loader.classList.remove('active');
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Formulario de edición
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!usuarioEditando) return;
+
+            const nombre = document.getElementById('editNombre').value.trim();
+            const rol = document.getElementById('editRol').value;
+
+            if (!nombre || !rol) {
+                mostrarAlerta('error', 'Por favor completa todos los campos obligatorios', 'edit');
+                return;
+            }
+
+            const loader = document.getElementById('editLoader');
+            const submitBtn = document.getElementById('editSubmitBtn');
+            loader.classList.add('active');
+            submitBtn.disabled = true;
+
+            try {
+                // Actualizar datos en la base de datos
+                await update(ref(db, `usuarios/${usuarioEditando.uid}`), {
+                    nombre: nombre,
+                    rol: rol,
+                    ultimaActualizacion: new Date().toISOString()
+                });
+
+                mostrarAlerta('success', '✓ Usuario actualizado correctamente', 'edit');
+
+                setTimeout(() => {
+                    cerrarModal();
+                }, 1500);
+
+            } catch (error) {
+                console.error('Error al actualizar:', error);
+                mostrarAlerta('error', `Error: ${error.message}`, 'edit');
+            } finally {
+                loader.classList.remove('active');
+                submitBtn.disabled = false;
+            }
+        });
+
+        function cargarUsuarios() {
+            const usersList = document.getElementById('usersList');
+            
+            if (!auth.currentUser) {
+                usersList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas fa-lock"></i></div>
+                        <div>Inicia sesión para ver usuarios</div>
+                    </div>
+                `;
+            }
+            
+            const usuariosRef = ref(db, 'usuarios');
+            
+            onValue(usuariosRef, (snapshot) => {
+                if (!snapshot.exists()) {
+                    usersList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon"><i class="fas fa-user-slash"></i></div>
+                            <div>No hay usuarios registrados</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const usuarios = snapshot.val();
+                const usuariosArray = Object.entries(usuarios).map(([uid, data]) => ({
+                    uid,
+                    ...data
+                }));
+
+                usuariosArray.sort((a, b) => {
+                    const dateA = new Date(a.fechaCreacion || 0);
+                    const dateB = new Date(b.fechaCreacion || 0);
+                    return dateB - dateA;
+                });
+
+                const html = usuariosArray.map(user => {
+                    const badgeClass = `badge-${user.rol}`;
+                    const rolTexto = {
+                        'auxiliar': 'Auxiliar',
+                        'supervisor': 'Supervisor',
+                        'admin': 'Admin'
+                    }[user.rol] || user.rol;
+
+                    const userDataJson = JSON.stringify({
+                        nombre: user.nombre,
+                        email: user.email,
+                        rol: user.rol
+                    }).replace(/"/g, '&quot;');
+
+                    return `
+                        <div class="user-item">
+                            <div class="user-info">
+                                <div class="user-name">${user.nombre}</div>
+                                <div class="user-details">${user.email}</div>
+                            </div>
+                            <div class="user-actions">
+                                <div class="role-badge ${badgeClass}">${rolTexto}</div>
+                                <button class="btn btn-icon edit" onclick='abrirModalEditar("${user.uid}", ${userDataJson})' title="Editar usuario">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                usersList.innerHTML = html;
+            }, (error) => {
+                console.error('Error al cargar usuarios:', error);
+                usersList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div>Error al cargar usuarios</div>
+                    </div>
+                `;
+            });
+        }
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                cargarUsuarios();
+            }
+        });
+        
+        cargarUsuarios();
+
+        // ==================== CARGA MASIVA DESDE EXCEL ====================
+        let usuariosExcel = [];
+
+        const uploadSection = document.getElementById('uploadSection');
+        const fileInput = document.getElementById('excelFile');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const previewContainer = document.getElementById('previewContainer');
+        const progressContainer = document.getElementById('progressContainer');
+        const resultsSummary = document.getElementById('resultsSummary');
+
+        // Evento click en la zona de carga
+        uploadSection.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Drag and drop
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadSection.classList.add('dragover');
+        });
+
+        uploadSection.addEventListener('dragleave', () => {
+            uploadSection.classList.remove('dragover');
+        });
+
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                procesarExcel(files[0]);
+            }
+        });
+
+        // Evento cambio de archivo
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                procesarExcel(file);
+            }
+        });
+
+        function procesarExcel(file) {
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                    
+                    if (jsonData.length === 0) {
+                        mostrarAlerta('error', 'El archivo Excel está vacío');
+                        return;
+                    }
+
+                    // Procesar y validar datos
+                    usuariosExcel = jsonData.map((row, index) => {
+                        // Normalizar nombres de columnas (quitar espacios y convertir a minúsculas)
+                        const normalizedRow = {};
+                        Object.keys(row).forEach(key => {
+                            const normalizedKey = key.trim().toUpperCase();
+                            normalizedRow[normalizedKey] = row[key];
+                        });
+
+                        // Extraer datos con nombres flexibles
+                        const nombre = normalizedRow['NOMBRE COMPLETO'] || normalizedRow['NOMBRE'];
+                        const correo = normalizedRow['CORREO'] || normalizedRow['EMAIL'] || normalizedRow['CORREO ELECTRÓNICO'];
+                        const rolExcel = normalizedRow['ROL'];
+                        const password = normalizedRow['CONTRASEÑA'] || normalizedRow['PASSWORD'];
+
+                        // Convertir rol a formato del sistema
+                        let rol = '';
+                        if (rolExcel) {
+                            const rolUpper = rolExcel.toString().toUpperCase().trim();
+                            if (rolUpper.includes('AUXILIAR')) {
+                                rol = 'auxiliar';
+                            } else if (rolUpper.includes('SUPERVISOR')) {
+                                rol = 'supervisor';
+                            } else if (rolUpper.includes('EJECUTIVO')) {
+                                rol = 'ejecutivo';
+                            } else if (rolUpper.includes('ANALISTA')) {
+                                rol = 'analista';
+                            } else if (rolUpper.includes('ESPECIALISTA')) {
+                                rol = 'especialista';
+                            } else if (rolUpper.includes('ADMIN')) {
+                                rol = 'admin';
+                            }
+                        }
+
+                        return {
+                            fila: index + 2, // +2 porque Excel empieza en 1 y tiene encabezado
+                            nombre: nombre || '',
+                            correo: correo || '',
+                            rol: rol,
+                            password: password || '',
+                            valido: !!(nombre && correo && rol && password && password.toString().length >= 6)
+                        };
+                    });
+
+                    mostrarVistaPrevia();
+                } catch (error) {
+                    console.error('Error al procesar Excel:', error);
+                    mostrarAlerta('error', 'Error al leer el archivo. Verifica que sea un Excel válido');
+                }
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        function mostrarVistaPrevia() {
+            const validos = usuariosExcel.filter(u => u.valido).length;
+            const invalidos = usuariosExcel.length - validos;
+
+            let html = `
+                <div class="alert ${invalidos > 0 ? 'alert-info' : 'alert-success'}" style="display: flex;">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Se encontraron ${usuariosExcel.length} usuarios: ${validos} válidos, ${invalidos} con errores</span>
+                </div>
+            `;
+
+            html += `
+                <div style="max-height: 300px; overflow-y: auto;">
+                    <table class="preview-table">
+                        <thead>
+                            <tr>
+                                <th>Estado</th>
+                                <th>Nombre</th>
+                                <th>Correo</th>
+                                <th>Rol</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            usuariosExcel.forEach(user => {
+                const icon = user.valido 
+                    ? '<i class="fas fa-check-circle" style="color: #10b981;"></i>' 
+                    : '<i class="fas fa-exclamation-circle" style="color: #ef4444;"></i>';
+                
+                const rolTexto = {
+                    'auxiliar': 'Auxiliar',
+                    'supervisor': 'Supervisor',
+                    'admin': 'Admin'
+                }[user.rol] || 'Sin rol';
+
+                html += `
+                    <tr>
+                        <td style="text-align: center;">${icon}</td>
+                        <td>${user.nombre || '<span style="color: #ef4444;">Falta nombre</span>'}</td>
+                        <td>${user.correo || '<span style="color: #ef4444;">Falta correo</span>'}</td>
+                        <td>${user.rol ? rolTexto : '<span style="color: #ef4444;">Rol inválido</span>'}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            previewContainer.innerHTML = html;
+            uploadBtn.style.display = validos > 0 ? 'flex' : 'none';
+        }
+
+        // Evento del botón de carga
+        uploadBtn.addEventListener('click', async () => {
+            const usuariosValidos = usuariosExcel.filter(u => u.valido);
+            
+            if (usuariosValidos.length === 0) {
+                mostrarAlerta('error', 'No hay usuarios válidos para cargar');
+                return;
+            }
+
+            // Confirmar acción
+            const confirmar = await mostrarModalPersonalizado({
+                titulo: 'Confirmar Carga Masiva',
+                mensaje: `¿Deseas cargar ${usuariosValidos.length} usuarios?\n\nSe crearán cuentas con contraseñas temporales.`,
+                tipo: 'warning',
+                confirmText: 'Sí, cargar usuarios',
+                cancelText: 'Cancelar'
+            });
+
+            if (!confirmar) {
+                return;
+            }
+
+            uploadBtn.disabled = true;
+            progressContainer.classList.add('active');
+            resultsSummary.classList.remove('show');
+
+            const resultados = {
+                exitosos: [],
+                errores: []
+            };
+
+            for (let i = 0; i < usuariosValidos.length; i++) {
+                const user = usuariosValidos[i];
+                const progreso = ((i + 1) / usuariosValidos.length) * 100;
+                
+                document.getElementById('progressFill').style.width = `${progreso}%`;
+                document.getElementById('progressText').textContent = 
+                    `Procesando ${i + 1} de ${usuariosValidos.length}: ${user.nombre}`;
+
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(
+                        auth, 
+                        user.correo, 
+                        user.password
+                    );
+                    const firebaseUser = userCredential.user;
+
+                    await set(ref(db, `usuarios/${firebaseUser.uid}`), {
+                        nombre: user.nombre,
+                        email: user.correo,
+                        rol: user.rol,
+                        fechaCreacion: new Date().toISOString(),
+                        ultimaActualizacion: new Date().toISOString()
+                    });
+
+                    resultados.exitosos.push({
+                        nombre: user.nombre,
+                        correo: user.correo
+                    });
+
+                    await signOut(auth);
+
+                    // Pequeña pausa para no saturar Firebase
+                    await new Promise(resolve => setTimeout(resolve, 500));
+
+                } catch (error) {
+                    let mensajeError = 'Error desconocido';
+                    
+                    switch(error.code) {
+                        case 'auth/email-already-in-use':
+                            mensajeError = 'Correo ya registrado';
+                            break;
+                        case 'auth/invalid-email':
+                            mensajeError = 'Correo inválido';
+                            break;
+                        case 'auth/weak-password':
+                            mensajeError = 'Contraseña débil';
+                            break;
+                        default:
+                            mensajeError = error.message;
+                    }
+
+                    resultados.errores.push({
+                        nombre: user.nombre,
+                        correo: user.correo,
+                        error: mensajeError
+                    });
+                }
+            }
+
+            mostrarResultados(resultados, usuariosValidos.length);
+            uploadBtn.disabled = false;
+            progressContainer.classList.remove('active');
+        });
+
+        function mostrarResultados(resultados, total) {
+            document.getElementById('totalProcessed').textContent = total;
+            document.getElementById('totalSuccess').textContent = resultados.exitosos.length;
+            document.getElementById('totalErrors').textContent = resultados.errores.length;
+
+            let html = '<div style="max-height: 300px; overflow-y: auto;">';
+
+            // Mostrar exitosos
+            if (resultados.exitosos.length > 0) {
+                html += '<h4 style="color: #10b981; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle"></i> Usuarios Creados Exitosamente</h4>';
+                resultados.exitosos.forEach(user => {
+                    html += `
+                        <div class="result-item">
+                            <div class="result-icon success"><i class="fas fa-check"></i></div>
+                            <div class="result-text">${user.nombre} - ${user.correo}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            // Mostrar errores
+            if (resultados.errores.length > 0) {
+                html += '<h4 style="color: #ef4444; font-size: 14px; margin: 16px 0 8px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-exclamation-circle"></i> Errores</h4>';
+                resultados.errores.forEach(user => {
+                    html += `
+                        <div class="result-item">
+                            <div class="result-icon error"><i class="fas fa-times"></i></div>
+                            <div class="result-text">
+                                <strong>${user.nombre}</strong> - ${user.correo}
+                                <div style="color: #9ca3af; font-size: 12px; margin-top: 2px;">${user.error}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            html += '</div>';
+
+            document.getElementById('resultsDetails').innerHTML = html;
+            resultsSummary.classList.add('show');
+
+            // Limpiar para nueva carga
+            fileInput.value = '';
+            previewContainer.innerHTML = '';
+            uploadBtn.style.display = 'none';
+            usuariosExcel = [];
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('editModal').addEventListener('click', (e) => {
+            if (e.target.id === 'editModal') {
+                cerrarModal();
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+/**
+ * Cloudflare Worker - Proxy para Brevo API
+ * Despliega este código en: https://dash.cloudflare.com/workers
+ * 
+ * INSTRUCCIONES:
+ * 1. Ve a Cloudflare Dashboard > Workers & Pages
+ * 2. Edita tu worker: spring-field-4fe9
+ * 3. Copia y pega este código
+ * 4. Agrega la variable de entorno BREVO_API_KEY con tu clave real
+ * 5. Guarda y despliega
+ */
+
+// Configuración CORS
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Max-Age': '86400',
+};
+
+export default {
+  async fetch(request, env) {
+    // Manejar preflight CORS (IMPORTANTE)
+    if (request.method === 'OPTIONS') {
+      return new Response(null, {
+        headers: corsHeaders
+      });
+    }
+
+    // Solo permitir método POST
+    if (request.method !== 'POST') {
+      return new Response(JSON.stringify({ 
+        error: 'Método no permitido. Solo POST.' 
+      }), {
+        status: 405,
+        headers: {
+          'Content-Type': 'application/json',
+          ...corsHeaders
+        }
+      });
+    }
+
+    try {
+      // Verificar que existe la API key
+      if (!env.BREVO_API_KEY) {
+        return new Response(JSON.stringify({ 
+          error: 'BREVO_API_KEY no está configurada en las variables de entorno',
+          hint: 'Ve a Settings > Variables y agrega BREVO_API_KEY'
+        }), {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            ...corsHeaders
+          }
+        });
+      }
+
+      // Obtener datos del request
+      const requestData = await request.json();
+
+      // Validar datos requeridos
+      if (!requestData.to || !requestData.subject || !requestData.htmlContent) {
+        return new Response(JSON.stringify({ 
+          error: 'Faltan datos requeridos',
+          required: ['to', 'subject', 'htmlContent'],
+          received: Object.keys(requestData)
+        }), {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            ...corsHeaders
+          }
+        });
+      }
+
+      console.log('📧 Enviando correo a través de Brevo...');
+
+      // Llamar a Brevo API
+      const brevoResponse = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'api-key': env.BREVO_API_KEY,
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+      });
+
+      const brevoData = await brevoResponse.json();
+
+      console.log('📨 Respuesta de Brevo:', brevoResponse.status, brevoData);
+
+      // Retornar respuesta de Brevo con headers CORS
+      return new Response(JSON.stringify(brevoData), {
+        status: brevoResponse.status,
+        headers: {
+          'Content-Type': 'application/json',
+          ...corsHeaders
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ Error en Worker:', error);
+      
+      return new Response(JSON.stringify({ 
+        error: 'Error interno del servidor',
+        message: error.message,
+        stack: error.stack
+      }), {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          ...corsHeaders
+        }
+      });
+    }
+  }
+};

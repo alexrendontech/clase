@@ -2,11 +2,77 @@
  * Servicio de notificaciones por correo - Cloudflare Worker Proxy
  * Usa Cloudflare Workers para proteger la API key de Brevo
  * Plan gratuito: 300 correos/día
+ * 
+ * FIX v3: Los adjuntos SIEMPRE se envían como base64 (content), nunca por URL.
+ * Brevo es poco fiable descargando URLs externas (Cloudinary), lo que causaba
+ * que los correos llegaran sin adjunto de forma intermitente.
  */
 
 const CLOUDFLARE_WORKER_URL = 'https://spring-field-4fe9.mifestereo.workers.dev';
+const MAX_REINTENTOS_EMAIL = 3;
+const PAUSA_ENTRE_REINTENTOS_MS = 2000;
 
-async function enviarCorreo({ to, toName, subject, htmlContent, textContent }) {
+/**
+ * Descarga un archivo desde una URL y lo convierte a base64.
+ * Esto garantiza que el adjunto siempre se envíe como contenido directo.
+ */
+async function urlABase64(url) {
+    try {
+        console.log('📥 Descargando archivo para convertir a base64:', url);
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Error HTTP ${response.status} al descargar ${url}`);
+        }
+        const blob = await response.blob();
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                // Extraer solo la parte base64 (sin el prefijo data:...;base64,)
+                const base64 = reader.result.split(',')[1];
+                if (!base64 || base64.length < 10) {
+                    reject(new Error('Conversión a base64 produjo contenido vacío'));
+                    return;
+                }
+                console.log('✅ Archivo convertido a base64 (' + Math.round(base64.length * 0.75 / 1024) + ' KB)');
+                resolve(base64);
+            };
+            reader.onerror = () => reject(new Error('Error al leer blob como base64'));
+            reader.readAsDataURL(blob);
+        });
+    } catch (error) {
+        console.error('❌ Error al convertir URL a base64:', error);
+        throw error;
+    }
+}
+
+/**
+ * Convierte un archivo File del navegador directamente a base64.
+ */
+async function fileABase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64 = reader.result.split(',')[1];
+            if (!base64 || base64.length < 10) {
+                reject(new Error('Conversión de archivo a base64 produjo contenido vacío'));
+                return;
+            }
+            console.log('✅ Archivo local convertido a base64 (' + Math.round(base64.length * 0.75 / 1024) + ' KB)');
+            resolve(base64);
+        };
+        reader.onerror = () => reject(new Error('Error al leer archivo como base64'));
+        reader.readAsDataURL(file);
+    });
+}
+
+/**
+ * Pausa la ejecución por un tiempo determinado.
+ */
+function esperar(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function enviarCorreo({ to, toName, subject, htmlContent, textContent, attachments }) {
     try {
         console.log('📧 Intentando enviar correo a:', to);
 
@@ -33,25 +99,122 @@ async function enviarCorreo({ to, toName, subject, htmlContent, textContent }) {
             payload.textContent = textContent;
         }
         
-        const response = await fetch(CLOUDFLARE_WORKER_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
-
-        const data = await response.json();
-        
-        console.log('📨 Respuesta Worker:', { status: response.status, data });
-        
-        if (!response.ok) {
-            console.error('❌ Error Worker completo:', JSON.stringify(data, null, 2));
-            throw new Error(data.message || data.error || `Error ${response.status}: ${JSON.stringify(data)}`);
+        // ✅ FIX v3: SIEMPRE convertir adjuntos a base64 content (nunca enviar por URL)
+        if (attachments && attachments.length > 0) {
+            console.log('📎📎📎 PROCESANDO ADJUNTOS (SIEMPRE BASE64) 📎📎📎');
+            console.log(`Total adjuntos a procesar: ${attachments.length}`);
+            
+            const adjuntosProcesados = [];
+            
+            for (let idx = 0; idx < attachments.length; idx++) {
+                const att = attachments[idx];
+                // Sanear el nombre del archivo
+                const sanitizedName = att.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+                
+                let base64Content = null;
+                
+                // PRIORIDAD 1: Si ya tiene contenido base64 directo, usarlo
+                if (att.content && att.content.length > 10) {
+                    base64Content = att.content;
+                    console.log(`Adjunto #${idx + 1}: Usando base64 directo (${sanitizedName})`);
+                }
+                // PRIORIDAD 2: Si tiene un objeto File del navegador, convertirlo
+                else if (att.file && att.file instanceof File) {
+                    try {
+                        base64Content = await fileABase64(att.file);
+                        console.log(`Adjunto #${idx + 1}: Convertido desde File (${sanitizedName})`);
+                    } catch (convError) {
+                        console.error(`❌ Error convirtiendo File a base64:`, convError);
+                    }
+                }
+                // PRIORIDAD 3: Si tiene URL, descargar y convertir a base64
+                else if (att.url) {
+                    try {
+                        base64Content = await urlABase64(att.url);
+                        console.log(`Adjunto #${idx + 1}: Descargado y convertido desde URL (${sanitizedName})`);
+                    } catch (dlError) {
+                        console.error(`❌ Error descargando URL para adjunto:`, dlError);
+                        // Segundo intento tras pausa
+                        try {
+                            console.log(`🔄 Reintentando descarga de URL...`);
+                            await esperar(2000);
+                            base64Content = await urlABase64(att.url);
+                            console.log(`✅ Reintento exitoso para adjunto #${idx + 1}`);
+                        } catch (retryError) {
+                            console.error(`❌❌ Segundo intento fallido:`, retryError);
+                        }
+                    }
+                }
+                
+                // Validar que tenemos contenido válido
+                if (base64Content && base64Content.length > 10) {
+                    const tamanoKB = Math.round(base64Content.length * 0.75 / 1024);
+                    console.log(`✅ Adjunto #${idx + 1} listo: ${sanitizedName} (${tamanoKB} KB)`);
+                    
+                    if (tamanoKB > 2048) {
+                        console.warn(`⚠️ ADVERTENCIA: Archivo grande (${tamanoKB} KB). Límite Brevo ~2MB`);
+                    }
+                    
+                    adjuntosProcesados.push({
+                        name: sanitizedName,
+                        content: base64Content
+                    });
+                } else {
+                    console.error(`❌ Adjunto #${idx + 1} (${sanitizedName}) NO tiene contenido válido. Se enviará sin este adjunto.`);
+                }
+            }
+            
+            if (adjuntosProcesados.length > 0) {
+                payload.attachment = adjuntosProcesados;
+                console.log(`📎 ${adjuntosProcesados.length}/${attachments.length} adjuntos listos para enviar`);
+            } else {
+                console.warn('⚠️ Ningún adjunto pudo ser procesado. El correo se enviará sin adjuntos.');
+            }
+            
+            console.log('📎📎📎 FIN PROCESAMIENTO ADJUNTOS 📎📎📎\n');
         }
+        
+        // ✅ FIX v3: Envío con reintentos automáticos
+        let ultimoError = null;
+        const tieneAdjuntos = payload.attachment && payload.attachment.length > 0;
+        const intentosMax = tieneAdjuntos ? MAX_REINTENTOS_EMAIL : 1;
+        
+        for (let intento = 1; intento <= intentosMax; intento++) {
+            try {
+                if (intento > 1) {
+                    console.log(`🔄 Reintento ${intento}/${intentosMax} para enviar correo...`);
+                    await esperar(PAUSA_ENTRE_REINTENTOS_MS * intento);
+                }
+                
+                const response = await fetch(CLOUDFLARE_WORKER_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
 
-        console.log('✅ Correo enviado exitosamente a:', to);
-        return { success: true, messageId: data.messageId };
+                const data = await response.json();
+                
+                console.log(`📨 Respuesta Worker (intento ${intento}):`, { status: response.status, data });
+                
+                if (!response.ok) {
+                    console.error('❌ Error Worker completo:', JSON.stringify(data, null, 2));
+                    throw new Error(data.message || data.error || `Error ${response.status}: ${JSON.stringify(data)}`);
+                }
+
+                console.log('✅ Correo enviado exitosamente a:', to, tieneAdjuntos ? '(CON adjunto)' : '(sin adjunto)');
+                return { success: true, messageId: data.messageId };
+                
+            } catch (intentoError) {
+                ultimoError = intentoError;
+                console.warn(`⚠️ Intento ${intento}/${intentosMax} falló:`, intentoError.message);
+            }
+        }
+        
+        // Si llegamos aquí, todos los reintentos fallaron
+        console.error('❌ Todos los reintentos fallaron para enviar correo a:', to);
+        return { success: false, error: ultimoError?.message || 'Error desconocido tras reintentos' };
         
     } catch (error) {
         console.error('❌ Error completo al enviar correo:', error);
@@ -61,7 +224,7 @@ async function enviarCorreo({ to, toName, subject, htmlContent, textContent }) {
 }
 
 async function notificarSupervisorNuevaReprogramacion(data) {
-    const { supervisorEmail, supervisorNombre, auxiliarNombre, zona, archivoNombre, totalRegistrosReprogramacion, totalRegistrosPendientes, fechaSubida } = data;
+    const { supervisorEmail, supervisorNombre, auxiliarNombre, zona, archivoNombre, totalRegistrosReprogramacion, totalRegistrosPendientes, fechaSubida, excelBase64, excelUrl, excelFile } = data;
     
     const totalRegistros = totalRegistrosReprogramacion + totalRegistrosPendientes;
     
@@ -226,6 +389,22 @@ async function notificarSupervisorNuevaReprogramacion(data) {
                                         </table>
                                     </td>
                                 </tr>
+                                <!-- Botón de descarga directa si existe la URL -->
+                                ${excelUrl ? `
+                                <tr>
+                                    <td align="center" style="padding: 10px 0 30px 0;">
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+                                            <tr>
+                                                <td align="center" bgcolor="#4f46e5" style="border-radius: 6px;">
+                                                    <a href="${excelUrl}" target="_blank" style="display: inline-block; padding: 14px 28px; font-family: sans-serif; font-size: 15px; font-weight: bold; color: #ffffff; text-decoration: none; border-radius: 6px; border: 1px solid #4f46e5;">
+                                                        📥 Descargar Archivo Excel Original
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                ` : ''}
                                 <!-- Acción requerida -->
                                 <tr>
                                     <td style="color: #4b5563; font-size: 15px; line-height: 1.6; padding-bottom: 12px;">
@@ -317,18 +496,32 @@ Sistema de Gestión de Reprogramaciones
 Este es un mensaje automático, por favor no responder directamente a este correo.
 © ${new Date().getFullYear()} Sistema de Reprogramaciones. Todos los derechos reservados.`;
 
+    // ✅ FIX v3: Construir adjuntos priorizando base64 sobre URL
+    const attachments = [];
+    if (excelBase64) {
+        // PRIORIDAD 1: base64 directo (más fiable)
+        attachments.push({ content: excelBase64, name: archivoNombre });
+    } else if (excelFile && excelFile instanceof File) {
+        // PRIORIDAD 2: objeto File del navegador
+        attachments.push({ file: excelFile, name: archivoNombre });
+    } else if (excelUrl) {
+        // PRIORIDAD 3: URL (se descargará y convertirá a base64 en enviarCorreo)
+        attachments.push({ url: excelUrl, name: archivoNombre });
+    }
+
     return await enviarCorreo({
         to: supervisorEmail,
         toName: supervisorNombre,
         subject: `Nueva Reprogramación Zona ${zona} - ${auxiliarNombre} (${totalRegistrosReprogramacion + totalRegistrosPendientes} registros)`,
         htmlContent: htmlContent,
-        textContent: textContent
+        textContent: textContent,
+        attachments: attachments.length > 0 ? attachments : undefined
     });
 }
 
 async function notificarAuxiliarReprogramacionCompletada(data) {
     // ✅ Recibe UN email individual, no un array
-    const { auxiliarEmail, auxiliarNombre, supervisorNombre, zona, archivoNombre, totalRegistros, fechaRespuesta } = data;
+    const { auxiliarEmail, auxiliarNombre, supervisorNombre, zona, archivoNombre, totalRegistros, fechaRespuesta, excelBase64, excelUrl } = data;
     
     console.log('📧 notificarAuxiliarReprogramacionCompletada llamada con:', {
         auxiliarEmail,
@@ -583,12 +776,23 @@ Sistema de Gestión de Reprogramaciones
 Este es un mensaje automático, por favor no responder directamente a este correo.
 © ${new Date().getFullYear()} Sistema de Reprogramaciones. Todos los derechos reservados.`;
 
+    // ✅ FIX v3: Construir adjuntos priorizando base64 sobre URL
+    const attachments = [];
+    if (excelBase64) {
+        // PRIORIDAD 1: base64 directo (más fiable)
+        attachments.push({ content: excelBase64, name: archivoNombre });
+    } else if (excelUrl) {
+        // PRIORIDAD 3: URL (se descargará y convertirá a base64 en enviarCorreo)
+        attachments.push({ url: excelUrl, name: archivoNombre });
+    }
+
     return await enviarCorreo({
         to: auxiliarEmail,
         toName: auxiliarNombre,
         subject: `Reprogramación Zona ${zona} completada por ${supervisorNombre} - ${archivoNombre}`,
         htmlContent: htmlContent,
-        textContent: textContent
+        textContent: textContent,
+        attachments: attachments.length > 0 ? attachments : undefined
     });
 }
 

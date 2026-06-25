@@ -1,0 +1,29 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "usuarios": {
+      ".read": true,
+      ".indexOn": ["rol", "email"],
+      "$uid": {
+        ".write": "auth != null || !data.exists()"
+      }
+    },
+    "reprogramaciones": {
+      "$mes": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        ".indexOn": ["auxiliarId", "supervisorId", "estado", "fechaSubida"],
+        "$reprogId": {
+          ".read": "auth != null",
+          ".write": "auth != null"
+        }
+      }
+    },
+    "zonas": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('usuarios').child(auth.uid).child('rol').val() == 'admin'",
+      ".indexOn": ["supervisores"]
+    }
+  }
+}

@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -10,20 +12,30 @@
     <meta name="theme-color" content="#8b5cf6">
     <title>Supervisión App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <style>
         :root {
-            --primary: #8b5cf6;
-            --primary-dark: #7c3aed;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
             --success: #10b981;
             --warning: #f59e0b;
-            --error: #ef4444;
-            --bg-primary: #f1f5f9;
+            --error: #f43f5e;
+            --bg-primary: #f8fafc;
             --bg-secondary: #ffffff;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
             --border: #e2e8f0;
-            --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+            --shadow-md: 0 10px 25px -5px rgba(99, 102, 241, 0.15), 0 8px 10px -6px rgba(99, 102, 241, 0.1);
+            --shadow-lg: 0 20px 40px -10px rgba(15, 23, 42, 0.08), 0 10px 20px -8px rgba(15, 23, 42, 0.04);
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 28px;
         }
 
         * {
@@ -31,7 +43,7 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         body {
@@ -45,23 +57,52 @@
             overflow: hidden;
         }
 
-        /* --- HEADER ESTILO APP --- */
+        /* --- HEADER ESTILO APP (PREMIUM GRADIENT) --- */
         .header {
-            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
             color: white;
-            padding: 12px 16px 20px;
-            border-bottom-left-radius: 24px;
-            border-bottom-right-radius: 24px;
+            padding: 24px 20px 32px;
+            border-bottom-left-radius: var(--radius-lg);
+            border-bottom-right-radius: var(--radius-lg);
             box-shadow: var(--shadow-md);
             z-index: 100;
             flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decoración de fondo del Header */
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -20%;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, rgba(99, 102, 241, 0) 70%);
+            pointer-events: none;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -10%;
+            left: -10%;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0) 70%);
+            pointer-events: none;
         }
 
         .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 2;
         }
 
         .header-brand {
@@ -70,180 +111,274 @@
         }
 
         .app-title {
-            font-size: 20px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
             font-weight: 800;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(120deg, #ffffff 0%, #e0e7ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .app-title i {
+            background: rgba(255, 255, 255, 0.12);
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            font-size: 16px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            -webkit-text-fill-color: initial;
+            color: #818cf8;
         }
 
         .supervisor-name {
-            font-size: 14px;
+            font-size: 13px;
             opacity: 0.9;
-            font-weight: 500;
+            font-weight: 600;
+            margin-top: 6px;
+            letter-spacing: 0.2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #c7d2fe;
+        }
+
+        .supervisor-name::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #10b981;
         }
 
         .logout-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
-            backdrop-filter: blur(4px);
+            font-size: 18px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #ef4444;
+            transform: scale(0.95);
         }
 
         /* --- STATS CARDS (Mini Dashboard) --- */
         .header-stats {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
+            gap: 12px;
+            position: relative;
+            z-index: 2;
         }
 
         .stat-card {
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(8px);
-            border-radius: 16px;
-            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: var(--radius-md);
+            padding: 14px 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            transition: all 0.25s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
         }
 
         .stat-number {
-            font-size: 20px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
             font-weight: 800;
-            line-height: 1.2;
+            line-height: 1;
         }
 
         .stat-label {
             font-size: 10px;
-            opacity: 0.9;
-            margin-top: 2px;
-            font-weight: 600;
+            opacity: 0.7;
+            margin-top: 6px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            color: #e2e8f0;
         }
 
-        .stat-card.pending .stat-number { color: #fcd34d; }
-        .stat-card.warning .stat-number { color: #fdba74; }
-        .stat-card.offline .stat-number { color: #fca5a5; }
+        .stat-card.pending .stat-number {
+            color: #fbbf24;
+            text-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
+        }
+
+        .stat-card.warning .stat-number {
+            color: #f97316;
+            text-shadow: 0 0 12px rgba(249, 115, 22, 0.3);
+        }
+
+        .stat-card.offline .stat-number {
+            color: #f43f5e;
+            text-shadow: 0 0 12px rgba(244, 63, 94, 0.3);
+        }
 
         /* --- FILTROS SUPERIORES (Pills) --- */
         .filter-scroller {
-            background: var(--bg-primary);
-            padding: 12px 16px;
+            background: #ffffff;
+            padding: 16px 20px;
             overflow-x: auto;
             white-space: nowrap;
             -webkit-overflow-scrolling: touch;
             display: flex;
-            gap: 8px;
+            gap: 12px;
             flex-shrink: 0;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid #f1f5f9;
         }
-        
-        .filter-scroller::-webkit-scrollbar { display: none; }
+
+        .filter-scroller::-webkit-scrollbar {
+            display: none;
+        }
 
         .filter-pill {
-            padding: 8px 16px;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 20px;
+            padding: 10px 18px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 99px;
             font-size: 13px;
-            font-weight: 600;
-            color: var(--text-secondary);
+            font-weight: 700;
+            color: #475569;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-            box-shadow: var(--shadow-sm);
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .filter-pill:hover {
+            border-color: #cbd5e1;
+            background: #f1f5f9;
+        }
+
+        .filter-pill:active {
+            transform: scale(0.96);
         }
 
         .filter-pill.active {
-            background: var(--text-primary);
+            background: #1e1b4b;
             color: white;
-            border-color: var(--text-primary);
+            border-color: #1e1b4b;
+            box-shadow: 0 4px 14px rgba(30, 27, 75, 0.2);
         }
 
         .pill-badge {
-            background: rgba(0,0,0,0.1);
-            padding: 1px 6px;
-            border-radius: 10px;
-            font-size: 10px;
+            background: #e2e8f0;
+            color: #475569;
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 800;
+            transition: all 0.2s;
         }
-        .filter-pill.active .pill-badge { background: rgba(255,255,255,0.2); }
+
+        .filter-pill.active .pill-badge {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
 
         /* --- CONTENT AREA --- */
         .main-container {
             flex: 1;
             overflow-y: auto;
-            padding: 16px 16px 80px 16px;
+            padding: 20px 20px 80px 20px;
             position: relative;
         }
 
         /* --- SEGMENTED CONTROL (Estilo iOS) --- */
         .app-segment-container {
-            background: #e2e8f0;
-            border-radius: 14px;
-            padding: 4px;
+            background: #f1f5f9;
+            border-radius: var(--radius-sm);
+            padding: 5px;
             display: flex;
-            margin-bottom: 20px;
-            position: sticky; /* Sticky dentro del contenedor */
+            margin-bottom: 24px;
+            position: sticky;
             top: 0;
             z-index: 90;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e2e8f0;
         }
 
         .segment-btn {
             flex: 1;
             border: none;
             background: transparent;
-            padding: 10px 8px;
-            border-radius: 10px;
-            color: var(--text-secondary);
+            padding: 12px 8px;
+            border-radius: calc(var(--radius-sm) - 2px);
+            color: #64748b;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 4px;
-            transition: all 0.2s ease;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
         }
 
         .segment-btn.active {
             background: white;
-            color: var(--primary);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            font-weight: 700;
+            color: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
         }
 
         .segment-btn i {
             font-size: 16px;
             margin-bottom: 2px;
+            color: #94a3b8;
+            transition: color 0.2s;
+        }
+
+        .segment-btn.active i {
+            color: var(--primary);
         }
 
         .segment-badge {
             position: absolute;
             top: 4px;
-            right: 4px;
+            right: 8px;
             background: var(--error);
             color: white;
             font-size: 9px;
-            padding: 2px 5px;
-            border-radius: 10px;
-            min-width: 16px;
+            padding: 2px 6px;
+            border-radius: 99px;
+            min-width: 18px;
             text-align: center;
-            border: 2px solid #e2e8f0;
+            border: 2px solid #f1f5f9;
+            font-weight: 850;
         }
-        
+
         .segment-btn.active .segment-badge {
             border-color: white;
         }
@@ -251,83 +386,120 @@
         .segment-desc {
             font-size: 10px;
             opacity: 0.7;
-            font-weight: 400;
+            font-weight: 600;
             display: none;
         }
+
         @media (min-width: 380px) {
-            .segment-desc { display: block; }
+            .segment-desc {
+                display: block;
+            }
         }
 
         /* --- CARDS & TABLES --- */
         .reprog-card {
             background: white;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border);
-            animation: fadeIn 0.3s ease;
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+            border: 1px solid #f1f5f9;
+            animation: fadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .reprog-card.tipo-reprogramaciones { border-left: 4px solid #3b82f6; }
-        .reprog-card.tipo-pendientes { border-left: 4px solid #f59e0b; }
+        .reprog-card:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(99, 102, 241, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .reprog-card.tipo-reprogramaciones {
+            border-left: 5px solid var(--primary);
+        }
+
+        .reprog-card.tipo-pendientes {
+            border-left: 5px solid var(--warning);
+        }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #f8fafc;
+            padding-bottom: 14px;
         }
 
         .card-title {
-            font-size: 15px;
-            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            font-size: 17px;
+            font-weight: 800;
             color: var(--text-primary);
             margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .card-subtitle {
             font-size: 12px;
-            color: var(--text-secondary);
+            color: #64748b;
             display: flex;
             align-items: center;
             gap: 10px;
+            font-weight: 600;
+        }
+
+        .card-subtitle i {
+            color: var(--primary-light);
         }
 
         .status-badge {
-            padding: 4px 8px;
-            border-radius: 6px;
+            padding: 5px 10px;
+            border-radius: 8px;
             font-size: 10px;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .badge-pending { background: #fff7ed; color: #c2410c; }
-        .badge-answered { background: #f0fdf4; color: #15803d; }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .badge-answered {
+            background: #d1fae5;
+            color: #065f46;
+        }
 
         /* Tablas Responsive */
         .table-wrapper {
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             overflow-x: auto;
             overflow-y: visible;
             -webkit-overflow-scrolling: touch;
-            margin-top: 12px;
+            margin-top: 14px;
             background: white;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
         }
 
         .data-table {
             width: 100%;
             min-width: 600px;
             border-collapse: collapse;
-            font-size: 12px;
+            font-size: 13px;
         }
 
         .data-table th {
             background: #f8fafc;
-            padding: 12px 8px;
+            padding: 14px 10px;
             text-align: left;
-            font-weight: 600;
-            color: var(--text-secondary);
+            font-weight: 700;
+            color: #475569;
             border-bottom: 1px solid var(--border);
             white-space: nowrap;
             position: sticky;
@@ -336,81 +508,242 @@
         }
 
         .data-table td {
-            padding: 10px 8px;
+            padding: 12px 10px;
             border-bottom: 1px solid var(--border);
+            color: #334155;
         }
 
-        .editable-cell input, .editable-cell textarea {
+        .editable-cell input,
+        .editable-cell textarea {
             width: 100%;
-            min-width: 150px;
-            border: 2px solid var(--border);
-            border-radius: 6px;
-            padding: 10px;
-            font-size: 14px;
+            min-width: 160px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 600;
             font-family: inherit;
             box-sizing: border-box;
-            min-height: 44px;
-            background: white;
+            min-height: 40px;
+            background: #f8fafc;
+            transition: all 0.2s ease;
         }
-        
+
         .editable-cell textarea {
-            min-height: 60px;
+            min-height: 52px;
             resize: vertical;
+            font-weight: 500;
         }
-        
-        .editable-cell input:focus, .editable-cell textarea:focus {
+
+        .editable-cell input:focus,
+        .editable-cell textarea:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        /* Mobile responsive card tables */
+        @media (max-width: 768px) {
+            .mobile-swipe-hint {
+                display: none !important;
+            }
+
+            .table-wrapper {
+                border: none;
+                background: transparent;
+                box-shadow: none;
+                overflow-x: visible;
+                margin-top: 10px;
+            }
+
+            .data-table {
+                min-width: 100%;
+                display: block;
+            }
+
+            .data-table thead {
+                display: none;
+            }
+
+            .data-table tbody {
+                display: block;
+            }
+
+            .data-table tr {
+                display: block;
+                background: var(--bg-secondary);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-md);
+                padding: 16px;
+                margin-bottom: 16px;
+                box-shadow: var(--shadow-sm);
+                transition: all 0.2s ease;
+            }
+
+            .data-table tr:hover {
+                box-shadow: var(--shadow-md);
+                border-color: var(--primary-light);
+            }
+
+            .data-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 0;
+                border-bottom: 1px solid #f1f5f9;
+                font-size: 13px;
+                text-align: right;
+            }
+
+            .data-table td:last-child {
+                border-bottom: none;
+            }
+
+            .data-table td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: var(--text-secondary);
+                text-transform: uppercase;
+                font-size: 11px;
+                letter-spacing: 0.5px;
+                text-align: left;
+                margin-right: 15px;
+            }
+
+            /* Style inputs and textareas to look native and full width inside cards */
+            .data-table td.editable-cell {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                padding: 12px 0;
+            }
+
+            .data-table td.editable-cell::before {
+                margin-bottom: 4px;
+            }
+
+            .editable-cell input,
+            .editable-cell textarea {
+                min-width: 100%;
+                width: 100%;
+                background: #f8fafc;
+                border: 1.5px solid var(--border);
+                border-radius: var(--radius-sm);
+                padding: 12px 14px;
+            }
+
+            .editable-cell textarea {
+                min-height: 70px;
+            }
         }
 
         .btn {
             width: 100%;
-            padding: 12px;
-            border-radius: 12px;
+            padding: 14px;
+            border-radius: var(--radius-sm);
             border: none;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 15px;
-            margin-top: 12px;
+            margin-top: 14px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: transform 0.1s;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
-        .btn:active { transform: scale(0.98); }
-        .btn-success { background: var(--success); color: white; }
-        .btn-warning { background: var(--warning); color: white; }
+
+        .btn:hover {
+            filter: brightness(1.05);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
 
         /* Estados */
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 50px 20px;
             color: var(--text-secondary);
         }
-        .empty-state i { font-size: 40px; margin-bottom: 12px; opacity: 0.3; }
-        
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+            color: var(--primary);
+        }
+
+        .empty-state div {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
         /* Banner de conexión */
         .connection-banner {
             position: fixed;
-            top: 0; left: 0; right: 0;
-            padding: 8px;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
             text-align: center;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
             color: white;
             z-index: 1000;
             transform: translateY(-100%);
-            transition: transform 0.3s;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        .connection-banner.show { transform: translateY(0); }
-        .connection-banner.online { background: var(--success); }
-        .connection-banner.offline { background: var(--error); }
 
-        .tab-pane { display: none; }
-        .tab-pane.active { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .connection-banner.show {
+            transform: translateY(0);
+        }
+
+        .connection-banner.online {
+            background: var(--success);
+        }
+
+        .connection-banner.offline {
+            background: var(--error);
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         /* Loader */
         .loader {
@@ -418,611 +751,674 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 40px;
+            padding: 60px 40px;
         }
-        .loader.active { display: flex; }
+
+        .loader.active {
+            display: flex;
+        }
+
         .spinner {
-            width: 30px; height: 30px;
-            border: 3px solid #e2e8f0;
+            width: 36px;
+            height: 36px;
+            border: 4px solid #f1f5f9;
             border-top-color: var(--primary);
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            animation: spin 0.8s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Alertas */
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Alertas (Toasts) */
         .alert-toast {
             position: fixed;
-            bottom: 20px;
+            bottom: 24px;
             left: 20px;
             right: 20px;
             background: white;
-            padding: 16px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 16px 20px;
+            border-radius: var(--radius-md);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             z-index: 2000;
-            transform: translateY(150%);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border-left: 5px solid var(--primary);
+            transform: translateY(180%);
+            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-left: 6px solid var(--primary);
         }
-        .alert-toast.show { transform: translateY(0); }
-        .alert-toast.success { border-color: var(--success); }
-        .alert-toast.error { border-color: var(--error); }
-        
+
+        .alert-toast.show {
+            transform: translateY(0);
+        }
+
+        .alert-toast.success {
+            border-color: var(--success);
+        }
+
+        .alert-toast.error {
+            border-color: var(--error);
+        }
+
         /* Modal */
         .modal-overlay {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             z-index: 9999;
             display: flex;
             align-items: center;
             justify-content: center;
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.2s;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
         }
-        .modal-overlay.show { opacity: 1; pointer-events: all; }
+
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
         .modal-card {
             background: white;
             width: 90%;
-            max-width: 320px;
-            border-radius: 20px;
-            padding: 24px;
+            max-width: 340px;
+            border-radius: var(--radius-md);
+            padding: 28px;
             text-align: center;
             transform: scale(0.9);
-            transition: transform 0.2s;
+            box-shadow: var(--shadow-lg);
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .modal-overlay.show .modal-card { transform: scale(1); }
+
+        .modal-overlay.show .modal-card {
+            transform: scale(1);
+        }
     </style>
 </head>
+
 <body>
 
-<div class="connection-banner" id="connectionBanner">
-    <span id="connectionText">Conectado</span>
-</div>
+    <div class="connection-banner" id="connectionBanner">
+        <span id="connectionText">Conectado</span>
+    </div>
 
-<header class="header">
-    <div class="header-top">
-        <div class="header-brand">
-            <div class="app-title">
-                <i class="fas fa-cube"></i> Supervisión
+    <header class="header">
+        <div class="header-top">
+            <div class="header-brand">
+                <div class="app-title">
+                    <i class="fas fa-cube"></i> Supervisión
+                </div>
+                <div class="supervisor-name" id="supervisorName">Cargando...</div>
             </div>
-            <div class="supervisor-name" id="supervisorName">Cargando...</div>
+            <button class="logout-btn" onclick="cerrarSesion()">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
         </div>
-        <button class="logout-btn" onclick="cerrarSesion()">
-            <i class="fas fa-sign-out-alt"></i>
+
+        <div class="header-stats">
+            <div class="stat-card pending">
+                <span class="stat-number" id="reprogCount">0</span>
+                <span class="stat-label">Reprog.</span>
+            </div>
+            <div class="stat-card warning">
+                <span class="stat-number" id="pendingCount">0</span>
+                <span class="stat-label">Pendientes</span>
+            </div>
+            <div class="stat-card offline">
+                <span class="stat-number" id="offlineCount">0</span>
+                <span class="stat-label">Offline</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="filter-scroller">
+        <button class="filter-pill active" data-tab="pendientes" onclick="cambiarTab('pendientes')">
+            Pendientes
+            <span class="pill-badge" id="pendingBadge">0</span>
+        </button>
+        <button class="filter-pill" data-tab="respondidas" onclick="cambiarTab('respondidas')">
+            Respondidas
+        </button>
+        <button class="filter-pill" data-tab="todas" onclick="cambiarTab('todas')">
+            Todas
         </button>
     </div>
 
-    <div class="header-stats">
-        <div class="stat-card pending">
-            <span class="stat-number" id="reprogCount">0</span>
-            <span class="stat-label">Reprog.</span>
-        </div>
-        <div class="stat-card warning">
-            <span class="stat-number" id="pendingCount">0</span>
-            <span class="stat-label">Pendientes</span>
-        </div>
-        <div class="stat-card offline">
-            <span class="stat-number" id="offlineCount">0</span>
-            <span class="stat-label">Offline</span>
-        </div>
-    </div>
-</header>
+    <div class="main-container">
 
-<div class="filter-scroller">
-    <button class="filter-pill active" data-tab="pendientes" onclick="cambiarTab('pendientes')">
-        Pendientes
-        <span class="pill-badge" id="pendingBadge">0</span>
-    </button>
-    <button class="filter-pill" data-tab="respondidas" onclick="cambiarTab('respondidas')">
-        Respondidas
-    </button>
-    <button class="filter-pill" data-tab="todas" onclick="cambiarTab('todas')">
-        Todas
-    </button>
-</div>
-
-<div class="main-container">
-    
-    <div class="sync-status" id="syncStatus" style="display:none; background:#fffbeb; color:#92400e; padding:10px; border-radius:8px; margin:10px 0; font-size:13px; align-items:center; gap:8px;">
-        <i class="fas fa-sync fa-spin"></i>
-        <div>
-            <strong id="syncTitle">Sincronizando...</strong>
-            <span id="syncDesc" style="font-size:11px; display:block;">Guardando datos</span>
-        </div>
-    </div>
-    
-    <div class="loader active" id="loader">
-        <div class="spinner"></div>
-        <div style="margin-top:10px; font-size:13px; color:#64748b;">Cargando datos...</div>
-    </div>
-
-    <div class="app-segment-container">
-        <button class="segment-btn tab-btn" data-tab="reprogramaciones">
-            <div style="position:relative">
-                <i class="fas fa-clipboard-list"></i>
-                <span id="reprogBadge" class="segment-badge" style="display:none;">0</span>
+        <div class="sync-status" id="syncStatus"
+            style="display:none; background:#fffbeb; color:#92400e; padding:10px; border-radius:8px; margin:10px 0; font-size:13px; align-items:center; gap:8px;">
+            <i class="fas fa-sync fa-spin"></i>
+            <div>
+                <strong id="syncTitle">Sincronizando...</strong>
+                <span id="syncDesc" style="font-size:11px; display:block;">Guardando datos</span>
             </div>
-            <span>Reprogramaciones</span>
-            <span class="segment-desc">Visitas a reprogramar</span>
-        </button>
-        
-        <button class="segment-btn tab-btn active" data-tab="pendientes">
-            <div style="position:relative">
-                <i class="fas fa-clock"></i>
-                <span id="pendientesBadge" class="segment-badge" style="display:none;">0</span>
+        </div>
+
+        <!-- Banner de actualización desde servidor (caché mostrando datos viejos) -->
+        <div id="refreshBanner" style="display:none; background:linear-gradient(135deg, #eff6ff, #dbeafe); color:#1e40af; padding:10px 14px; border-radius:8px; margin:8px 0 4px; font-size:12px; align-items:center; gap:10px; border:1px solid #bfdbfe;">
+            <i class="fas fa-sync fa-spin" style="font-size:13px; color:#3b82f6;"></i>
+            <div>
+                <strong style="font-weight:700; font-size:12px;">Mostrando datos guardados</strong>
+                <span style="font-size:11px; display:block; opacity:0.85;">Actualizando desde el servidor...</span>
             </div>
-            <span>Pendientes</span>
-            <span class="segment-desc">Tareas generales</span>
-        </button>
+        </div>
+
+        <div class="loader active" id="loader">
+            <div class="spinner"></div>
+            <div style="margin-top:10px; font-size:13px; color:#64748b;">Cargando datos...</div>
+        </div>
+
+        <div class="app-segment-container">
+            <button class="segment-btn tab-btn" data-tab="reprogramaciones">
+                <div style="position:relative">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span id="reprogBadge" class="segment-badge" style="display:none;">0</span>
+                </div>
+                <span>Reprogramaciones</span>
+                <span class="segment-desc">Visitas a reprogramar</span>
+            </button>
+
+            <button class="segment-btn tab-btn active" data-tab="pendientes">
+                <div style="position:relative">
+                    <i class="fas fa-clock"></i>
+                    <span id="pendientesBadge" class="segment-badge" style="display:none;">0</span>
+                </div>
+                <span>Pendientes</span>
+                <span class="segment-desc">Tareas generales</span>
+            </button>
+        </div>
+
+        <div class="tab-content-area">
+            <div class="tab-pane" id="reprogramaciones-tab">
+                <div id="reprogContainer"></div>
+            </div>
+            <div class="tab-pane active" id="pendientes-tab">
+                <div id="pendientesContainer"></div>
+            </div>
+        </div>
     </div>
 
-    <div class="tab-content-area">
-        <div class="tab-pane" id="reprogramaciones-tab">
-            <div id="reprogContainer"></div>
-        </div>
-        <div class="tab-pane active" id="pendientes-tab">
-            <div id="pendientesContainer"></div>
+    <div class="alert-toast" id="mainToast">
+        <div id="toastIcon"></div>
+        <div id="toastMsg" style="font-size:14px; font-weight:500;">Mensaje</div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-card">
+            <div class="modal-icon" style="font-size:32px; margin-bottom:16px;">⚠️</div>
+            <h3 id="modalTitle" style="margin-bottom:8px; font-size:18px;">Título</h3>
+            <p id="modalMessage" style="color:#64748b; font-size:14px; margin-bottom:20px; line-height:1.5;">Mensaje</p>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <button id="modalCancel"
+                    style="padding:12px; border-radius:10px; border:1px solid #e2e8f0; background:white; font-weight:600;">Cancelar</button>
+                <button id="modalConfirm"
+                    style="padding:12px; border-radius:10px; border:none; background:var(--primary); color:white; font-weight:600;">Aceptar</button>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="alert-toast" id="mainToast">
-    <div id="toastIcon"></div>
-    <div id="toastMsg" style="font-size:14px; font-weight:500;">Mensaje</div>
-</div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="email-service.js?v=2"></script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getDatabase, ref, get, update, onChildAdded, onChildChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-<div class="modal-overlay" id="modalOverlay">
-    <div class="modal-card">
-        <div class="modal-icon" style="font-size:32px; margin-bottom:16px;">⚠️</div>
-        <h3 id="modalTitle" style="margin-bottom:8px; font-size:18px;">Título</h3>
-        <p id="modalMessage" style="color:#64748b; font-size:14px; margin-bottom:20px; line-height:1.5;">Mensaje</p>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-            <button id="modalCancel" style="padding:12px; border-radius:10px; border:1px solid #e2e8f0; background:white; font-weight:600;">Cancelar</button>
-            <button id="modalConfirm" style="padding:12px; border-radius:10px; border:none; background:var(--primary); color:white; font-weight:600;">Aceptar</button>
-        </div>
-    </div>
-</div>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBDRqsZI8EQaGn1lCc4Y5rIcfmLE7969zY",
+            authDomain: "reprogramacionesme.firebaseapp.com",
+            databaseURL: "https://reprogramacionesme-default-rtdb.firebaseio.com",
+            projectId: "reprogramacionesme",
+            storageBucket: "reprogramacionesme.firebasestorage.app",
+            messagingSenderId: "674035461204",
+            appId: "1:674035461204:web:a70b7793f71ae1c5e311c1"
+        };
 
-<script src="email-service.js"></script>
-<script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getDatabase, ref, get, update, onChildAdded, onChildChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBDRqsZI8EQaGn1lCc4Y5rIcfmLE7969zY",
-        authDomain: "reprogramacionesme.firebaseapp.com",
-        databaseURL: "https://reprogramacionesme-default-rtdb.firebaseio.com",
-        projectId: "reprogramacionesme",
-        storageBucket: "reprogramacionesme.firebasestorage.app",
-        messagingSenderId: "674035461204",
-        appId: "1:674035461204:web:a70b7793f71ae1c5e311c1"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-
-    class OfflineStorage {
-        constructor() { this.dbName = 'SupervisionOfflineDB'; this.version = 1; this.db = null; }
-        async init() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(this.dbName, this.version);
-                request.onerror = () => reject(request.error);
-                request.onsuccess = () => { this.db = request.result; resolve(this.db); };
-                request.onupgradeneeded = (event) => {
-                    const db = event.target.result;
-                    if (!db.objectStoreNames.contains('reprogramaciones')) db.createObjectStore('reprogramaciones', { keyPath: 'id' });
-                    if (!db.objectStoreNames.contains('cambiosPendientes')) {
-                        const store = db.createObjectStore('cambiosPendientes', { keyPath: 'timestamp' });
-                        store.createIndex('reprogId', 'reprogId', { unique: false });
-                    }
-                    if (!db.objectStoreNames.contains('usuario')) db.createObjectStore('usuario', { keyPath: 'uid' });
-                };
-            });
-        }
-        async guardarReprogramaciones(reprogs) {
-            const tx = this.db.transaction(['reprogramaciones'], 'readwrite');
-            const store = tx.objectStore('reprogramaciones');
-            for (const reprog of reprogs) await store.put(reprog);
-            return tx.complete;
-        }
-        async obtenerReprogramaciones() {
-            if (!this.db) return [];
-            const tx = this.db.transaction(['reprogramaciones'], 'readonly');
-            return new Promise(resolve => {
-                const req = tx.objectStore('reprogramaciones').getAll();
-                req.onsuccess = () => resolve(req.result || []);
-                req.onerror = () => resolve([]);
-            });
-        }
-        async guardarCambioPendiente(reprogId, mes, datos, tipo = 'reprogramaciones', nombreHoja = '') {
-            const tx = this.db.transaction(['cambiosPendientes'], 'readwrite');
-            const cambio = { timestamp: Date.now(), reprogId, mes, datos, tipo, nombreHoja, sincronizado: false };
-            await tx.objectStore('cambiosPendientes').put(cambio);
-            return cambio;
-        }
-        async obtenerCambiosPendientes() {
-            if (!this.db) return [];
-            const tx = this.db.transaction(['cambiosPendientes'], 'readonly');
-            return new Promise(resolve => {
-                const req = tx.objectStore('cambiosPendientes').getAll();
-                req.onsuccess = () => resolve((req.result || []).filter(c => !c.sincronizado));
-            });
-        }
-        async marcarCambioSincronizado(timestamp) {
-            if (!this.db) return;
-            await this.db.transaction(['cambiosPendientes'], 'readwrite').objectStore('cambiosPendientes').delete(timestamp);
-        }
-        async guardarUsuario(u) { if(this.db) await this.db.transaction(['usuario'], 'readwrite').objectStore('usuario').put(u); }
-        async obtenerUsuario(uid) {
-            if(!this.db) return null;
-            return new Promise(resolve => {
-                const req = this.db.transaction(['usuario'], 'readonly').objectStore('usuario').get(uid);
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => resolve(null);
-            });
-        }
-    }
-
-    async function obtenerTodasLasAuxiliares() {
-        const snapshot = await get(ref(db, 'usuarios'));
-        if (!snapshot.exists()) return [];
-        return Object.entries(snapshot.val()).filter(([_,d])=>d.rol==='auxiliar').map(([uid,d])=>({uid, nombre:d.nombre, email:d.email}));
-    }
-
-    const offlineStorage = new OfflineStorage();
-    let isOnline = navigator.onLine, currentUser = null, userData = null;
-    let todasReprogramaciones = [], tabActual = 'pendientes', datosEditados = {}, reprogramacionesIds = new Set();
-    let primeraCargar = true, dbReady = false;
-    let tabActiva = 'pendientes'; 
-
-    // Inner Tabs Logic (Segmented Control)
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tabName = btn.dataset.tab;
-            tabActiva = tabName;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById(tabName + '-tab').classList.add('active');
-        });
-    });
-
-    // Outer Filters Logic (Pills)
-    window.cambiarTab = function(nuevoTab) {
-        tabActual = nuevoTab;
-        document.querySelectorAll('.filter-pill').forEach(t => {
-            t.classList.remove('active');
-            if (t.dataset.tab === nuevoTab) t.classList.add('active');
-        });
-        mostrarReprogramaciones(); // Re-renderizar con filtro
-    };
-
-    const connectionBanner = document.getElementById('connectionBanner');
-    const connectionText = document.getElementById('connectionText');
-    function mostrarEstadoConexion(online) {
-        isOnline = online;
-        if (online) {
-            connectionBanner.className = 'connection-banner online show';
-            connectionText.innerHTML = '<i class="fas fa-wifi"></i> Conexión recuperada';
-            setTimeout(() => connectionBanner.classList.remove('show'), 3000);
-            if (dbReady) sincronizarCambiosPendientes();
-        } else {
-            connectionBanner.className = 'connection-banner offline show';
-            connectionText.innerHTML = '<i class="fas fa-wifi-slash"></i> Modo sin conexión';
-        }
-    }
-    window.addEventListener('online', () => mostrarEstadoConexion(true));
-    window.addEventListener('offline', () => mostrarEstadoConexion(false));
-
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            currentUser = user;
-            try {
-                await offlineStorage.init();
-                dbReady = true;
-                await cargarDatosUsuario();
-                await cargarReprogramaciones();
-                iniciarEscuchaNuevasReprogramaciones();
-                actualizarContadorOffline((await offlineStorage.obtenerCambiosPendientes()).length);
-            } catch (error) { mostrarAlerta('error', error.message); }
-        } else { window.location.href = 'login.html'; }
-    });
-
-    async function cargarDatosUsuario() {
-        try {
-            const el = document.getElementById('supervisorName');
-            const cached = await offlineStorage.obtenerUsuario(currentUser.uid);
-            if (cached?.nombre) { userData = cached; el.textContent = userData.nombre; }
-            if (isOnline) {
-                const snap = await get(ref(db, `usuarios/${currentUser.uid}`));
-                if (snap.exists()) {
-                    userData = snap.val();
-                    const nombre = userData.nombre || currentUser.displayName || 'Supervisor';
-                    el.textContent = nombre;
-                    await offlineStorage.guardarUsuario({ uid: currentUser.uid, ...userData });
-                }
-            }
-        } catch(e){ console.error(e); }
-    }
-
-    function obtenerUltimosMeses(n) {
-        const m = [], d = new Date();
-        for(let i=0; i<n; i++) {
-            const f = new Date(d.getFullYear(), d.getMonth()-i, 1);
-            m.push(f.toISOString().slice(0,7).replace('-',''));
-        }
-        return m;
-    }
-
-    async function cargarReprogramaciones() {
-        const loader = document.getElementById('loader');
-        try {
-            const cached = await offlineStorage.obtenerReprogramaciones();
-            if(cached.length>0) { todasReprogramaciones=cached; loader.classList.remove('active'); actualizarEstadisticas(); mostrarReprogramaciones(); }
-            
-            if(isOnline) {
-                const meses = obtenerUltimosMeses(3);
-                const promesas = meses.map(async mes => {
-                    const snap = await get(ref(db, `reprogramaciones/${mes}`));
-                    if(!snap.exists()) return [];
-                    return Object.entries(snap.val())
-                        .filter(([_, r]) => r.supervisoresZona?.some(s => s.email === currentUser.email))
-                        .map(([id, r]) => ({id, mes, ...r}));
+        class OfflineStorage {
+            constructor() { this.dbName = 'SupervisionOfflineDB'; this.version = 1; this.db = null; }
+            async init() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(this.dbName, this.version);
+                    request.onerror = () => reject(request.error);
+                    request.onsuccess = () => { this.db = request.result; resolve(this.db); };
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        if (!db.objectStoreNames.contains('reprogramaciones')) db.createObjectStore('reprogramaciones', { keyPath: 'id' });
+                        if (!db.objectStoreNames.contains('cambiosPendientes')) {
+                            const store = db.createObjectStore('cambiosPendientes', { keyPath: 'timestamp' });
+                            store.createIndex('reprogId', 'reprogId', { unique: false });
+                        }
+                        if (!db.objectStoreNames.contains('usuario')) db.createObjectStore('usuario', { keyPath: 'uid' });
+                    };
                 });
-                const res = await Promise.all(promesas);
-                todasReprogramaciones = res.flat().sort((a,b)=> new Date(b.fechaSubida)-new Date(a.fechaSubida));
-                await offlineStorage.guardarReprogramaciones(todasReprogramaciones);
-                loader.classList.remove('active');
-                actualizarEstadisticas();
-                mostrarReprogramaciones();
-                reprogramacionesIds = new Set(todasReprogramaciones.map(r=>r.id));
-                primeraCargar = false;
             }
-        } catch(e) { console.error(e); loader.classList.remove('active'); }
-    }
+            async guardarReprogramaciones(reprogs) {
+                const tx = this.db.transaction(['reprogramaciones'], 'readwrite');
+                const store = tx.objectStore('reprogramaciones');
+                for (const reprog of reprogs) await store.put(reprog);
+                return tx.complete;
+            }
+            async obtenerReprogramaciones() {
+                if (!this.db) return [];
+                const tx = this.db.transaction(['reprogramaciones'], 'readonly');
+                return new Promise(resolve => {
+                    const req = tx.objectStore('reprogramaciones').getAll();
+                    req.onsuccess = () => resolve(req.result || []);
+                    req.onerror = () => resolve([]);
+                });
+            }
+            async guardarCambioPendiente(reprogId, mes, datos, tipo = 'reprogramaciones', nombreHoja = '') {
+                const tx = this.db.transaction(['cambiosPendientes'], 'readwrite');
+                const cambio = { timestamp: Date.now(), reprogId, mes, datos, tipo, nombreHoja, sincronizado: false };
+                await tx.objectStore('cambiosPendientes').put(cambio);
+                return cambio;
+            }
+            async obtenerCambiosPendientes() {
+                if (!this.db) return [];
+                const tx = this.db.transaction(['cambiosPendientes'], 'readonly');
+                return new Promise(resolve => {
+                    const req = tx.objectStore('cambiosPendientes').getAll();
+                    req.onsuccess = () => resolve((req.result || []).filter(c => !c.sincronizado));
+                });
+            }
+            async marcarCambioSincronizado(timestamp) {
+                if (!this.db) return;
+                await this.db.transaction(['cambiosPendientes'], 'readwrite').objectStore('cambiosPendientes').delete(timestamp);
+            }
+            async guardarUsuario(u) { if (this.db) await this.db.transaction(['usuario'], 'readwrite').objectStore('usuario').put(u); }
+            async obtenerUsuario(uid) {
+                if (!this.db) return null;
+                return new Promise(resolve => {
+                    const req = this.db.transaction(['usuario'], 'readonly').objectStore('usuario').get(uid);
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => resolve(null);
+                });
+            }
+        }
 
-    function iniciarEscuchaNuevasReprogramaciones() {
-        obtenerUltimosMeses(3).forEach(mes => {
-            const rRef = ref(db, `reprogramaciones/${mes}`);
-            onChildAdded(rRef, (snap) => {
-                if(primeraCargar) return;
-                const val = snap.val();
-                if(val?.supervisoresZona?.some(s=>s.email===currentUser.email) && !reprogramacionesIds.has(snap.key)){
-                    reprogramacionesIds.add(snap.key);
-                    todasReprogramaciones.unshift({id:snap.key, mes, ...val});
-                    offlineStorage.guardarReprogramaciones(todasReprogramaciones);
+        async function obtenerTodasLasAuxiliares() {
+            const snapshot = await get(ref(db, 'usuarios'));
+            if (!snapshot.exists()) return [];
+            return Object.entries(snapshot.val()).filter(([_, d]) => d.rol === 'auxiliar').map(([uid, d]) => ({ uid, nombre: d.nombre, email: d.email }));
+        }
+
+        const offlineStorage = new OfflineStorage();
+        let isOnline = navigator.onLine, currentUser = null, userData = null;
+        let todasReprogramaciones = [], tabActual = 'pendientes', datosEditados = {}, reprogramacionesIds = new Set();
+        let primeraCargar = true, dbReady = false;
+        let tabActiva = 'pendientes';
+
+        // Inner Tabs Logic (Segmented Control)
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabName = btn.dataset.tab;
+                tabActiva = tabName;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(tabName + '-tab').classList.add('active');
+            });
+        });
+
+        // Outer Filters Logic (Pills)
+        window.cambiarTab = function (nuevoTab) {
+            tabActual = nuevoTab;
+            document.querySelectorAll('.filter-pill').forEach(t => {
+                t.classList.remove('active');
+                if (t.dataset.tab === nuevoTab) t.classList.add('active');
+            });
+            mostrarReprogramaciones(); // Re-renderizar con filtro
+        };
+
+        const connectionBanner = document.getElementById('connectionBanner');
+        const connectionText = document.getElementById('connectionText');
+        function mostrarEstadoConexion(online) {
+            isOnline = online;
+            if (online) {
+                connectionBanner.className = 'connection-banner online show';
+                connectionText.innerHTML = '<i class="fas fa-wifi"></i> Conexión recuperada';
+                setTimeout(() => connectionBanner.classList.remove('show'), 3000);
+                if (dbReady) sincronizarCambiosPendientes();
+            } else {
+                connectionBanner.className = 'connection-banner offline show';
+                connectionText.innerHTML = '<i class="fas fa-wifi-slash"></i> Modo sin conexión';
+            }
+        }
+        window.addEventListener('online', () => mostrarEstadoConexion(true));
+        window.addEventListener('offline', () => mostrarEstadoConexion(false));
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                try {
+                    await offlineStorage.init();
+                    dbReady = true;
+                    await cargarDatosUsuario();
+                    await cargarReprogramaciones();
+                    iniciarEscuchaNuevasReprogramaciones();
+                    actualizarContadorOffline((await offlineStorage.obtenerCambiosPendientes()).length);
+                } catch (error) { mostrarAlerta('error', error.message); }
+            } else { window.location.href = 'login.html'; }
+        });
+
+        async function cargarDatosUsuario() {
+            try {
+                const el = document.getElementById('supervisorName');
+                const cached = await offlineStorage.obtenerUsuario(currentUser.uid);
+                if (cached?.nombre) { userData = cached; el.textContent = userData.nombre; }
+                if (isOnline) {
+                    const snap = await get(ref(db, `usuarios/${currentUser.uid}`));
+                    if (snap.exists()) {
+                        userData = snap.val();
+                        const nombre = userData.nombre || currentUser.displayName || 'Supervisor';
+                        el.textContent = nombre;
+                        await offlineStorage.guardarUsuario({ uid: currentUser.uid, ...userData });
+                    }
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function obtenerUltimosMeses(n) {
+            const m = [], d = new Date();
+            for (let i = 0; i < n; i++) {
+                const f = new Date(d.getFullYear(), d.getMonth() - i, 1);
+                m.push(f.toISOString().slice(0, 7).replace('-', ''));
+            }
+            return m;
+        }
+
+        async function cargarReprogramaciones() {
+            const loader = document.getElementById('loader');
+            try {
+                const cached = await offlineStorage.obtenerReprogramaciones();
+                if (cached.length > 0) {
+                    todasReprogramaciones = cached;
+                    loader.classList.remove('active');
                     actualizarEstadisticas();
                     mostrarReprogramaciones();
-                    mostrarAlerta('success', `Nueva asignación de ${val.auxiliarNombre}`);
+                    // Mostrar banner sutil de "actualizando" si hay internet
+                    if (isOnline) {
+                        const refreshBanner = document.getElementById('refreshBanner');
+                        if (refreshBanner) refreshBanner.style.display = 'flex';
+                    }
                 }
-            }, (error) => {
-                // Suprimir errores 403 iniciales (permisos durante carga)
-                if(error.code !== 'PERMISSION_DENIED') console.error('Error listener:', error);
-            });
-            onChildChanged(rRef, (snap) => {
-                const val = snap.val();
-                if(val?.supervisoresZona?.some(s=>s.email===currentUser.email)) {
-                    const idx = todasReprogramaciones.findIndex(r=>r.id===snap.key);
-                    if(idx!==-1) {
-                        todasReprogramaciones[idx] = {id:snap.key, mes, ...val};
+
+                if (isOnline) {
+                    const meses = obtenerUltimosMeses(3);
+                    const promesas = meses.map(async mes => {
+                        const snap = await get(ref(db, `reprogramaciones/${mes}`));
+                        if (!snap.exists()) return [];
+                        return Object.entries(snap.val())
+                            .filter(([_, r]) => r.supervisoresZona?.some(s => s.email === currentUser.email))
+                            .map(([id, r]) => ({ id, mes, ...r }));
+                    });
+                    const res = await Promise.all(promesas);
+                    todasReprogramaciones = res.flat().sort((a, b) => new Date(b.fechaSubida) - new Date(a.fechaSubida));
+                    await offlineStorage.guardarReprogramaciones(todasReprogramaciones);
+                    loader.classList.remove('active');
+                    // Ocultar banner de "actualizando"
+                    const refreshBanner = document.getElementById('refreshBanner');
+                    if (refreshBanner) refreshBanner.style.display = 'none';
+                    actualizarEstadisticas();
+                    mostrarReprogramaciones();
+                    reprogramacionesIds = new Set(todasReprogramaciones.map(r => r.id));
+                    primeraCargar = false;
+                }
+            } catch (e) { console.error(e); loader.classList.remove('active'); }
+        }
+
+        function iniciarEscuchaNuevasReprogramaciones() {
+            obtenerUltimosMeses(3).forEach(mes => {
+                const rRef = ref(db, `reprogramaciones/${mes}`);
+                onChildAdded(rRef, (snap) => {
+                    if (primeraCargar) return;
+                    const val = snap.val();
+                    if (val?.supervisoresZona?.some(s => s.email === currentUser.email) && !reprogramacionesIds.has(snap.key)) {
+                        reprogramacionesIds.add(snap.key);
+                        todasReprogramaciones.unshift({ id: snap.key, mes, ...val });
                         offlineStorage.guardarReprogramaciones(todasReprogramaciones);
                         actualizarEstadisticas();
                         mostrarReprogramaciones();
+                        mostrarAlerta('success', `Nueva asignación de ${val.auxiliarNombre}`);
                     }
-                }
-            }, (error) => {
-                // Suprimir errores 403 iniciales (permisos durante carga)
-                if(error.code !== 'PERMISSION_DENIED') console.error('Error listener:', error);
+                }, (error) => {
+                    // Suprimir errores 403 iniciales (permisos durante carga)
+                    if (error.code !== 'PERMISSION_DENIED') console.error('Error listener:', error);
+                });
+                onChildChanged(rRef, (snap) => {
+                    const val = snap.val();
+                    if (val?.supervisoresZona?.some(s => s.email === currentUser.email)) {
+                        const idx = todasReprogramaciones.findIndex(r => r.id === snap.key);
+                        if (idx !== -1) {
+                            todasReprogramaciones[idx] = { id: snap.key, mes, ...val };
+                            offlineStorage.guardarReprogramaciones(todasReprogramaciones);
+                            actualizarEstadisticas();
+                            mostrarReprogramaciones();
+                        }
+                    }
+                }, (error) => {
+                    // Suprimir errores 403 iniciales (permisos durante carga)
+                    if (error.code !== 'PERMISSION_DENIED') console.error('Error listener:', error);
+                });
             });
-        });
-    }
-
-    async function sincronizarCambiosPendientes() {
-        const pendientes = await offlineStorage.obtenerCambiosPendientes();
-        if(pendientes.length===0) return;
-        const status = document.getElementById('syncStatus');
-        status.style.display = 'flex';
-        let sync = 0;
-        for(const c of pendientes) {
-            try {
-                // Determinar si es reprogramación o pendiente basado en los datos guardados
-                const updateData = {
-                    estado: 'respondida',
-                    fechaRespuesta: new Date().toISOString()
-                };
-                
-                // Si el cambio tiene información sobre el tipo, usarlo
-                // Si tiene nombreHoja, es una tarea pendiente
-                if(c.nombreHoja) {
-                    updateData[`datosPendientesPorHoja/${c.nombreHoja}`] = c.datos;
-                } else if(c.tipo === 'pendientes') {
-                    updateData.datosPendientes = c.datos;
-                } else {
-                    // Por defecto, asumir que es reprogramación
-                    updateData.datosReprogramacion = c.datos;
-                }
-                
-                await update(ref(db, `reprogramaciones/${c.mes}/${c.reprogId}`), updateData);
-                await offlineStorage.marcarCambioSincronizado(c.timestamp);
-                sync++;
-            } catch(e){ console.error(e); }
-        }
-        status.style.display = 'none';
-        if(sync>0) { mostrarAlerta('success', 'Sincronización completada'); cargarReprogramaciones(); }
-        actualizarContadorOffline((await offlineStorage.obtenerCambiosPendientes()).length);
-    }
-
-    function actualizarContadorOffline(n) { 
-        document.getElementById('offlineCount').textContent = n;
-        const card = document.querySelector('.stat-card.offline');
-        if(n>0) card.style.background = 'rgba(239,68,68,0.2)';
-        else card.style.background = 'rgba(255,255,255,0.15)';
-    }
-
-    function actualizarEstadisticas() {
-        // Stats Superiores siempre muestran la carga de trabajo (Pendientes reales)
-        const pendingTotal = todasReprogramaciones.filter(r => r.estado === 'pendiente');
-        const rCount = pendingTotal.filter(r => r.datosReprogramacion?.length > 0).length;
-        const pCount = pendingTotal.filter(r => r.datosPendientes?.length > 0).length;
-        
-        document.getElementById('reprogCount').textContent = rCount;
-        document.getElementById('pendingCount').textContent = pCount;
-        document.getElementById('pendingBadge').textContent = rCount + pCount;
-    }
-
-    function mostrarReprogramaciones() {
-        // 1. FILTRADO PRINCIPAL (Lógica corregida)
-        let itemsFiltrados = [];
-        
-        if (tabActual === 'pendientes') {
-            // Solo mostrar las que NO han sido respondidas
-            itemsFiltrados = todasReprogramaciones.filter(r => r.estado === 'pendiente');
-        } else if (tabActual === 'respondidas') {
-            // Solo mostrar el HISTORIAL (las ya respondidas)
-            itemsFiltrados = todasReprogramaciones.filter(r => r.estado === 'respondida');
-        } else {
-            // Tab 'Todas': mostrar todo
-            itemsFiltrados = todasReprogramaciones;
         }
 
-        // 2. Separar para los Tabs Internos (Reprogramaciones vs Pendientes)
-        const reprogs = itemsFiltrados.filter(r => r.datosReprogramacion?.length > 0);
-        
-        // ✅ FILTRAR PENDIENTES: Formato antiguo O nuevo
-        const pends = itemsFiltrados.filter(r => {
-            const tieneFormatoAntiguo = r.datosPendientes?.length > 0;
-            const tieneFormatoNuevo = r.datosPendientesPorHoja && Object.keys(r.datosPendientesPorHoja).length > 0;
-            return tieneFormatoAntiguo || tieneFormatoNuevo;
-        });
+        async function sincronizarCambiosPendientes() {
+            const pendientes = await offlineStorage.obtenerCambiosPendientes();
+            if (pendientes.length === 0) return;
+            const status = document.getElementById('syncStatus');
+            status.style.display = 'flex';
+            let sync = 0;
+            for (const c of pendientes) {
+                try {
+                    // Determinar si es reprogramación o pendiente basado en los datos guardados
+                    const updateData = {
+                        estado: 'respondida',
+                        fechaRespuesta: new Date().toISOString()
+                    };
 
-        // Contar total de hojas de pendientes (incluyendo subdivisiones)
-        let totalHojasPendientes = 0;
-        pends.forEach(r => {
-            if (r.datosPendientesPorHoja && Object.keys(r.datosPendientesPorHoja).length > 0) {
-                totalHojasPendientes += Object.keys(r.datosPendientesPorHoja).length;
-            } else if (r.datosPendientes?.length > 0) {
-                totalHojasPendientes += 1; // Formato antiguo
+                    // Si el cambio tiene información sobre el tipo, usarlo
+                    // Si tiene nombreHoja, es una tarea pendiente
+                    if (c.nombreHoja) {
+                        updateData[`datosPendientesPorHoja/${c.nombreHoja}`] = c.datos;
+                    } else if (c.tipo === 'pendientes') {
+                        updateData.datosPendientes = c.datos;
+                    } else {
+                        // Por defecto, asumir que es reprogramación
+                        updateData.datosReprogramacion = c.datos;
+                    }
+
+                    await update(ref(db, `reprogramaciones/${c.mes}/${c.reprogId}`), updateData);
+                    await offlineStorage.marcarCambioSincronizado(c.timestamp);
+                    sync++;
+                } catch (e) { console.error(e); }
             }
-        });
-
-        // Actualizar Badges de los Tabs Internos con la cantidad FILTRADA
-        const rBadge = document.getElementById('reprogBadge');
-        if(reprogs.length > 0) { rBadge.textContent = reprogs.length; rBadge.style.display = 'block'; } 
-        else rBadge.style.display = 'none';
-
-        const pBadge = document.getElementById('pendientesBadge');
-        if(totalHojasPendientes > 0) { pBadge.textContent = totalHojasPendientes; pBadge.style.display = 'block'; }
-        else pBadge.style.display = 'none';
-
-        // 3. Renderizar Reprogramaciones
-        const containerR = document.getElementById('reprogContainer');
-        if(reprogs.length===0) {
-            const msg = tabActual === 'respondidas' ? 'No hay historial de reprogramaciones' : 'No hay reprogramaciones pendientes';
-            containerR.innerHTML = emptyStateHTML('clipboard-list', msg);
-        } else {
-            containerR.innerHTML = reprogs.map(r => crearCardReprog(r, 'reprogramaciones')).join('');
+            status.style.display = 'none';
+            if (sync > 0) { mostrarAlerta('success', 'Sincronización completada'); cargarReprogramaciones(); }
+            actualizarContadorOffline((await offlineStorage.obtenerCambiosPendientes()).length);
         }
 
-        // 4. Renderizar Pendientes (Tareas) - CADA HOJA POR SEPARADO
-        const containerP = document.getElementById('pendientesContainer');
-        if(pends.length===0) {
-            const msg = tabActual === 'respondidas' ? 'No hay historial de tareas' : 'No hay tareas pendientes';
-            containerP.innerHTML = emptyStateHTML('clock', msg);
-        } else {
-            // Agrupar por reprogramación y luego por hoja
-            let htmlPendientes = '';
-            pends.forEach(reprog => {
-                // Si tiene datosPendientesPorHoja, renderizar cada hoja por separado
-                if (reprog.datosPendientesPorHoja && Object.keys(reprog.datosPendientesPorHoja).length > 0) {
-                    for (const [nombreHoja, datos] of Object.entries(reprog.datosPendientesPorHoja)) {
-                        const reprogConHoja = { 
-                            ...reprog, 
-                            datosPendientes: datos, 
-                            nombreHojaActual: nombreHoja 
-                        };
-                        htmlPendientes += crearCardReprog(reprogConHoja, 'pendientes');
-                    }
-                } else {
-                    // Fallback: si no tiene el nuevo formato, usar el antiguo
-                    htmlPendientes += crearCardReprog(reprog, 'pendientes');
+        function actualizarContadorOffline(n) {
+            document.getElementById('offlineCount').textContent = n;
+            const card = document.querySelector('.stat-card.offline');
+            if (n > 0) card.style.background = 'rgba(239,68,68,0.2)';
+            else card.style.background = 'rgba(255,255,255,0.15)';
+        }
+
+        function actualizarEstadisticas() {
+            // Stats Superiores siempre muestran la carga de trabajo (Pendientes reales)
+            const pendingTotal = todasReprogramaciones.filter(r => r.estado === 'pendiente');
+            const rCount = pendingTotal.filter(r => r.datosReprogramacion?.length > 0).length;
+            const pCount = pendingTotal.filter(r => r.datosPendientes?.length > 0).length;
+
+            document.getElementById('reprogCount').textContent = rCount;
+            document.getElementById('pendingCount').textContent = pCount;
+            document.getElementById('pendingBadge').textContent = rCount + pCount;
+        }
+
+        function mostrarReprogramaciones() {
+            // 1. FILTRADO PRINCIPAL (Lógica corregida)
+            let itemsFiltrados = [];
+
+            if (tabActual === 'pendientes') {
+                // Solo mostrar las que NO han sido respondidas
+                itemsFiltrados = todasReprogramaciones.filter(r => r.estado === 'pendiente');
+            } else if (tabActual === 'respondidas') {
+                // Solo mostrar el HISTORIAL (las ya respondidas)
+                itemsFiltrados = todasReprogramaciones.filter(r => r.estado === 'respondida');
+            } else {
+                // Tab 'Todas': mostrar todo
+                itemsFiltrados = todasReprogramaciones;
+            }
+
+            // 2. Separar para los Tabs Internos (Reprogramaciones vs Pendientes)
+            const reprogs = itemsFiltrados.filter(r => r.datosReprogramacion?.length > 0);
+
+            // ✅ FILTRAR PENDIENTES: Formato antiguo O nuevo
+            const pends = itemsFiltrados.filter(r => {
+                const tieneFormatoAntiguo = r.datosPendientes?.length > 0;
+                const tieneFormatoNuevo = r.datosPendientesPorHoja && Object.keys(r.datosPendientesPorHoja).length > 0;
+                return tieneFormatoAntiguo || tieneFormatoNuevo;
+            });
+
+            // Contar total de hojas de pendientes (incluyendo subdivisiones)
+            let totalHojasPendientes = 0;
+            pends.forEach(r => {
+                if (r.datosPendientesPorHoja && Object.keys(r.datosPendientesPorHoja).length > 0) {
+                    totalHojasPendientes += Object.keys(r.datosPendientesPorHoja).length;
+                } else if (r.datosPendientes?.length > 0) {
+                    totalHojasPendientes += 1; // Formato antiguo
                 }
             });
-            containerP.innerHTML = htmlPendientes;
+
+            // Actualizar Badges de los Tabs Internos con la cantidad FILTRADA
+            const rBadge = document.getElementById('reprogBadge');
+            if (reprogs.length > 0) { rBadge.textContent = reprogs.length; rBadge.style.display = 'block'; }
+            else rBadge.style.display = 'none';
+
+            const pBadge = document.getElementById('pendientesBadge');
+            if (totalHojasPendientes > 0) { pBadge.textContent = totalHojasPendientes; pBadge.style.display = 'block'; }
+            else pBadge.style.display = 'none';
+
+            // 3. Renderizar Reprogramaciones
+            const containerR = document.getElementById('reprogContainer');
+            if (reprogs.length === 0) {
+                const msg = tabActual === 'respondidas' ? 'No hay historial de reprogramaciones' : 'No hay reprogramaciones pendientes';
+                containerR.innerHTML = emptyStateHTML('clipboard-list', msg);
+            } else {
+                containerR.innerHTML = reprogs.map(r => crearCardReprog(r, 'reprogramaciones')).join('');
+            }
+
+            // 4. Renderizar Pendientes (Tareas) - CADA HOJA POR SEPARADO
+            const containerP = document.getElementById('pendientesContainer');
+            if (pends.length === 0) {
+                const msg = tabActual === 'respondidas' ? 'No hay historial de tareas' : 'No hay tareas pendientes';
+                containerP.innerHTML = emptyStateHTML('clock', msg);
+            } else {
+                // Agrupar por reprogramación y luego por hoja
+                let htmlPendientes = '';
+                pends.forEach(reprog => {
+                    // Si tiene datosPendientesPorHoja, renderizar cada hoja por separado
+                    if (reprog.datosPendientesPorHoja && Object.keys(reprog.datosPendientesPorHoja).length > 0) {
+                        for (const [nombreHoja, datos] of Object.entries(reprog.datosPendientesPorHoja)) {
+                            const reprogConHoja = {
+                                ...reprog,
+                                datosPendientes: datos,
+                                nombreHojaActual: nombreHoja
+                            };
+                            htmlPendientes += crearCardReprog(reprogConHoja, 'pendientes');
+                        }
+                    } else {
+                        // Fallback: si no tiene el nuevo formato, usar el antiguo
+                        htmlPendientes += crearCardReprog(reprog, 'pendientes');
+                    }
+                });
+                containerP.innerHTML = htmlPendientes;
+            }
         }
-    }
 
-    function emptyStateHTML(icon, text) {
-        return `<div class="empty-state"><i class="fas fa-${icon}"></i><div>${text}</div></div>`;
-    }
-
-    function crearCardReprog(reprog, tipo) {
-        const fecha = new Date(reprog.fechaSubida).toLocaleDateString('es-CO');
-        const datos = tipo === 'reprogramaciones' ? (reprog.datosReprogramacion||[]) : (reprog.datosPendientes||[]);
-        const estadoClass = reprog.estado==='respondida'?'badge-answered':'badge-pending';
-        
-        // Crear ID único para cada hoja (importante cuando hay múltiples hojas)
-        const edicionId = reprog.nombreHojaActual ? `${reprog.id}_${reprog.nombreHojaActual}` : reprog.id;
-        
-        // Init cache edicion solo si está pendiente
-        if (!datosEditados[edicionId] && reprog.estado === 'pendiente') {
-            datosEditados[edicionId] = datos.map(row => ({...row, 'FECHA REPROGRAMACION': row['FECHA REPROGRAMACION']||'', 'OBSERVACION': row['OBSERVACION']||''}));
+        function emptyStateHTML(icon, text) {
+            return `<div class="empty-state"><i class="fas fa-${icon}"></i><div>${text}</div></div>`;
         }
 
-        let tableHTML = '';
-        
-        // Si está pendiente, mostrar tabla editable
-        if(reprog.estado==='pendiente' && datos.length>0) {
-            const cols = Object.keys(datos[0] || {}).filter(c => c!=='FECHA REPROGRAMACION' && c!=='OBSERVACION');
-            const allCols = ['FECHA REPROGRAMACION', 'OBSERVACION', ...cols]; 
+        function crearCardReprog(reprog, tipo) {
+            const fecha = new Date(reprog.fechaSubida).toLocaleDateString('es-CO');
+            const datos = tipo === 'reprogramaciones' ? (reprog.datosReprogramacion || []) : (reprog.datosPendientes || []);
 
-            tableHTML = `
-                <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 10px 12px; border-radius: 6px; margin: 12px 0 8px 0; font-size: 12px; color: #1e40af; display: flex; align-items: center; gap: 8px;">
+            // Determinar si ESTA parte específica ya fue respondida
+            const partKey = tipo === 'reprogramaciones' ? 'reprogramaciones' :
+                (reprog.nombreHojaActual ? `pendientes_${reprog.nombreHojaActual}` : 'pendientes');
+            const estaParteRespondida = reprog.partesRespondidas?.[partKey] === true || reprog.estado === 'respondida';
+            const estadoClass = estaParteRespondida ? 'badge-answered' : 'badge-pending';
+
+            // Crear ID único para cada hoja (importante cuando hay múltiples hojas)
+            const edicionId = reprog.nombreHojaActual ? `${reprog.id}_${reprog.nombreHojaActual}` : reprog.id;
+
+            // Init cache edicion solo si esta parte NO ha sido respondida
+            if (!datosEditados[edicionId] && !estaParteRespondida) {
+                datosEditados[edicionId] = datos.map(row => ({ ...row, 'FECHA REPROGRAMACION': row['FECHA REPROGRAMACION'] || '', 'OBSERVACION': row['OBSERVACION'] || '' }));
+            }
+
+            let tableHTML = '';
+
+            // Si está pendiente, mostrar tabla editable
+            if (!estaParteRespondida && datos.length > 0) {
+                const cols = Object.keys(datos[0] || {}).filter(c => c !== 'FECHA REPROGRAMACION' && c !== 'OBSERVACION' && c !== '_rowIndex');
+                const allCols = ['FECHA REPROGRAMACION', 'OBSERVACION', ...cols];
+
+                tableHTML = `
+                <div class="mobile-swipe-hint" style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 10px 12px; border-radius: 6px; margin: 12px 0 8px 0; font-size: 12px; color: #1e40af; display: flex; align-items: center; gap: 8px;">
                     <i class="fas fa-hand-point-right" style="font-size: 16px;"></i>
                     <span style="font-weight: 600;">Desliza horizontalmente para ver todas las columnas</span>
                 </div>
                 <div class="table-wrapper">
                     <table class="data-table">
-                        <thead><tr>${allCols.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
+                        <thead><tr>${allCols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
                         <tbody>
                             ${datos.map((row, i) => `<tr>${allCols.map(col => renderCell(col, row, i, edicionId)).join('')}</tr>`).join('')}
                         </tbody>
                     </table>
                 </div>
-                <button class="btn ${isOnline?'btn-success':'btn-warning'}" onclick="guardarRespuestas('${reprog.mes}', '${reprog.id}', '${edicionId}', '${reprog.nombreHojaActual || ''}')">
-                    <i class="fas ${isOnline?'fa-check':'fa-save'}"></i> ${isOnline?'Enviar Respuesta':'Guardar Offline'}
+                <button class="btn ${isOnline ? 'btn-success' : 'btn-warning'}" onclick="guardarRespuestas('${reprog.mes}', '${reprog.id}', '${edicionId}', '${reprog.nombreHojaActual || ''}')">
+                    <i class="fas ${isOnline ? 'fa-check' : 'fa-save'}"></i> ${isOnline ? 'Enviar Respuesta' : 'Guardar Offline'}
                 </button>
             `;
-        } 
-        // Si YA está respondida, mostrar tabla SOLO LECTURA (Historial)
-        else if (reprog.estado === 'respondida' && datos.length > 0) {
-             const cols = Object.keys(datos[0] || {});
-             tableHTML = `
-                <div style="background: #d1fae5; border-left: 4px solid #10b981; padding: 10px 12px; border-radius: 6px; margin: 12px 0 8px 0; font-size: 12px; color: #065f46; display: flex; align-items: center; gap: 8px;">
+            }
+            // Si YA está respondida, mostrar tabla SOLO LECTURA (Historial)
+            else if (estaParteRespondida && datos.length > 0) {
+                const cols = Object.keys(datos[0] || {}).filter(c => c !== '_rowIndex');
+                tableHTML = `
+                <div class="mobile-swipe-hint" style="background: #d1fae5; border-left: 4px solid #10b981; padding: 10px 12px; border-radius: 6px; margin: 12px 0 8px 0; font-size: 12px; color: #065f46; display: flex; align-items: center; gap: 8px;">
                     <i class="fas fa-check-circle" style="font-size: 16px;"></i>
-                    <span style="font-weight: 600;">Respondida - Desliza para ver todos los datos</span>
+                    <span style="font-weight: 600;">Completada - Desliza para ver todos los datos</span>
                 </div>
                 <div class="table-wrapper" style="opacity:0.8;">
                     <table class="data-table">
-                        <thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
+                        <thead><tr>${cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
                         <tbody>
-                            ${datos.map(row => `<tr>${cols.map(col => `<td>${row[col]||'-'}</td>`).join('')}</tr>`).join('')}
+                            ${datos.map(row => `<tr>${cols.map(col => `<td data-label="${col}">${row[col] || '-'}</td>`).join('')}</tr>`).join('')}
                         </tbody>
                     </table>
                 </div>
                 <div style="margin-top:10px; font-size:12px; color:var(--success); font-weight:600; text-align:center;">
-                    <i class="fas fa-check-double"></i> Enviado el: ${new Date(reprog.fechaRespuesta).toLocaleString()}
+                    <i class="fas fa-check-double"></i> ${reprog.fechaRespuesta ? 'Enviado el: ' + new Date(reprog.fechaRespuesta).toLocaleString() : 'Guardado correctamente'}
                 </div>
             `;
-        }
+            }
 
-        return `
+            return `
             <div class="reprog-card tipo-${tipo}">
                 <div class="card-header">
                     <div>
@@ -1032,196 +1428,262 @@
                         </div>
                         <div class="card-subtitle"><i class="far fa-calendar"></i> ${fecha} &bull; ${datos.length} items</div>
                     </div>
-                    <span class="status-badge ${estadoClass}">${reprog.estado}</span>
+                    <span class="status-badge ${estadoClass}">${estaParteRespondida ? 'respondida' : 'pendiente'}</span>
                 </div>
                 ${tableHTML}
             </div>
         `;
-    }
-
-    function renderCell(col, row, idx, id) {
-        if(col==='FECHA REPROGRAMACION') 
-            return `<td class="editable-cell"><input type="date" data-r="${id}" data-i="${idx}" data-f="${col}" value="${row[col]||''}" onchange="actualizarCelda(this)"></td>`;
-        if(col==='OBSERVACION') 
-            return `<td class="editable-cell"><textarea rows="2" data-r="${id}" data-i="${idx}" data-f="${col}" onchange="actualizarCelda(this)">${row[col]||''}</textarea></td>`;
-        return `<td>${row[col]||'-'}</td>`;
-    }
-
-    window.actualizarCelda = function(el) {
-        const {r, i, f} = el.dataset;
-        if(datosEditados[r]) datosEditados[r][i][f] = el.value;
-    };
-
-    window.guardarRespuestas = async function(mes, reprogId, edicionId, nombreHoja = '') {
-        // ✅ USAR edicionId PARA ACCEDER A LOS DATOS (puede ser compuesto)
-        // ✅ USAR reprogId PARA GUARDAR EN FIREBASE (siempre es el ID real)
-        const datos = datosEditados[edicionId];
-        
-        console.log('🔧 guardarRespuestas llamada:', { mes, reprogId, edicionId, nombreHoja, tieneDatos: !!datos });
-        
-        if(!datos) {
-            mostrarAlerta('error', 'No hay datos para guardar');
-            return;
-        }
-        
-        if(!datos || datos.length === 0) {
-            mostrarAlerta('error', 'No hay datos para guardar');
-            return;
         }
 
-        if(datos.some(d => !d['FECHA REPROGRAMACION'] || !d['OBSERVACION'])) {
-            if(!(await mostrarModal('Campos vacíos', '¿Enviar con campos vacíos?'))) return;
+        function renderCell(col, row, idx, id) {
+            if (col === 'FECHA REPROGRAMACION')
+                return `<td class="editable-cell" data-label="${col}"><input type="date" data-r="${id}" data-i="${idx}" data-f="${col}" value="${row[col] || ''}" onchange="actualizarCelda(this)"></td>`;
+            if (col === 'OBSERVACION')
+                return `<td class="editable-cell" data-label="${col}"><textarea rows="2" data-r="${id}" data-i="${idx}" data-f="${col}" onchange="actualizarCelda(this)">${row[col] || ''}</textarea></td>`;
+            return `<td data-label="${col}">${row[col] || '-'}</td>`;
         }
 
-        const btn = event.target;
-        const originalText = btn.innerHTML;
-        btn.disabled = true; 
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        window.actualizarCelda = function (el) {
+            const { r, i, f } = el.dataset;
+            if (datosEditados[r]) datosEditados[r][i][f] = el.value;
+        };
 
-        try {
-            const updateData = { 
-                estado: 'respondida', 
-                fechaRespuesta: new Date().toISOString(),
-                supervisorId: currentUser.uid,
-                supervisorNombre: userData?.nombre || 'Supervisor',
-                supervisorEmail: currentUser.email
-            };
-            
-            // ✅ GUARDAR SEGÚN EL TIPO DE DATOS
-            if(tabActiva === 'reprogramaciones') {
-                updateData.datosReprogramacion = datos;
-                console.log('💾 Guardando datosReprogramacion:', datos.length + ' filas');
-            } else if (tabActiva === 'pendientes') {
-                if(nombreHoja) {
-                    // Estructura nueva por hoja
-                    if(!updateData.datosPendientesPorHoja) {
-                        updateData.datosPendientesPorHoja = {};
-                    }
-                    updateData.datosPendientesPorHoja[nombreHoja] = datos;
-                    console.log('💾 Guardando datosPendientesPorHoja["' + nombreHoja + '"]:', datos.length + ' filas');
-                } else {
-                    // Estructura antigua
-                    updateData.datosPendientes = datos;
-                    console.log('💾 Guardando datosPendientes:', datos.length + ' filas');
-                }
+        window.guardarRespuestas = async function (mes, reprogId, edicionId, nombreHoja = '') {
+            // ✅ USAR edicionId PARA ACCEDER A LOS DATOS (puede ser compuesto)
+            // ✅ USAR reprogId PARA GUARDAR EN FIREBASE (siempre es el ID real)
+            const datos = datosEditados[edicionId];
+
+            console.log('🔧 guardarRespuestas llamada:', { mes, reprogId, edicionId, nombreHoja, tieneDatos: !!datos });
+
+            if (!datos) {
+                mostrarAlerta('error', 'No hay datos para guardar');
+                return;
             }
 
-            // ✅ GUARDAR EN FIREBASE CON EL ID REAL
-            if(isOnline) {
-                await update(ref(db, `reprogramaciones/${mes}/${reprogId}`), updateData);
-                console.log('✅ Guardado en Firebase:', `reprogramaciones/${mes}/${reprogId}`);
-            } else {
-                console.warn('⚠️ Sin conexión, no se pudo guardar en Firebase');
+            if (!datos || datos.length === 0) {
+                mostrarAlerta('error', 'No hay datos para guardar');
+                return;
             }
-            
-            // ✅ NOTIFICAR A CADA AUXILIAR INDIVIDUALMENTE
+
+            if (datos.some(d => !d['FECHA REPROGRAMACION'] || !d['OBSERVACION'])) {
+                if (!(await mostrarModal('Campos vacíos', '¿Enviar con campos vacíos?'))) return;
+            }
+
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
             try {
-                console.log('📧 Obteniendo auxiliares...');
-                const auxs = await obtenerTodasLasAuxiliares();
-                console.log('👥 Auxiliares encontradas:', auxs.length);
-                
-                if(auxs.length > 0) {
-                    const reprogOriginal = todasReprogramaciones.find(r => r.id === reprogId);
-                    const totalReg = (reprogOriginal?.totalRegistrosReprogramacion || 0) + 
-                                     (reprogOriginal?.totalRegistrosPendientes || 0);
-                    
-                    // ✅ ENVIAR UN EMAIL A CADA AUXILIAR (NO ARRAY)
-                    for (const auxiliar of auxs) {
-                        try {
-                            console.log('📨 Enviando email a:', auxiliar.email);
-                            
-                            await notificarAuxiliarReprogramacionCompletada({
-                                auxiliarEmail: auxiliar.email,        // ✅ STRING individual
-                                auxiliarNombre: auxiliar.nombre,
-                                supervisorNombre: userData?.nombre || 'Supervisor',
-                                zona: reprogOriginal?.zona || 'N/A',
-                                archivoNombre: reprogOriginal?.archivoNombre || 'archivo.xlsx',
-                                totalRegistros: totalReg || datos.length,
-                                fechaRespuesta: updateData.fechaRespuesta
-                            });
-                            
-                            console.log('✅ Email enviado correctamente a:', auxiliar.email);
-                        } catch (emailError) {
-                            console.error('❌ Error enviando email a ' + auxiliar.email + ':', emailError);
+                const updateData = {
+                    supervisorId: currentUser.uid,
+                    supervisorNombre: userData?.nombre || 'Supervisor',
+                    supervisorEmail: currentUser.email
+                };
+
+                // Obtener registro original para rastrear partes completadas
+                const reprogOriginal = todasReprogramaciones.find(r => r.id === reprogId);
+                const partesRespondidas = { ...(reprogOriginal?.partesRespondidas || {}) };
+
+                // ✅ GUARDAR SEGÚN EL TIPO DE DATOS (path-based para no sobreescribir otras hojas)
+                if (tabActiva === 'reprogramaciones') {
+                    updateData.datosReprogramacion = datos;
+                    partesRespondidas.reprogramaciones = true;
+                    console.log('💾 Guardando datosReprogramacion:', datos.length + ' filas');
+                } else if (tabActiva === 'pendientes') {
+                    if (nombreHoja) {
+                        // Path-based update para NO sobreescribir otras hojas pendientes
+                        updateData[`datosPendientesPorHoja/${nombreHoja}`] = datos;
+                        partesRespondidas[`pendientes_${nombreHoja}`] = true;
+                        console.log('💾 Guardando datosPendientesPorHoja["' + nombreHoja + '"]:', datos.length + ' filas');
+                    } else {
+                        // Estructura antigua
+                        updateData.datosPendientes = datos;
+                        partesRespondidas.pendientes = true;
+                        console.log('💾 Guardando datosPendientes:', datos.length + ' filas');
+                    }
+                }
+
+                updateData.partesRespondidas = partesRespondidas;
+
+                // Verificar si TODAS las partes han sido completadas
+                let todasCompletadas = true;
+
+                if (reprogOriginal?.datosReprogramacion?.length > 0 && !partesRespondidas.reprogramaciones) {
+                    todasCompletadas = false;
+                }
+
+                if (reprogOriginal?.datosPendientesPorHoja && Object.keys(reprogOriginal.datosPendientesPorHoja).length > 0) {
+                    for (const hojaName of Object.keys(reprogOriginal.datosPendientesPorHoja)) {
+                        if (!partesRespondidas[`pendientes_${hojaName}`]) {
+                            todasCompletadas = false;
+                            break;
                         }
                     }
-                } else {
-                    console.warn('⚠️ No hay auxiliares para notificar');
+                } else if (reprogOriginal?.datosPendientes?.length > 0 && !partesRespondidas.pendientes) {
+                    todasCompletadas = false;
                 }
-            } catch(notifError) {
-                console.error('❌ Error en notificación:', notifError);
-            }
-            
-            // ✅ ACTUALIZAR ESTADO LOCAL (borrar cache de edición)
-            delete datosEditados[edicionId];
-            const idx = todasReprogramaciones.findIndex(r => r.id === reprogId);
-            if(idx !== -1) {
-                todasReprogramaciones[idx].estado = 'respondida';
-                todasReprogramaciones[idx].fechaRespuesta = updateData.fechaRespuesta;
-                
-                if(tabActiva === 'reprogramaciones') {
-                    todasReprogramaciones[idx].datosReprogramacion = datos;
-                } else if(tabActiva === 'pendientes') {
-                    if(nombreHoja && todasReprogramaciones[idx].datosPendientesPorHoja) {
-                        todasReprogramaciones[idx].datosPendientesPorHoja[nombreHoja] = datos;
-                    } else {
-                        todasReprogramaciones[idx].datosPendientes = datos;
+
+                if (todasCompletadas) {
+                    updateData.estado = 'respondida';
+                    updateData.fechaRespuesta = new Date().toISOString();
+                    console.log('✅ Todas las partes completadas - marcando como respondida');
+                } else {
+                    console.log('⏳ Parte guardada - faltan otras partes por completar');
+                }
+
+                // ✅ GUARDAR EN FIREBASE CON EL ID REAL
+                if (isOnline) {
+                    await update(ref(db, `reprogramaciones/${mes}/${reprogId}`), updateData);
+                    console.log('✅ Guardado en Firebase:', `reprogramaciones/${mes}/${reprogId}`);
+                } else {
+                    console.warn('⚠️ Sin conexión, no se pudo guardar en Firebase');
+                }
+
+                // 📎 Generar Excel y notificar SOLO cuando TODAS las partes están completas
+                let excelBase64 = null;
+                if (todasCompletadas) {
+                    try {
+                        if (reprogOriginal) {
+                            const wb = XLSX.utils.book_new();
+
+                            // Agregar hoja de reprogramaciones si existe
+                            if (tabActiva === 'reprogramaciones' && datos.length > 0) {
+                                const ws = XLSX.utils.json_to_sheet(datos);
+                                XLSX.utils.book_append_sheet(wb, ws, 'Reprogramaciones');
+                            }
+
+                            // Agregar hoja de pendientes si existe
+                            if (tabActiva === 'pendientes' && datos.length > 0) {
+                                const ws = XLSX.utils.json_to_sheet(datos);
+                                XLSX.utils.book_append_sheet(wb, ws, nombreHoja || 'Pendientes');
+                            }
+
+                            // Convertir a base64
+                            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
+                            excelBase64 = wbout;
+                            console.log('📎 Excel generado en base64 (' + (excelBase64.length / 1024).toFixed(2) + ' KB)');
+                        }
+                    } catch (e) {
+                        console.warn('⚠️ No se pudo generar Excel en base64:', e);
+                    }
+
+                    // ✅ NOTIFICAR A CADA AUXILIAR INDIVIDUALMENTE
+                    try {
+                        console.log('📧 Obteniendo auxiliares...');
+                        const auxs = await obtenerTodasLasAuxiliares();
+                        console.log('👥 Auxiliares encontradas:', auxs.length);
+
+                        if (auxs.length > 0) {
+                            const totalReg = (reprogOriginal?.totalRegistrosReprogramacion || 0) +
+                                (reprogOriginal?.totalRegistrosPendientes || 0);
+
+                            // ✅ ENVIAR UN EMAIL A CADA AUXILIAR (NO ARRAY)
+                            for (const auxiliar of auxs) {
+                                try {
+                                    console.log('📨 Enviando email a:', auxiliar.email);
+
+                                    const nombreArchivoRespuesta = (reprogOriginal?.archivoNombre || 'archivo.xlsx').replace('.xlsx', '_RESPONDIDO.xlsx');
+
+                                    await notificarAuxiliarReprogramacionCompletada({
+                                        auxiliarEmail: auxiliar.email,        // ✅ STRING individual
+                                        auxiliarNombre: auxiliar.nombre,
+                                        supervisorNombre: userData?.nombre || 'Supervisor',
+                                        zona: reprogOriginal?.zona || 'N/A',
+                                        archivoNombre: nombreArchivoRespuesta,
+                                        totalRegistros: totalReg || datos.length,
+                                        fechaRespuesta: updateData.fechaRespuesta,
+                                        excelBase64: excelBase64
+                                    });
+
+                                    console.log('✅ Email enviado correctamente a:', auxiliar.email);
+                                } catch (emailError) {
+                                    console.error('❌ Error enviando email a ' + auxiliar.email + ':', emailError);
+                                }
+                            }
+                        } else {
+                            console.warn('⚠️ No hay auxiliares para notificar');
+                        }
+                    } catch (notifError) {
+                        console.error('❌ Error en notificación:', notifError);
+                    }
+                } // fin if(todasCompletadas) - Excel + emails
+
+                // ✅ ACTUALIZAR ESTADO LOCAL (borrar cache de edición)
+                delete datosEditados[edicionId];
+                const idx = todasReprogramaciones.findIndex(r => r.id === reprogId);
+                if (idx !== -1) {
+                    todasReprogramaciones[idx].partesRespondidas = partesRespondidas;
+
+                    if (todasCompletadas) {
+                        todasReprogramaciones[idx].estado = 'respondida';
+                        todasReprogramaciones[idx].fechaRespuesta = updateData.fechaRespuesta;
+                    }
+
+                    if (tabActiva === 'reprogramaciones') {
+                        todasReprogramaciones[idx].datosReprogramacion = datos;
+                    } else if (tabActiva === 'pendientes') {
+                        if (nombreHoja && todasReprogramaciones[idx].datosPendientesPorHoja) {
+                            todasReprogramaciones[idx].datosPendientesPorHoja[nombreHoja] = datos;
+                        } else {
+                            todasReprogramaciones[idx].datosPendientes = datos;
+                        }
                     }
                 }
+
+                actualizarEstadisticas();
+                mostrarReprogramaciones();
+
+                mostrarAlerta('success', todasCompletadas ? '✅ Todas las partes completadas y emails enviados' : '✅ Parte guardada correctamente');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+
+            } catch (error) {
+                console.error('❌ Error crítico al guardar:', error);
+                mostrarAlerta('error', 'Error: ' + error.message);
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
-            
-            actualizarEstadisticas();
-            mostrarReprogramaciones();
-            
-            mostrarAlerta('success', '✅ Respuesta enviada y emails notificados');
-            btn.disabled = false;
-            btn.innerHTML = originalText;
+        };
 
-        } catch(error) {
-            console.error('❌ Error crítico al guardar:', error);
-            mostrarAlerta('error', 'Error: ' + error.message);
-            btn.disabled = false; 
-            btn.innerHTML = originalText;
+        // UI Helpers
+        function mostrarAlerta(tipo, msg) {
+            const toast = document.getElementById('mainToast');
+            const icon = document.getElementById('toastIcon');
+            document.getElementById('toastMsg').textContent = msg;
+
+            toast.className = `alert-toast show ${tipo}`;
+            icon.innerHTML = tipo === 'success' ? '<i class="fas fa-check-circle" style="color:var(--success);font-size:20px;"></i>' :
+                tipo === 'error' ? '<i class="fas fa-times-circle" style="color:var(--error);font-size:20px;"></i>' :
+                    '<i class="fas fa-exclamation-circle" style="color:var(--warning);font-size:20px;"></i>';
+
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
-    };
 
-    // UI Helpers
-    function mostrarAlerta(tipo, msg) {
-        const toast = document.getElementById('mainToast');
-        const icon = document.getElementById('toastIcon');
-        document.getElementById('toastMsg').textContent = msg;
-        
-        toast.className = `alert-toast show ${tipo}`;
-        icon.innerHTML = tipo==='success' ? '<i class="fas fa-check-circle" style="color:var(--success);font-size:20px;"></i>' : 
-                         tipo==='error' ? '<i class="fas fa-times-circle" style="color:var(--error);font-size:20px;"></i>' : 
-                         '<i class="fas fa-exclamation-circle" style="color:var(--warning);font-size:20px;"></i>';
-                         
-        setTimeout(() => toast.classList.remove('show'), 3000);
-    }
+        function mostrarModal(titulo, msg) {
+            return new Promise(resolve => {
+                const el = document.getElementById('modalOverlay');
+                document.getElementById('modalTitle').textContent = titulo;
+                document.getElementById('modalMessage').textContent = msg;
+                el.classList.add('show');
 
-    function mostrarModal(titulo, msg) {
-        return new Promise(resolve => {
-            const el = document.getElementById('modalOverlay');
-            document.getElementById('modalTitle').textContent = titulo;
-            document.getElementById('modalMessage').textContent = msg;
-            el.classList.add('show');
-            
-            const ok = document.getElementById('modalConfirm');
-            const cancel = document.getElementById('modalCancel');
-            
-            const close = (res) => {
-                el.classList.remove('show');
-                ok.replaceWith(ok.cloneNode(true));
-                cancel.replaceWith(cancel.cloneNode(true));
-                resolve(res);
-            };
-            
-            ok.onclick = () => close(true);
-            cancel.onclick = () => close(false);
-        });
-    }
+                const ok = document.getElementById('modalConfirm');
+                const cancel = document.getElementById('modalCancel');
 
-    window.cerrarSesion = () => signOut(auth);
-</script>
+                const close = (res) => {
+                    el.classList.remove('show');
+                    ok.replaceWith(ok.cloneNode(true));
+                    cancel.replaceWith(cancel.cloneNode(true));
+                    resolve(res);
+                };
+
+                ok.onclick = () => close(true);
+                cancel.onclick = () => close(false);
+            });
+        }
+
+        window.cerrarSesion = () => signOut(auth);
+    </script>
 </body>
+
 </html>
